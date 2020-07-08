@@ -27,10 +27,10 @@ public class DbOperator {
 
     /**
      * 从数据库读取数据
-     * @param sql 查询问句
+     * @param sql 查询sql
      * @return 查询结果
      */
-    public ResultSet getResultSet(String sql) {
+    private ResultSet getResultSet(String sql) {
         ResultSet rs = null;
         try {
             Statement s = conn.createStatement();
@@ -42,10 +42,10 @@ public class DbOperator {
     }
 
     /**
-     * 获取 Entities 表中的武器实体
-     * @return 武器实体列表
+     * 获取 Entities 表中的实体
+     * @return 实体列表
      */
-    public List<String> getWeapons() {
+    public List<String> getEntities() {
         String sql = "SELECT entity_name FROM entities";
         ResultSet rs = getResultSet(sql);
 
@@ -55,7 +55,7 @@ public class DbOperator {
                 res.add(rs.getString("entity_name"));
             }
         } catch (SQLException e) {
-            logger.error("获取武器实体失败！", e);
+            logger.error("获取实体列表失败！", e);
         }
         return res;
     }

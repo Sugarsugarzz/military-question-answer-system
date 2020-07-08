@@ -30,7 +30,7 @@ public class QuestionParser {
     private List<String> buildNatures() {
         List<String> nature_list = new ArrayList<>();
         nature_list.add("n_country");
-        nature_list.add("n_weapon");
+        nature_list.add("n_entity");
         nature_list.add("n_attr");
         nature_list.add("n_big");
         nature_list.add("n_small");
@@ -49,7 +49,7 @@ public class QuestionParser {
         for (String nature: natures) {
             parser_map.put(nature, new ArrayList<>());
         }
-        // 问句词性模式
+        // pattern存问句词性模式
         parser_map.put("pattern", new ArrayList<>());
         logger.info("词性字典初始化完成！");
         return parser_map;

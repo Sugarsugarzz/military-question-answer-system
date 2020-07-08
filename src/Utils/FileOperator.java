@@ -19,7 +19,7 @@ public class FileOperator {
 
     /**
      * 有参构造函数
-     * @param filepath
+     * @param filepath 文件路径
      */
     public FileOperator(String filepath) {
         this.filepath = filepath;
@@ -36,7 +36,7 @@ public class FileOperator {
 
     /**
      * Match文件转Map函数（Match File to Match Map）
-     * @return
+     * @return Map函数
      */
     public Map<String, String> matchFileToMap() {
 
@@ -102,9 +102,9 @@ public class FileOperator {
 
     /**
      * 将实体List写入文件
-     * 以  实体：实体  的形式
-     * @param entities
-     * @param filepath
+     * 以  实体：实体  的形式，一般在getXXX列表后使用此方法。
+     * @param entities 实体列表
+     * @param filepath 文件路径
      */
     public void entitiesToFile(List<String> entities, String filepath) {
 

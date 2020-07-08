@@ -5,7 +5,6 @@ import Searcher.AnswerSearcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +23,9 @@ public class MilitaryQA {
         // 答案搜索
         logger.info("Searching Answer...");
         AnswerSearcher answerSearcher = new AnswerSearcher(parser_dict);
-        ResultSet results = answerSearcher.getAnswer();
+        List<Map<String, String>> results = answerSearcher.getAnswer();
         // 打印答案
+        logger.info("Answer is ：" + results);
 
     }
 }

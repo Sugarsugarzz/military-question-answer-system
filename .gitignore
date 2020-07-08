@@ -15,16 +15,21 @@
 bin/  
 gen/  
   
-# Eclipse project files  
+# IDE project files
 .classpath  
-.project  
-.DS_Store  
+.project
 .idea
 *.iml
 out
 
+# System
+.DS_Store
+
+# DataBase
 jdbc.properties
-*.log
+
+# Log
+log
 
 
 

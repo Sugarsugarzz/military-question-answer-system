@@ -17,8 +17,8 @@ public class Mapper {
     public static Map<String, String> BigCategory = buildBigCategory();
     // 二级分类
     public static Map<String, String> SmallCategory = buildSmallCategory();
-    // 武器实体
-    public static Map<String, String> Weapon = buildWeapon();
+    // 实体
+    public static Map<String, String> Entity = buildEntity();
     // 实体属性
     public static Map<String, String> Attribute = buildAttribute();
     // 比较词
@@ -45,8 +45,8 @@ public class Mapper {
         return fileOperator.matchFileToMap();
     }
 
-    private static Map<String, String> buildWeapon() {
-        String filepath = "data/dict_for_match_query/weapon.txt";
+    private static Map<String, String> buildEntity() {
+        String filepath = "data/dict_for_match_query/entity.txt";
         FileOperator fileOperator = new FileOperator(filepath);
         return fileOperator.matchFileToMap();
     }

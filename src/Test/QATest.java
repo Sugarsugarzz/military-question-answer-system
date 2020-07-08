@@ -4,6 +4,7 @@ import QA.MilitaryQA;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
 public class QATest {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
@@ -11,6 +12,6 @@ public class QATest {
     public static void main(String[] args) {
 
         MilitaryQA QA = new MilitaryQA();
-        QA.qa_main("神舟七号的长度？");
+        QA.qa_main("神舟七号的长度、发射地点、生产商、原产国、简介？");
     }
 }
