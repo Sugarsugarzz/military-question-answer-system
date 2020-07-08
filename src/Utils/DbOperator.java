@@ -1,10 +1,14 @@
 package Utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DbOperator {
+
+    private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
     private Connection conn;
 
@@ -17,15 +21,14 @@ public class DbOperator {
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://192.168.10.231:3307/military_qa?characterEncoding=UTF-8", "bj", "bj2016");
         } catch (Exception e) {
-            System.out.println("数据库连接发生错误");
-            e.printStackTrace();
+            logger.error("数据库连接发生错误： ", e);
         }
     }
 
     /**
      * 从数据库读取数据
-     * @param sql
-     * @return
+     * @param sql 查询问句
+     * @return 查询结果
      */
     public ResultSet getResultSet(String sql) {
         ResultSet rs = null;
@@ -33,15 +36,14 @@ public class DbOperator {
             Statement s = conn.createStatement();
             rs = s.executeQuery(sql);
         } catch (Exception e) {
-            System.out.println("数据库读取发生错误");
-            e.printStackTrace();
+            logger.error("数据库读取发生错误： ", e);
         }
         return rs;
     }
 
     /**
      * 获取 Entities 表中的武器实体
-     * @return
+     * @return 武器实体列表
      */
     public List<String> getWeapons() {
         String sql = "SELECT entity_name FROM entities";
@@ -53,14 +55,14 @@ public class DbOperator {
                 res.add(rs.getString("entity_name"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("获取武器实体失败！", e);
         }
         return res;
     }
 
     /**
      * 获取 Concepts 表中的一级分类
-     * @return
+     * @return 一级分类列表
      */
     public List<String> getBigCategory() {
         String sql = "SELECT concept_name FROM concepts WHERE level = 2";
@@ -72,14 +74,14 @@ public class DbOperator {
                 res.add(rs.getString("concept_name"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("获取一级分类失败！", e);
         }
         return res;
     }
 
     /**
      * 获取 Concepts 表中的二级分类
-     * @return
+     * @return 二级分类列表
      */
     public List<String> getSmallCategory() {
         String sql = "SELECT concept_name FROM concepts WHERE level = 3";
@@ -91,14 +93,14 @@ public class DbOperator {
                 res.add(rs.getString("concept_name"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("获取二级分类失败！", e);
         }
         return res;
     }
 
     /**
      * 获取 Concepts 表中的属性
-     * @return
+     * @return 属性列表
      */
     public List<String> getAttributes() {
         String sql = "SELECT concept_name FROM concepts WHERE level = 0";
@@ -110,7 +112,7 @@ public class DbOperator {
                 res.add(rs.getString("concept_name"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("获取属性失败！", e);
         }
         return res;
     }

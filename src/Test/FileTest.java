@@ -12,12 +12,12 @@ public class FileTest {
         String filepath = "data/dict_for_match_query/country.txt";
         FileOperator fileOperator = new FileOperator(filepath);
         Map<String, String> res = fileOperator.matchFileToMap();
-//        for (Map.Entry<String, String> entry: res.entrySet()) {
-//            System.out.println("Key：" + entry.getKey() + ", Value：" + entry.getValue());
-//        }
+        for (Map.Entry<String, String> entry: res.entrySet()) {
+            System.out.println("Key：" + entry.getKey() + ", Value：" + entry.getValue());
+        }
 
         // 将 问句中所有可能涉及的实体词 加入到分词器的词典中
-        fileOperator.matchFileToSegFile();
+//        fileOperator.matchFileToSegFile();
 
     }
 }

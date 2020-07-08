@@ -2,10 +2,14 @@ package Parser;
 
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
 public class QuestionParser {
+
+    private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
     private String question;
     private List<String> natures = buildNatures();
@@ -13,15 +17,15 @@ public class QuestionParser {
 
     /**
      * 有参构造函数
-     * @param question
+     * @param question 问句
      */
     public QuestionParser(String question) {
         this.question = question;
     }
 
     /**
-     * 初始化词性列表
-     * @return
+     * 初始化已定义的词性列表
+     * @return 初始已定义词性列表
      */
     private List<String> buildNatures() {
         List<String> nature_list = new ArrayList<>();
@@ -32,12 +36,13 @@ public class QuestionParser {
         nature_list.add("n_small");
         nature_list.add("n_compare");
         nature_list.add("n_most");
+        logger.info("词性列表初始化完成！");
         return nature_list;
     }
 
     /**
      * 初始化词性字典
-     * @return
+     * @return 初始词性字典
      */
     private Map<String, List<String>> buildParserDict() {
         Map<String, List<String>> parser_map = new HashMap<>();
@@ -46,12 +51,13 @@ public class QuestionParser {
         }
         // 问句词性模式
         parser_map.put("pattern", new ArrayList<>());
+        logger.info("词性字典初始化完成！");
         return parser_map;
     }
 
     /**
-     * 问句解析器
-     * 返回：词性字典
+     * 问句模式解析
+     * @return 词性字典
      */
     public Map<String, List<String>> parser() {
 
@@ -64,10 +70,9 @@ public class QuestionParser {
             }
         }
 
-        // 测试打印dict
-        for (String key: parser_dict.keySet()) {
-            System.out.println(key + ":" + parser_dict.get(key));
-        }
+        logger.info("问句解析完成。");
+        logger.info("词性匹配情况：" + parser_dict);
+        logger.info("问句模式：" + parser_dict.get("pattern"));
 
         return parser_dict;
     }

@@ -24,5 +24,7 @@ gen/
 out
 
 jdbc.properties
+*.log
+
 
 
