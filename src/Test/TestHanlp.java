@@ -5,7 +5,7 @@ import com.hankcs.hanlp.seg.common.Term;
 
 import java.util.List;
 
-public class HanlpTest {
+public class TestHanlp {
 
     public static void main(String[] args) {
 

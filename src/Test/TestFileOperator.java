@@ -4,7 +4,7 @@ import Utils.FileOperator;
 
 import java.util.Map;
 
-public class FileTest {
+public class TestFileOperator {
 
     public static void main(String[] args) {
 

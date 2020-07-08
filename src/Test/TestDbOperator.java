@@ -5,7 +5,7 @@ import Utils.FileOperator;
 
 import java.util.List;
 
-public class DbTest {
+public class TestDbOperator {
 
     public static void main(String[] args) {
 
