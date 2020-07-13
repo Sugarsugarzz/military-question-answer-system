@@ -10,16 +10,7 @@ public class AnswerSearcher {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    private Map<String, List<String>> parser_dict;
     private Map<String, List<List<String>>> patterns = buildPatterns();
-
-    /**
-     * 有参构造函数
-     * @param parser_dict 词性字典
-     */
-    public AnswerSearcher(Map<String, List<String>> parser_dict) {
-        this.parser_dict = parser_dict;
-    }
 
     /**
      * 初始化问句匹配模式
@@ -53,7 +44,7 @@ public class AnswerSearcher {
     /**
      * 判断问句模式，从数据库检索答案
      */
-    public List<Answer> getAnswer() {
+    public List<Answer> getAnswer(Map<String, List<String>> parser_dict) {
 
         // 存储结果
         List<Answer> answers = new ArrayList<>();
@@ -79,9 +70,6 @@ public class AnswerSearcher {
         } else {
             logger.info("未找到相应问句模板！");
         }
-
-
-
 
         return answers;
     }

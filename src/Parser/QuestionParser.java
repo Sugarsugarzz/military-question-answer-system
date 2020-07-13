@@ -11,17 +11,8 @@ public class QuestionParser {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    private String question;
     private List<String> natures = buildNatures();
     private Map<String, List<String>> parser_dict = buildParserDict();
-
-    /**
-     * 有参构造函数
-     * @param question 问句
-     */
-    public QuestionParser(String question) {
-        this.question = question;
-    }
 
     /**
      * 初始化已定义的词性列表
@@ -59,7 +50,7 @@ public class QuestionParser {
      * 问句模式解析
      * @return 词性字典
      */
-    public Map<String, List<String>> parser() {
+    public Map<String, List<String>> parser(String question) {
 
         // 利用HanLP分词，遍历词和词性
         List<Term> terms = HanLP.segment(question);

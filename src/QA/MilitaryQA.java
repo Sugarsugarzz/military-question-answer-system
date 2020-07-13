@@ -14,17 +14,18 @@ public class MilitaryQA {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
+    private QuestionParser questionParser = new QuestionParser();
+    private AnswerSearcher answerSearcher = new AnswerSearcher();
+
     public void qa_main(String question) {
 
         logger.info("Question is ：" + question);
         // 问句解析
         logger.info("Parsing Question...");
-        QuestionParser questionParser = new QuestionParser(question);
-        Map<String, List<String>> parser_dict = questionParser.parser();
+        Map<String, List<String>> parser_dict = questionParser.parser(question);
         // 答案检索
         logger.info("Searching Answer...");
-        AnswerSearcher answerSearcher = new AnswerSearcher(parser_dict);
-        List<Answer> results = answerSearcher.getAnswer();
+        List<Answer> results = answerSearcher.getAnswer(parser_dict);
         // 打印答案
         logger.info("Answer is ：" + results);
 
