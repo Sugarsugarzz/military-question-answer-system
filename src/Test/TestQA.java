@@ -12,6 +12,11 @@ public class TestQA {
     public static void main(String[] args) {
 
         MilitaryQA QA = new MilitaryQA();
-        QA.qa_main("神舟七号的长度、发射地点、生产商、原产国、简介？");
+        // 国家实体类别
+        QA.qa_main("中国的战斗机有哪些？");
+        // 单实体单属性/多属性
+//        QA.qa_main("神舟七号的长度、发射地点、生产商、原产国、简介？");
+
+
     }
 }

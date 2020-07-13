@@ -27,9 +27,19 @@ public class DbSearcher {
         answerMapper = sqlSession.getMapper(AnswerMapper.class);
     }
 
+    /**
+     * 国家及实体类别
+     * @param country 国家名
+     * @param category 实体类别名
+     * @return
+     */
+    public static List<Answer> searchByCountryAndCategory(String country, String category) {
+
+        return answerMapper.findByCountryAndCategory(country, category);
+    }
 
     /**
-     * 单实体多属性模板查询
+     * 单实体单属性/多属性模板查询
      * @param entity 实体名
      * @param attrs 属性列表
      * @return
