@@ -4,7 +4,7 @@ import Utils.FileOperator;
 
 import java.util.Map;
 
-public class Mapper {
+public class DictMapper {
 
     /**
      * 构建（问句中涉及的词形式，数据库中标准词形式）的映射关系

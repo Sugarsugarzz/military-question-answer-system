@@ -1,70 +1,41 @@
 package Searcher;
 
+import Mapper.AnswerMapper;
+import Model.Answer;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 public class DbSearcher {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    private Connection conn;
+    static AnswerMapper answerMapper;
 
-    /**
-     * 无参构造函数
-     * 初始化数据库连接
-     */
-    public DbSearcher() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://192.168.10.231:3307/military_qa?characterEncoding=UTF-8", "bj", "bj2016");
-        } catch (Exception e) {
-            logger.error("数据库连接发生错误： ", e);
-        }
+    static {
+        // 加载 MyBatis配置文件
+        InputStream inputStream = DbSearcher.class.getClassLoader().getResourceAsStream("mybatis-config.xml");
+        SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
+        SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(inputStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        answerMapper = sqlSession.getMapper(AnswerMapper.class);
     }
 
+
     /**
-     * 从数据库读取数据
-     * @param sql 查询问句
-     * @return 查询结果
+     * 单实体多属性模板查询
+     * @param entity 实体名
+     * @param attrs 属性列表
+     * @return
      */
-    private ResultSet getResultSet(String sql) {
-        ResultSet rs = null;
-        try {
-            Statement s = conn.createStatement();
-            rs = s.executeQuery(sql);
-        } catch (Exception e) {
-            logger.error("数据库读取发生错误： ", e);
-            e.printStackTrace();
-        }
-        return rs;
-    }
+    public static List<Answer> searchByEntityAndAttrs(String entity, List<String> attrs) {
 
-    public List<Map<String, String>> search(String entity, List<String> attrs) {
-
-        // 存结果
-        List<Map<String, String>> res = new ArrayList<>();
-
-        String base_sql = "SELECT attr_value FROM entity_attr " +
-                          "WHERE entity_id = (SELECT entity_id FROM entities WHERE entity_name = '"+ entity +"')";
-        for (String attr: attrs) {
-            String sql = base_sql + " and attr_id = (SELECT c_id FROM concepts WHERE concept_name = '" + attr + "') ";
-            ResultSet rs = getResultSet(sql);
-            try {
-                rs.first();
-                Map<String, String> map = new HashMap<>();
-                map.put(attr, rs.getString("attr_value"));
-                res.add(map);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return res;
+        return answerMapper.findByEntityAndAttrs(entity, attrs);
     }
 }

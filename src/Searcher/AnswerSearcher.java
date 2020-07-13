@@ -1,5 +1,6 @@
 package Searcher;
 
+import Model.Answer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +29,7 @@ public class AnswerSearcher {
 
         Map<String, List<List<String>>> patterns_map = new HashMap<>();
 
-        // 模式 1
+        // 模式 1：单实体多属性
         patterns_map.put("Pattern_1", new ArrayList<>());
         patterns_map.get("Pattern_1").add(Arrays.asList("n_entity", "n_attr"));
         patterns_map.get("Pattern_1").add(Arrays.asList("n_entity", "n_attr", "n_attr"));
@@ -43,24 +44,22 @@ public class AnswerSearcher {
     /**
      * 判断问句模式，从数据库检索答案
      */
-    public List<Map<String, String>> getAnswer() {
-
-        // 数据库答案检索工具类
-        DbSearcher dbSearcher = new DbSearcher();
+    public List<Answer> getAnswer() {
 
         // 存储结果
-        List<Map<String, String>> res = new ArrayList<>();
+        List<Answer> answers = new ArrayList<>();
 
-        // 单实体多属性
+        // 模式匹配
         if (patterns.get("Pattern_1").contains(parser_dict.get("pattern"))) {
+            // 单实体多属性
             logger.info(String.format("与 %s 问句模式匹配成功！", "Pattern_1"));
-            String entity = Mapper.Entity.get(parser_dict.get("n_entity").get(0));
+            String entity = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
             List<String> attrs = new ArrayList<>();
             for (String attr: parser_dict.get("n_attr")) {
-                attrs.add(Mapper.Attribute.get(attr));
+                attrs.add(DictMapper.Attribute.get(attr));
             }
             // 数据库检索答案
-            res = dbSearcher.search(entity, attrs);
+            answers = DbSearcher.searchByEntityAndAttrs(entity, attrs);
 
         } else {
             logger.info("未找到相应问句模板！");
@@ -69,7 +68,7 @@ public class AnswerSearcher {
 
 
 
-        return res;
+        return answers;
     }
 
 }
