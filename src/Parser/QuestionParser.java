@@ -27,7 +27,7 @@ public class QuestionParser {
         nature_list.add("n_small");
         nature_list.add("n_compare");
         nature_list.add("n_most");
-        logger.info("词性列表初始化完成！");
+//        logger.info("词性列表初始化完成！");
         return nature_list;
     }
 
@@ -42,7 +42,7 @@ public class QuestionParser {
         }
         // pattern存问句词性模式
         parser_map.put("pattern", new ArrayList<>());
-        logger.info("词性字典初始化完成！");
+//        logger.info("词性字典初始化完成！");
         return parser_map;
     }
 
@@ -61,7 +61,7 @@ public class QuestionParser {
             }
         }
 
-        logger.info("问句解析完成。");
+//        logger.info("问句解析完成。");
         logger.info("词性匹配情况：" + parser_dict);
         logger.info("问句模式：" + parser_dict.get("pattern"));
 

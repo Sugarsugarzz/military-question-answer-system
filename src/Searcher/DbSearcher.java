@@ -39,6 +39,16 @@ public class DbSearcher {
     }
 
     /**
+     * 单实体
+     * @param entity 实体名
+     * @return
+     */
+    public static List<Answer> searchByEntity(String entity) {
+
+        return answerMapper.findByEntity(entity);
+    }
+
+    /**
      * 单实体单属性/多属性模板查询
      * @param entity 实体名
      * @param attrs 属性列表

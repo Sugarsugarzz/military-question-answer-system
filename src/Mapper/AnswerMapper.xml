@@ -3,6 +3,20 @@
 
 <mapper namespace="Mapper.AnswerMapper">
 
+    <select id="findByCountryAndCategory" resultType="Model.Answer">
+        SELECT e.entity_id, e.entity_name
+        FROM concepts c, entities e, entity_attr a
+        <where>
+            c.concept_name = #{arg1} and c.c_id = e.concept_id  and e.entity_id = a.entity_id and attr_value = #{arg0}
+        </where>
+    </select>
+
+    <select id="findByEntity" resultType="Model.Answer">
+        SELECT entity_id, entity_name
+        FROM entities
+        WHERE entity_name like  concat('%', #{entity}, '%')
+    </select>
+
     <select id="findByEntityAndAttrs" resultType="Model.Answer">
         SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
         FROM concepts c, entities e, entity_attr a
@@ -14,12 +28,5 @@
         </where>
     </select>
 
-    <select id="findByCountryAndCategory" resultType="Model.Answer">
-        SELECT e.entity_id, e.entity_name
-        FROM concepts c, entities e, entity_attr a
-        <where>
-            c.concept_name = #{arg1} and c.c_id = e.concept_id  and e.entity_id = a.entity_id and attr_value = #{arg0}
-        </where>
-    </select>
 
 </mapper>
