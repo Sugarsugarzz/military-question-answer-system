@@ -58,4 +58,24 @@ public class DbSearcher {
 
         return answerMapper.findByEntityAndAttrs(entity, attrs);
     }
+
+    /**
+     * 全类别属性最大值
+     * @param attr 属性名
+     * @return
+     */
+    public static List<Answer> searchMaxInAllCategory(String attr) {
+
+        return answerMapper.findMaxByAttrInAllCategory(attr);
+    }
+
+    /**
+     * 全类别属性最小值
+     * @param attr 属性名
+     * @return
+     */
+    public static List<Answer> searchMinInAllCategory(String attr) {
+
+        return answerMapper.findMinByAttrInAllCategory(attr);
+    }
 }

@@ -57,7 +57,7 @@ public class AnswerSearcher {
         patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
         patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
 
-         // 模式 ：多实体单属性/多属性
+        // 模式 ：多实体单属性/多属性
         patterns_map.put("多实体单属性/多属性", new ArrayList<>());
         patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr"));
         patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr"));
@@ -83,6 +83,18 @@ public class AnswerSearcher {
         patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
         patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
         patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+
+        // 模式 ：全类别属性最值
+        patterns_map.put("全类别属性最值", new ArrayList<>());
+        patterns_map.get("全类别属性最值").add(Arrays.asList("n_attr", "n_most"));
+        patterns_map.get("全类别属性最值").add(Arrays.asList("n_most", "n_attr"));
+
+        // 模式 ：单类别属性最值
+        patterns_map.put("单实体类别属性最值", new ArrayList<>());
+        patterns_map.get("单实体类别属性最值").add(Arrays.asList("n_small", "n_attr", "n_most"));
+        patterns_map.get("单实体类别属性最值").add(Arrays.asList("n_small", "n_most", "n_attr"));
+        patterns_map.get("单实体类别属性最值").add(Arrays.asList("n_attr", "n_most", "n_small"));
+        patterns_map.get("单实体类别属性最值").add(Arrays.asList("n_attr", "n_small", "n_most"));
 
 
 //        logger.info("问句模式匹配字典初始化完成！");
@@ -142,6 +154,23 @@ public class AnswerSearcher {
                 // 数据库检索答案
                 answers.addAll(DbSearcher.searchByEntityAndAttrs(DictMapper.Entity.get(entity), attrs));
             }
+        }
+
+        else if (patterns.get("全类别属性最值").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "全类别属性最值"));
+            String type = DictMapper.Most.get(parser_dict.get("n_most").get(0));
+            String attr = DictMapper.Attribute.get(parser_dict.get("n_attr").get(0));
+
+            // 数据库检索答案
+            if (type.equals("max"))
+                answers.addAll(DbSearcher.searchMaxInAllCategory(attr));
+            else if (type.equals("min"))
+                answers.addAll(DbSearcher.searchMinInAllCategory(attr));
+        }
+
+        else if (patterns.get("单实体类别属性最值").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "单实体类别属性最值"));
+
         }
 
         else {

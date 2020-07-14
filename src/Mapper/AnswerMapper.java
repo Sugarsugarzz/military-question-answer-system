@@ -2,6 +2,7 @@ package Mapper;
 
 import Model.Answer;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface AnswerMapper {
@@ -11,4 +12,8 @@ public interface AnswerMapper {
     public List<Answer> findByEntity(String entity);
 
     public List<Answer> findByEntityAndAttrs(String entity, List<String> attr);
+
+    public List<Answer> findMaxByAttrInAllCategory(String attr);
+
+    public List<Answer> findMinByAttrInAllCategory(String attr);
 }

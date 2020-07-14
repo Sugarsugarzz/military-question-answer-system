@@ -28,5 +28,18 @@
         </where>
     </select>
 
+    <select id="findMaxByAttrInAllCategory" resultType="Model.Answer">
+        SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
+        FROM concepts c, entities e, entity_attr a
+        WHERE c.concept_name = #{attr} and c.c_id = a.attr_id and e.entity_id = a.entity_id
+        ORDER BY a.attr_value_reg DESC LIMIT 1
+    </select>
+
+    <select id="findMinByAttrInAllCategory" resultType="Model.Answer">
+        SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
+        FROM concepts c, entities e, entity_attr a
+        WHERE c.concept_name = #{attr} and c.c_id = a.attr_id and e.entity_id = a.entity_id
+        ORDER BY a.attr_value_reg ASC LIMIT 1
+    </select>
 
 </mapper>
