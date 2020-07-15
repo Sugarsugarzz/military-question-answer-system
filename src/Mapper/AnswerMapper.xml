@@ -32,14 +32,29 @@
         SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
         FROM concepts c, entities e, entity_attr a
         WHERE c.concept_name = #{attr} and c.c_id = a.attr_id and e.entity_id = a.entity_id
-        ORDER BY a.attr_value_reg DESC LIMIT 1
+        ORDER BY a.attr_value_reg * 1 DESC LIMIT 1
     </select>
 
     <select id="findMinByAttrInAllCategory" resultType="Model.Answer">
         SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
         FROM concepts c, entities e, entity_attr a
         WHERE c.concept_name = #{attr} and c.c_id = a.attr_id and e.entity_id = a.entity_id
-        ORDER BY a.attr_value_reg ASC LIMIT 1
+        ORDER BY a.attr_value_reg * 1 ASC LIMIT 1
     </select>
 
+    <select id="findMaxByAttrInSingleCategory" resultType="Model.Answer">
+        SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
+        FROM concepts c, entities e, entity_attr a
+        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{arg0})
+        and c.concept_name = #{arg1} and a.attr_id = c.c_id and a.entity_id = e.entity_id
+        ORDER BY a.attr_value_reg * 1 DESC LIMIT 1
+    </select>
+
+    <select id="findMinByAttrInSingleCategory" resultType="Model.Answer">
+        SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
+        FROM concepts c, entities e, entity_attr a
+        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{arg0})
+        and c.concept_name = #{arg1} and a.attr_id = c.c_id and a.entity_id = e.entity_id
+        ORDER BY a.attr_value_reg * 1 ASC LIMIT 1
+    </select>
 </mapper>

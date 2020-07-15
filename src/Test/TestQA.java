@@ -12,7 +12,7 @@ public class TestQA {
     public static void main(String[] args) {
 
         MilitaryQA QA = new MilitaryQA();
-        // 国家实体类别
+        // 国家及类别名
 //        QA.qa_main("中国的战斗机有哪些？");
 
         // 单实体
@@ -28,7 +28,9 @@ public class TestQA {
 //        QA.qa_main("神舟五号、神舟七号和歼-20战斗机的长度、发射地点、生产商、原产国和简介？");
 
         // 全类别属性最值
-        QA.qa_main("长度最长的武器装备是哪个？");
+//        QA.qa_main("武器装备里长度最长的是哪个？");
 
+        // 单类别属性最值
+        QA.qa_main("战斗机里长度最短的是哪个？");
     }
 }

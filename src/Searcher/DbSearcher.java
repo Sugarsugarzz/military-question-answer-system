@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 
 public class DbSearcher {
@@ -77,5 +78,27 @@ public class DbSearcher {
     public static List<Answer> searchMinInAllCategory(String attr) {
 
         return answerMapper.findMinByAttrInAllCategory(attr);
+    }
+
+    /**
+     * 单类别属性最大值
+     * @param category 类别名
+     * @param attr 属性名
+     * @return
+     */
+    public static List<Answer> searchMaxInSingleCategory(String category, String attr) {
+
+        return answerMapper.findMaxByAttrInSingleCategory(category, attr);
+    }
+
+    /**
+     * 单类别属性最小值
+     * @param category 类别名
+     * @param attr 属性名
+     * @return
+     */
+    public static List<Answer> searchMinInSingleCategory(String category, String attr) {
+
+        return answerMapper.findMinByAttrInSingleCategory(category, attr);
     }
 }

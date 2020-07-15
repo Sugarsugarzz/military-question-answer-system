@@ -16,4 +16,8 @@ public interface AnswerMapper {
     public List<Answer> findMaxByAttrInAllCategory(String attr);
 
     public List<Answer> findMinByAttrInAllCategory(String attr);
+
+    public List<Answer> findMaxByAttrInSingleCategory(String category, String attr);
+
+    public List<Answer> findMinByAttrInSingleCategory(String category, String attr);
 }
