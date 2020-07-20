@@ -6,9 +6,7 @@
     <select id="findByCountryAndCategory" resultType="Model.Answer">
         SELECT e.entity_id, e.entity_name
         FROM concepts c, entities e, entity_attr a
-        <where>
-            c.concept_name = #{arg1} and c.c_id = e.concept_id  and e.entity_id = a.entity_id and attr_value = #{arg0}
-        </where>
+        WHERE c.concept_name = #{category} and c.c_id = e.concept_id  and e.entity_id = a.entity_id and attr_value = #{country}
     </select>
 
     <select id="findByEntity" resultType="Model.Answer">
@@ -21,8 +19,8 @@
         SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
         FROM concepts c, entities e, entity_attr a
         <where>
-            a.attr_id = c.c_id and a.entity_id = e.entity_id and e.entity_name = #{arg0} and c.concept_name in
-            <foreach collection="arg1" open="(" close=")" item="attr" separator=",">
+            a.attr_id = c.c_id and a.entity_id = e.entity_id and e.entity_name = #{entity} and c.concept_name in
+            <foreach collection="attrs" open="(" close=")" item="attr" separator=",">
                 #{attr}
             </foreach>
         </where>
@@ -45,24 +43,24 @@
     <select id="findMaxByAttrInSingleCategory" resultType="Model.Answer">
         SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
         FROM concepts c, entities e, entity_attr a
-        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{arg0})
-        and c.concept_name = #{arg1} and a.attr_id = c.c_id and a.entity_id = e.entity_id
+        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{category})
+        and c.concept_name = #{attr} and a.attr_id = c.c_id and a.entity_id = e.entity_id
         ORDER BY a.attr_value_reg * 1 DESC LIMIT 1
     </select>
 
     <select id="findMinByAttrInSingleCategory" resultType="Model.Answer">
         SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
         FROM concepts c, entities e, entity_attr a
-        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{arg0})
-        and c.concept_name = #{arg1} and a.attr_id = c.c_id and a.entity_id = e.entity_id
+        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{category})
+        and c.concept_name = #{attr} and a.attr_id = c.c_id and a.entity_id = e.entity_id
         ORDER BY a.attr_value_reg * 1 ASC LIMIT 1
     </select>
 
     <select id="findInSingleRange" resultType="Model.Answer">
         SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
         FROM concepts c, entities e, entity_attr a
-        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{arg0})
-        and c.concept_name = #{arg1} and a.attr_id = c.c_id and a.entity_id = e.entity_id and a.attr_value_reg ${arg2} #{arg3} * 1
+        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{category})
+        and c.concept_name = #{attr} and a.attr_id = c.c_id and a.entity_id = e.entity_id and a.attr_value_reg ${type} #{item} * 1
         ORDER BY a.attr_value_reg * 1 ASC
     </select>
 </mapper>

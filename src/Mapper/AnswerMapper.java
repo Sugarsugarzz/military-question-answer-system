@@ -1,25 +1,25 @@
 package Mapper;
 
 import Model.Answer;
-
-import java.util.Collection;
+import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface AnswerMapper {
 
-    public List<Answer> findByCountryAndCategory(String country, String category);
+    public List<Answer> findByCountryAndCategory(@Param("country") String country, @Param("category") String category);
 
-    public List<Answer> findByEntity(String entity);
+    public List<Answer> findByEntity(@Param("entity") String entity);
 
-    public List<Answer> findByEntityAndAttrs(String entity, List<String> attr);
+    public List<Answer> findByEntityAndAttrs(@Param("entity") String entity, @Param("attrs") List<String> attrs);
 
-    public List<Answer> findMaxByAttrInAllCategory(String attr);
+    public List<Answer> findMaxByAttrInAllCategory(@Param("attr") String attr);
 
-    public List<Answer> findMinByAttrInAllCategory(String attr);
+    public List<Answer> findMinByAttrInAllCategory(@Param("attr") String attr);
 
-    public List<Answer> findMaxByAttrInSingleCategory(String category, String attr);
+    public List<Answer> findMaxByAttrInSingleCategory(@Param("category") String category, @Param("attr") String attr);
 
-    public List<Answer> findMinByAttrInSingleCategory(String category, String attr);
+    public List<Answer> findMinByAttrInSingleCategory(@Param("category") String category, @Param("attr") String attr);
 
-    public List<Answer> findInSingleRange(String category, String attr, String type, String item);
+    public List<Answer> findInSingleRange(@Param("category") String category, @Param("attr") String attr,
+                                          @Param("type") String type, @Param("item") String item);
 }
