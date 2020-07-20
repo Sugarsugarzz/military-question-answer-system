@@ -20,4 +20,6 @@ public interface AnswerMapper {
     public List<Answer> findMaxByAttrInSingleCategory(String category, String attr);
 
     public List<Answer> findMinByAttrInSingleCategory(String category, String attr);
+
+    public List<Answer> findInSingleRange(String category, String attr, String type, String item);
 }

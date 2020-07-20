@@ -57,4 +57,12 @@
         and c.concept_name = #{arg1} and a.attr_id = c.c_id and a.entity_id = e.entity_id
         ORDER BY a.attr_value_reg * 1 ASC LIMIT 1
     </select>
+
+    <select id="findInSingleRange" resultType="Model.Answer">
+        SELECT e.entity_id, e.entity_name, c.concept_name AS attr_name, a.attr_value
+        FROM concepts c, entities e, entity_attr a
+        WHERE e.concept_id = (SELECT c_id FROM concepts WHERE concept_name = #{arg0})
+        and c.concept_name = #{arg1} and a.attr_id = c.c_id and a.entity_id = e.entity_id and a.attr_value_reg ${arg2} #{arg3} * 1
+        ORDER BY a.attr_value_reg * 1 ASC
+    </select>
 </mapper>

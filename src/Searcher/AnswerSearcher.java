@@ -84,6 +84,19 @@ public class AnswerSearcher {
         patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
         patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
 
+        // 模式 ：单属性单类别单区间
+        patterns_map.put("单属性单类别单区间", new ArrayList<>());
+        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_small"));
+        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_small"));
+
+        // 模式 ：单属性单类别多区间
+        patterns_map.put("单属性单类别多区间", new ArrayList<>());
+        patterns_map.get("单属性单类别多区间").add(Arrays.asList());
+
+        // 模式 ：多属性单类别多区间
+        patterns_map.put("多属性单类别多区间", new ArrayList<>());
+        patterns_map.get("多属性单类别多区间").add(Arrays.asList());
+
         // 模式 ：全类别属性最值
         patterns_map.put("全类别属性最值", new ArrayList<>());
         patterns_map.get("全类别属性最值").add(Arrays.asList("n_attr", "n_most"));
@@ -154,6 +167,27 @@ public class AnswerSearcher {
                 // 数据库检索答案
                 answers.addAll(DbSearcher.searchByEntityAndAttrs(DictMapper.Entity.get(entity), attrs));
             }
+        }
+
+        else if (patterns.get("单属性单类别单区间").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "单属性单类别单区间"));
+            String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
+            String type = DictMapper.Compare.get(parser_dict.get("n_compare").get(0));
+            String attr = DictMapper.Attribute.get(parser_dict.get("n_attr").get(0));
+            List<String> time_items = DictMapper.processTime(parser_dict.get("n_time"));
+            List<String> unit_items = DictMapper.processUnit(parser_dict.get("n_unit"));
+            String item = time_items.isEmpty() ? unit_items.get(0) : time_items.get(0);
+
+            // 数据库检索答案
+            answers = DbSearcher.searchInSingleRange(category, attr, type, item);
+        }
+
+        else if (patterns.get("单属性单类别多区间").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "单属性单类别多区间"));
+        }
+
+        else if (patterns.get("多属性单类别多区间").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "多属性单类别多区间"));
         }
 
         else if (patterns.get("全类别属性最值").contains(parser_dict.get("pattern"))) {

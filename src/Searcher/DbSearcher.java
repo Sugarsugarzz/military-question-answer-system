@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
 
 public class DbSearcher {
@@ -32,7 +31,7 @@ public class DbSearcher {
      * 国家及实体类别
      * @param country 国家名
      * @param category 实体类别名
-     * @return
+     * @return 答案
      */
     public static List<Answer> searchByCountryAndCategory(String country, String category) {
 
@@ -42,7 +41,7 @@ public class DbSearcher {
     /**
      * 单实体
      * @param entity 实体名
-     * @return
+     * @return 答案
      */
     public static List<Answer> searchByEntity(String entity) {
 
@@ -53,7 +52,7 @@ public class DbSearcher {
      * 单实体单属性/多属性模板查询
      * @param entity 实体名
      * @param attrs 属性列表
-     * @return
+     * @return 答案
      */
     public static List<Answer> searchByEntityAndAttrs(String entity, List<String> attrs) {
 
@@ -63,7 +62,7 @@ public class DbSearcher {
     /**
      * 全类别属性最大值
      * @param attr 属性名
-     * @return
+     * @return 答案
      */
     public static List<Answer> searchMaxInAllCategory(String attr) {
 
@@ -73,7 +72,7 @@ public class DbSearcher {
     /**
      * 全类别属性最小值
      * @param attr 属性名
-     * @return
+     * @return 答案
      */
     public static List<Answer> searchMinInAllCategory(String attr) {
 
@@ -84,7 +83,7 @@ public class DbSearcher {
      * 单类别属性最大值
      * @param category 类别名
      * @param attr 属性名
-     * @return
+     * @return 答案
      */
     public static List<Answer> searchMaxInSingleCategory(String category, String attr) {
 
@@ -95,10 +94,23 @@ public class DbSearcher {
      * 单类别属性最小值
      * @param category 类别名
      * @param attr 属性名
-     * @return
+     * @return 答案
      */
     public static List<Answer> searchMinInSingleCategory(String category, String attr) {
 
         return answerMapper.findMinByAttrInSingleCategory(category, attr);
+    }
+
+    /**
+     * 单属性单类别单区间
+     * @param category 类别名
+     * @param attr 属性名
+     * @param type 比较符
+     * @param item 比较数值
+     * @return 答案
+     */
+    public static List<Answer> searchInSingleRange(String category, String attr, String type, String item) {
+
+        return answerMapper.findInSingleRange(category, attr, type, item);
     }
 }

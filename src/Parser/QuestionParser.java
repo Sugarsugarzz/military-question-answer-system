@@ -1,11 +1,14 @@
 package Parser;
 
 import com.hankcs.hanlp.HanLP;
+import com.hankcs.hanlp.dictionary.CustomDictionary;
 import com.hankcs.hanlp.seg.common.Term;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class QuestionParser {
 
@@ -27,6 +30,8 @@ public class QuestionParser {
         nature_list.add("n_small");
         nature_list.add("n_compare");
         nature_list.add("n_most");
+        nature_list.add("n_time");
+        nature_list.add("n_unit");
 //        logger.info("词性列表初始化完成！");
         return nature_list;
     }
@@ -51,6 +56,22 @@ public class QuestionParser {
      * @return 词性字典
      */
     public Map<String, List<String>> parser(String question) {
+
+        // 初始化词性字典
+        parser_dict = buildParserDict();
+
+        // 识别出问句中的<时间>，加入分词器词典
+        Matcher m_time = Pattern.compile("[0-9]{4}年([0-9]{0,2}月)?([0-9]{0,2}日)?").matcher(question);
+        while (m_time.find())
+            CustomDictionary.add(m_time.group(), "n_time");
+
+        // 识别出问句中的<单位数值>，加入分词器词典
+        String[] units = { "海里", "英里", "吨", "公里", "公里/节", "公里/小时", "毫米", "节", "克", "里", "米", "千克", "千米",
+                "千米/时", "千米/小时", "千米每小时", "余英里", "约海里", "最大海里", "厘米", "分米", "人", "位"};
+        String unit_regex = String.format("([0-9]+(.[0-9]+)?)(%s)+", String.join("|", units));
+        Matcher m_unit = Pattern.compile(unit_regex).matcher(question);
+        while (m_unit.find())
+            CustomDictionary.add(m_unit.group(), "n_unit");
 
         // 利用HanLP分词，遍历词和词性
         List<Term> terms = HanLP.segment(question);
