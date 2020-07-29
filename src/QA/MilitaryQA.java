@@ -1,6 +1,7 @@
 package QA;
 
 import Model.Answer;
+import Model.QA;
 import Parser.QuestionParser;
 import Searcher.AnswerSearcher;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +18,7 @@ public class MilitaryQA {
     private QuestionParser questionParser = new QuestionParser();
     private AnswerSearcher answerSearcher = new AnswerSearcher();
 
-    public void qa_main(String question) {
+    public QA oqa_main(String question) {
 
         logger.info("Question is ：" + question);
         // 问句解析
@@ -28,6 +29,8 @@ public class MilitaryQA {
         List<Answer> results = answerSearcher.getAnswer(parser_dict);
         // 打印答案
         logger.info("Answer is ：" + results);
-
+        QA qa = new QA(parser_dict, question, results);
+        return qa;
+        //System.out.println(parser_dict);
     }
 }
