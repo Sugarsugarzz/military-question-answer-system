@@ -3,6 +3,9 @@ package Parser;
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
 import com.hankcs.hanlp.seg.common.Term;
+
+import Model.EAHistory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +18,8 @@ public class QuestionParser {
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
     private List<String> natures = buildNatures();
+    private List<String> keywords1 = buildKey1();
+    private List<String> keywords2 = buildKey2();
     private Map<String, List<String>> parser_dict = buildParserDict();
 
     /**
@@ -87,6 +92,82 @@ public class QuestionParser {
         logger.info("问句模式：" + parser_dict.get("pattern"));
 
         return parser_dict;
+    }
+    
+    
+    /**
+     * 问句模式解析
+     * @return 词性字典
+     */
+    public String preProcessQuestion(EAHistory eah, String question) {
+
+        // 利用HanLP分词，遍历词和词性
+        List<Term> terms = HanLP.segment(question);
+        System.out.println(terms.toString());
+        String newQuest = question;
+        
+        Boolean flagAttr = false;
+        Boolean flagEntity = false;
+        for (Term term : terms) {
+        	//System.out.println(term.word);
+            if (term.nature.toString().equals("n_attr")) {
+            	flagAttr = true;
+            }
+            if (term.nature.toString().equals("n_entity")) {
+            	flagEntity = true;
+            }
+        }
+        
+        for (Term term : terms) {
+            if (keywords1.contains(term.word)) {
+                if(flagEntity && flagAttr) {
+                	String str= String.join(" ", eah.getHistEntity());
+                	newQuest = question.replace(term.word, str);
+                }else if (flagEntity) {
+                	ArrayList<String> strs = new ArrayList<String>();
+                	strs.addAll(eah.getHistEntity());
+                	strs.addAll(eah.getHistAttr());
+                	String str= String.join(" ", strs);
+                	newQuest = question.replace(term.word, str);
+                }else if (flagAttr) {
+                	String str= String.join(" ", eah.getHistEntity());
+                	newQuest = question.replace(term.word, str);
+                }
+                break;
+            }else if (keywords2.contains(term.word)) {
+            	if(flagEntity && flagAttr) {
+                	newQuest = question.replace(term.word, eah.getLastEntity());
+                }else if (flagEntity) {
+                	//String str= String.join(" ", strs);
+                	newQuest = question.replace(term.word, eah.getLastEntity() + " " + eah.getLastAttr());
+                }else if (flagAttr) {
+                	newQuest = question.replace(term.word, eah.getLastEntity());
+                }
+            	break;
+            }
+        }
+
+        return newQuest;
+    }
+
+    private List<String> buildKey1() {
+        List<String> nature_list = new ArrayList<>();
+        nature_list.add("它们");
+        nature_list.add("他们");
+        nature_list.add("她们");
+        return nature_list;
+    }
+    
+    private List<String> buildKey2() {
+        List<String> nature_list = new ArrayList<>();
+        nature_list.add("它");
+        nature_list.add("他");
+        nature_list.add("她");
+        nature_list.add("这");
+        nature_list.add("这儿");
+        nature_list.add("这个");
+        nature_list.add("这里");
+        return nature_list;
     }
 
 }
