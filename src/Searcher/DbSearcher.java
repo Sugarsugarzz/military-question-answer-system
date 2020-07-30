@@ -102,15 +102,58 @@ public class DbSearcher {
     }
 
     /**
-     * 单属性单类别单区间
+     * 单属性单类别单区间（数值型）
      * @param category 类别名
      * @param attr 属性名
-     * @param type 比较符
+     * @param operator 比较符
      * @param item 比较数值
      * @return 答案
      */
-    public static List<Answer> searchInSingleRange(String category, String attr, String type, String item) {
+    public static List<Answer> searchInSingleRangeByUnit(String category, String attr, String operator, String item) {
 
-        return answerMapper.findInSingleRange(category, attr, type, item);
+        return answerMapper.findInSingleRangeByUnit(category, attr, operator, item);
+    }
+
+    /**
+     * 单属性单类别单区间（时间型）
+     * @param category 类别名
+     * @param attr 属性名
+     * @param operator 比较符
+     * @param item 比较数值
+     * @return 答案
+     */
+    public static List<Answer> searchInSingleRangeByTime(String category, String attr, String operator, String item) {
+
+        return answerMapper.findInSingleRangeByTime(category, attr, operator, item);
+    }
+
+    /**
+     * 单属性单类别单区间（数值型）
+     * @param category 类别名
+     * @param attr 属性名
+     * @param operator_1 比较符_1
+     * @param item_1 比较数值_1
+     * @param operator_2 比较符_2
+     * @param item_2 比较数值_2
+     * @return 答案
+     */
+    public static List<Answer> searchInMultiRangeByUnit(String category, String attr, String operator_1, String item_1, String operator_2, String item_2) {
+
+        return answerMapper.findInMultiRangeByUnit(category, attr, operator_1, item_1, operator_2, item_2);
+    }
+
+    /**
+     * 单属性单类别单区间（时间型）
+     * @param category 类别名
+     * @param attr 属性名
+     * @param operator_1 比较符_1
+     * @param item_1 比较数值_1
+     * @param operator_2 比较符_2
+     * @param item_2 比较数值_2
+     * @return 答案
+     */
+    public static List<Answer> searchInMultiRangeByTime(String category, String attr, String operator_1, String item_1, String operator_2, String item_2) {
+
+        return answerMapper.findInMultiRangeByTime(category, attr, operator_1, item_1, operator_2, item_2);
     }
 }

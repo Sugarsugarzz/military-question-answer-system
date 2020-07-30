@@ -81,6 +81,7 @@ public class QuestionParser {
         // 利用HanLP分词，遍历词和词性
         List<Term> terms = HanLP.segment(question);
         for (Term term : terms) {
+//            System.out.println(term.nature + " - " + term.word);
             if (natures.contains(term.nature.toString())) {
                 parser_dict.get(term.nature.toString()).add(term.word);
                 parser_dict.get("pattern").add(term.nature.toString());

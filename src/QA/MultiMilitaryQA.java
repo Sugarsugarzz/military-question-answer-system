@@ -1,14 +1,11 @@
 package QA;
 
-import Model.Answer;
 import Model.EAHistory;
 import Model.QA;
 import Parser.QuestionParser;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.sun.glass.ui.Size;
 
 import java.util.ArrayList;
 import java.util.List;

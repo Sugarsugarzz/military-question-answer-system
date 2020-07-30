@@ -20,6 +20,15 @@ public interface AnswerMapper {
 
     public List<Answer> findMinByAttrInSingleCategory(@Param("category") String category, @Param("attr") String attr);
 
-    public List<Answer> findInSingleRange(@Param("category") String category, @Param("attr") String attr,
-                                          @Param("type") String type, @Param("item") String item);
+    public List<Answer> findInSingleRangeByUnit(@Param("category") String category, @Param("attr") String attr,
+                                          @Param("operator") String operator, @Param("unit_item") String unit_item);
+
+    public List<Answer> findInSingleRangeByTime(@Param("category") String category, @Param("attr") String attr,
+                                                @Param("operator") String operator, @Param("time_item") String time_item);
+
+    public List<Answer> findInMultiRangeByUnit(@Param("category") String category, @Param("attr") String attr, @Param("operator_1") String operator_1,
+                                               @Param("item_1") String item_1, @Param("operator_2") String operator_2, @Param("item_2") String item_2);
+
+    public List<Answer> findInMultiRangeByTime(@Param("category") String category, @Param("attr") String attr, @Param("operator_1") String operator_1,
+                                               @Param("item_1") String item_1, @Param("operator_2") String operator_2, @Param("item_2") String item_2);
 }

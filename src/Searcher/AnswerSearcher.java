@@ -87,15 +87,24 @@ public class AnswerSearcher {
         // 模式 ：单属性单类别单区间
         patterns_map.put("单属性单类别单区间", new ArrayList<>());
         patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_small"));
+        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit"));
         patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_small"));
+        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_small"));
+        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time"));
+        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare"));
 
         // 模式 ：单属性单类别多区间
         patterns_map.put("单属性单类别多区间", new ArrayList<>());
-        patterns_map.get("单属性单类别多区间").add(Arrays.asList());
+        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_compare", "n_unit", "n_small"));
+        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_compare", "n_unit"));
+        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_compare", "n_time", "n_small"));
+        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_time", "n_compare", "n_small"));
+        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time", "n_compare", "n_time"));
+        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare", "n_time", "n_compare"));
 
         // 模式 ：多属性单类别多区间
         patterns_map.put("多属性单类别多区间", new ArrayList<>());
-        patterns_map.get("多属性单类别多区间").add(Arrays.asList());
+        patterns_map.get("多属性单类别多区间").add(Arrays.asList(""));
 
         // 模式 ：全类别属性最值
         patterns_map.put("全类别属性最值", new ArrayList<>());
@@ -172,18 +181,36 @@ public class AnswerSearcher {
         else if (patterns.get("单属性单类别单区间").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "单属性单类别单区间"));
             String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String type = DictMapper.Compare.get(parser_dict.get("n_compare").get(0));
+            String operator = DictMapper.Compare.get(parser_dict.get("n_compare").get(0));
             String attr = DictMapper.Attribute.get(parser_dict.get("n_attr").get(0));
             List<String> time_items = DictMapper.processTime(parser_dict.get("n_time"));
             List<String> unit_items = DictMapper.processUnit(parser_dict.get("n_unit"));
-            String item = time_items.isEmpty() ? unit_items.get(0) : time_items.get(0);
 
             // 数据库检索答案
-            answers = DbSearcher.searchInSingleRange(category, attr, type, item);
+            if (time_items.isEmpty()) {
+                answers = DbSearcher.searchInSingleRangeByUnit(category, attr, operator, unit_items.get(0));
+            } else {
+                answers = DbSearcher.searchInSingleRangeByTime(category, attr, operator, time_items.get(0));
+            }
         }
 
         else if (patterns.get("单属性单类别多区间").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "单属性单类别多区间"));
+            String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
+            String operator_1 = DictMapper.Compare.get(parser_dict.get("n_compare").get(0));
+            String operator_2 = DictMapper.Compare.get(parser_dict.get("n_compare").get(1));
+            String attr = DictMapper.Attribute.get(parser_dict.get("n_attr").get(0));
+            List<String> time_items = DictMapper.processTime(parser_dict.get("n_time"));
+            List<String> unit_items = DictMapper.processUnit(parser_dict.get("n_unit"));
+
+            // 数据库检索答案
+            if (time_items.isEmpty()) {
+                answers = DbSearcher.searchInMultiRangeByUnit(category, attr, operator_1, unit_items.get(0),
+                        operator_2, unit_items.get(1));
+            } else {
+                answers = DbSearcher.searchInMultiRangeByTime(category, attr, operator_1, time_items.get(0),
+                        operator_2, time_items.get(1));
+            }
         }
 
         else if (patterns.get("多属性单类别多区间").contains(parser_dict.get("pattern"))) {
