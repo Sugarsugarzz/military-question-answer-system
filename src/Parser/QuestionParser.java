@@ -96,51 +96,61 @@ public class QuestionParser {
     
     
     /**
-     * 问句模式解析
-     * @return 词性字典
+     * 多轮问答中，处理问句中出现指代词的情况，将其替换为对应实体和属性
+     * @return 构造的新问句
      */
     public String preProcessQuestion(EAHistory eah, String question) {
 
         // 利用HanLP分词，遍历词和词性
         List<Term> terms = HanLP.segment(question);
-        System.out.println(terms.toString());
         String newQuest = question;
         
         Boolean flagAttr = false;
         Boolean flagEntity = false;
         for (Term term : terms) {
-        	//System.out.println(term.word);
+            if (term.nature.toString().equals("n_entity")) {
+                flagEntity = true;
+            }
             if (term.nature.toString().equals("n_attr")) {
             	flagAttr = true;
-            }
-            if (term.nature.toString().equals("n_entity")) {
-            	flagEntity = true;
             }
         }
         
         for (Term term : terms) {
+            // 指示代词（复数）
             if (keywords1.contains(term.word)) {
+                // 问句同时出现实体和属性的情况（如：神舟七号和它们的长度是多少？）
                 if(flagEntity && flagAttr) {
                 	String str= String.join(" ", eah.getHistEntity());
                 	newQuest = question.replace(term.word, str);
-                }else if (flagEntity) {
-                	ArrayList<String> strs = new ArrayList<String>();
+                }
+                // 问句中只出现的实体（如：神舟七号和它们的呢？）
+                else if (flagEntity) {
+                	ArrayList<String> strs = new ArrayList<>();
                 	strs.addAll(eah.getHistEntity());
                 	strs.addAll(eah.getHistAttr());
                 	String str= String.join(" ", strs);
                 	newQuest = question.replace(term.word, str);
-                }else if (flagAttr) {
+                }
+                // 问句中只出现的属性（如：它们的长度是多少？）
+                else if (flagAttr) {
                 	String str= String.join(" ", eah.getHistEntity());
                 	newQuest = question.replace(term.word, str);
                 }
                 break;
-            }else if (keywords2.contains(term.word)) {
+            }
+            // 指示代词（单数）
+            else if (keywords2.contains(term.word)) {
+                // 问句同时出现实体和属性的情况（如：神舟七号和它的长度是多少？）
             	if(flagEntity && flagAttr) {
                 	newQuest = question.replace(term.word, eah.getLastEntity());
-                }else if (flagEntity) {
-                	//String str= String.join(" ", strs);
+                }
+                // 问句中只出现的实体（如：神舟七号和它的呢？）
+            	else if (flagEntity) {
                 	newQuest = question.replace(term.word, eah.getLastEntity() + " " + eah.getLastAttr());
-                }else if (flagAttr) {
+                }
+                // 问句中只出现的属性（如：它的长度是多少？）
+            	else if (flagAttr) {
                 	newQuest = question.replace(term.word, eah.getLastEntity());
                 }
             	break;

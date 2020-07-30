@@ -18,51 +18,49 @@ import java.util.Map;
 public class MultiMilitaryQA {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
+
     private static ArrayList<QA> QAs = new ArrayList<QA>();
 
-    public void qa_main(String question) {
+	/**
+	 * 多轮问答的主函数
+	 * 在调用单轮问答基础上实现，加一层对问句的预处理过程
+	 * @param question 问句
+	 */
+	public void qa_main(String question) {
     	
     	int numQA = QAs.size(); 
     	MilitaryQA oQA = new MilitaryQA();
-    	if(numQA==0)
+    	if(numQA == 0)
     		QAs.add(oQA.oqa_main(question));
     	else {
+    		// 多轮，获取历史Entity和Attr，将问句中的指代词替换为对应实体名
     		QuestionParser questionParser = new QuestionParser();
     		EAHistory eah = getHistory();
     		String newQuestion = questionParser.preProcessQuestion(eah, question);
-    		System.out.println(" new question: ");
-    		System.out.println(newQuestion);
     		QAs.add(oQA.oqa_main(newQuestion));
     	}
-        //System.out.println(parser_dict);
     }
-    
-    public EAHistory getHistory() {
+
+	/**
+	 * 获取多轮问答过程中的历史信息，包括（最近一个属性、最近一个实体、历史所有属性、历史所有实体）
+	 * @return 历史信息存储实体类
+	 */
+	public EAHistory getHistory() {
     	int numQA = QAs.size();
-    	System.out.println(" num QAs : "+ numQA);
-    	ArrayList<String> attrs = new ArrayList<String>();
-    	ArrayList<String> entitys = new ArrayList<String>();
+    	ArrayList<String> attrs = new ArrayList<>();
+    	ArrayList<String> entitys = new ArrayList<>();
     	String attr = "";
     	String entity = "";
     	for (int i = numQA - 1; i >= 0; i--) {
     		Map<String, List<String>> parser_dict = QAs.get(i).getParser_dict();
-    		//List<Answer> answer = QAs.get(i).getAnswer();
     		attrs.addAll(parser_dict.get("n_attr"));
     		entitys.addAll(parser_dict.get("n_entity"));
     	}
-    	if (attrs.size()>0)
+    	if (attrs.size() > 0)
     		attr = attrs.get(0);
-    	if (entitys.size()>0)
+    	if (entitys.size() > 0)
     		entity = entitys.get(0);
-    	
-    	System.out.println(attr);
-    	System.out.println(entity);
-    	System.out.println(attrs.size());
-    	System.out.println(entitys.size());
-    	System.out.println(attrs);
-    	System.out.println(entitys);
-    	
-    	EAHistory eah = new EAHistory(attr, entity, attrs, entitys);
-    	return eah;
+
+    	return new EAHistory(attr, entity, attrs, entitys);
     }
 }

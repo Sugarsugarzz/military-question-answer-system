@@ -1,6 +1,10 @@
 package Test;
 
 import QA.MilitaryQA;
+import QA.MultiMilitaryQA;
+
+import java.util.Scanner;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,9 +15,21 @@ public class TestQA {
 
     public static void main(String[] args) {
 
-        MilitaryQA QA = new MilitaryQA();
+        MultiMilitaryQA QA = new MultiMilitaryQA();
+        
+        /*while (true) {
+        	String question = new Scanner(System.in).next();
+        	QA.qa_main(question);
+        }*/
+
+        // 多轮测试
+//        QA.qa_main("我想找中国的神舟七号");
+//        QA.qa_main("歼-10战斗机的长度");
+//        QA.qa_main("神舟六号载人飞船的长度");
+//        QA.qa_main("他们的生产商");
+
         // 国家及类别名
-//        QA.qa_main("中国的战斗机有哪些？");
+        QA.qa_main("中国的战斗机有哪些？");
 
         // 单实体
 //        QA.qa_main("我想找中国的神舟七号");
@@ -34,6 +50,9 @@ public class TestQA {
 //        QA.qa_main("战斗机里长度最短的是哪个？");
 
         // 单属性单类别区间
-        QA.qa_main("长度大于25米的战斗机有哪些？");
+//        QA.qa_main("长度大于25米的战斗机有哪些？");
+
+
+
     }
 }

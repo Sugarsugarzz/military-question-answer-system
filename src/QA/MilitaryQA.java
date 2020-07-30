@@ -18,6 +18,11 @@ public class MilitaryQA {
     private QuestionParser questionParser = new QuestionParser();
     private AnswerSearcher answerSearcher = new AnswerSearcher();
 
+    /**
+     * 单轮问答主函数
+     * @param question 问句
+     * @return QA实体类，包含该轮问答的词性字典、问句和答案
+     */
     public QA oqa_main(String question) {
 
         logger.info("Question is ：" + question);
@@ -29,8 +34,6 @@ public class MilitaryQA {
         List<Answer> results = answerSearcher.getAnswer(parser_dict);
         // 打印答案
         logger.info("Answer is ：" + results);
-        QA qa = new QA(parser_dict, question, results);
-        return qa;
-        //System.out.println(parser_dict);
+        return new QA(parser_dict, question, results);
     }
 }
