@@ -8,6 +8,8 @@ public interface AnswerMapper {
 
     List<Answer> findByCountryAndCategory(@Param("country") String country, @Param("category") String category);
 
+    List<Answer> findByCategory(@Param("category") String category);
+
     List<Answer> findByEntity(@Param("entity") String entity);
 
     List<Answer> findByEntityAndAttrs(@Param("entity") String entity, @Param("attrs") List<String> attrs);

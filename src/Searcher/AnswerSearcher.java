@@ -26,6 +26,10 @@ public class AnswerSearcher {
         patterns_map.get("国家及类别名").add(Arrays.asList("n_small", "n_country"));
 
         // 模式 ：单实体
+        patterns_map.put("单类别名", new ArrayList<>());
+        patterns_map.get("单类别名").add(Arrays.asList("n_small"));
+
+        // 模式 ：单实体
         patterns_map.put("单实体", new ArrayList<>());
         patterns_map.get("单实体").add(Arrays.asList("n_entity"));
         patterns_map.get("单实体").add(Arrays.asList("n_country", "n_entity"));
@@ -103,8 +107,11 @@ public class AnswerSearcher {
         patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare", "n_time", "n_compare"));
 
         // 模式 ：多属性单类别多区间
+        // [n_attr, n_time, n_compare, n_time, n_compare, n_attr, n_compare, n_unit, n_small]
         patterns_map.put("多属性单类别多区间", new ArrayList<>());
-        patterns_map.get("多属性单类别多区间").add(Arrays.asList(""));
+        patterns_map.get("多属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_unit", "n_small"));
+
+
 
         // 模式 ：全类别属性最值
         patterns_map.put("全类别属性最值", new ArrayList<>());
@@ -138,6 +145,13 @@ public class AnswerSearcher {
             String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
             // 数据库检索答案
             answers = DbSearcher.searchByCountryAndCategory(country, category);
+        }
+
+        else if (patterns.get("单类别名").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "单类别名"));
+            String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
+            // 数据库检索答案
+            answers = DbSearcher.searchByCategory(category);
         }
 
         else if (patterns.get("单实体").contains(parser_dict.get("pattern"))) {

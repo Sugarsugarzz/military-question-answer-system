@@ -14,16 +14,16 @@ import org.apache.logging.log4j.Logger;
 public class TestQA {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
-    private static SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private static SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static void main(String[] args) {
 
         MultiMilitaryQA QA = new MultiMilitaryQA();
         
-        while (true) {
-        	String question = new Scanner(System.in).next();
-        	QA.qa_main("小黑", question, sf.format(new Date()));
-        }
+//        while (true) {
+//        	String question = new Scanner(System.in).next();
+//        	QA.qa_main("小黑", question, sf.format(new Date()));
+//        }
 
         // 多轮测试
 //        QA.qa_main("我想找中国的神舟七号");
@@ -32,7 +32,10 @@ public class TestQA {
 //        QA.qa_main("他们的生产商");
 
         // 国家及类别名
-//        QA.qa_main("中国的战斗机有哪些？");
+//        QA.qa_main("小明", "中国的战斗机有哪些？", sf.format(new Date()));
+
+        // 单类别名
+        QA.qa_main("小明", "战斗机有哪些？", sf.format(new Date()));
 
         // 单实体
 //        QA.qa_main("我想找中国的神舟七号");
@@ -59,6 +62,9 @@ public class TestQA {
 
         // 单属性单类别多区间
 //        QA.qa_main("小明", "发射日期小于2010年且大于2005年的宇宙飞船", sf.format(new Date()));
+
+        // 多属性单类别多区间
+//        QA.qa_main("小明", "服役时间在1950年之后2000年之前且最大航程大于5000公里的运输机？", sf.format(new Date()));
 
     }
 }

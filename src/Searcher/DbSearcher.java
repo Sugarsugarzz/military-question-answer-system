@@ -53,6 +53,16 @@ public class DbSearcher {
     }
 
     /**
+     * 单类别名
+     * @param category 实体类别名
+     * @return 答案
+     */
+    public static List<Answer> searchByCategory(String category) {
+
+        return answerMapper.findByCategory(category);
+    }
+
+    /**
      * 单实体
      * @param entity 实体名
      * @return 答案
