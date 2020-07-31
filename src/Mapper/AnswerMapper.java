@@ -35,4 +35,10 @@ public interface AnswerMapper {
                                                @Param("item_1") String item_1, @Param("operator_2") String operator_2, @Param("item_2") String item_2);
 
     void saveQAInfo(@Param("uid") String uid, @Param("q_time") String q_time, @Param("question") String question, @Param("answer") String answer);
+
+    List<Answer> findMultiAttrInSingleRangeByUnit(@Param("category") String category, @Param("attr_1") String attr_1, @Param("operator_1") String operator_1,
+                                                  @Param("item_1") String item_1, @Param("attr_2") String attr_2, @Param("operator_2") String operator_2, @Param("item_2") String item_2);
+
+    List<Answer> findMultiAttrInSingleRangeByTimeAndUnit(@Param("category") String category, @Param("attr_1") String attr_1, @Param("operator_1") String operator_1,
+                                                  @Param("item_1") String item_1, @Param("attr_2") String attr_2, @Param("operator_2") String operator_2, @Param("item_2") String item_2);
 }

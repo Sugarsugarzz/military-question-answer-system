@@ -35,7 +35,7 @@ public class TestQA {
 //        QA.qa_main("小明", "中国的战斗机有哪些？", sf.format(new Date()));
 
         // 单类别名
-        QA.qa_main("小明", "战斗机有哪些？", sf.format(new Date()));
+//        QA.qa_main("小明", "战斗机有哪些？", sf.format(new Date()));
 
         // 单实体
 //        QA.qa_main("我想找中国的神舟七号");
@@ -56,7 +56,7 @@ public class TestQA {
 //        QA.qa_main("战斗机里长度最短的是哪个？");
 
         // 单属性单类别单区间
-//        QA.qa_main("长度大于25米的战斗机有哪些？");
+//        QA.qa_main("小明", "长度大于25米的战斗机有哪些？", sf.format(new Date()));
 //        QA.qa_main("发射日期大于2011年的宇宙飞船？");
 //        QA.qa_main("宇宙飞船里发射日期在2011年之后的有哪些？");
 
@@ -64,7 +64,8 @@ public class TestQA {
 //        QA.qa_main("小明", "发射日期小于2010年且大于2005年的宇宙飞船", sf.format(new Date()));
 
         // 多属性单类别多区间
-//        QA.qa_main("小明", "服役时间在1950年之后2000年之前且最大航程大于5000公里的运输机？", sf.format(new Date()));
+//        QA.qa_main("小明", "长度大于25米且高度大于5米的战斗机有哪些？？", sf.format(new Date()));
+        QA.qa_main("小明", "首飞时间晚于2010年且高度大于4米的战斗机有哪些？？", sf.format(new Date()));
 
     }
 }

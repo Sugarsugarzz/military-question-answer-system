@@ -180,4 +180,36 @@ public class DbSearcher {
 
         return answerMapper.findInMultiRangeByTime(category, attr, operator_1, item_1, operator_2, item_2);
     }
+
+    /**
+     * 多属性单类别单区间（数值型）
+     * @param category 类别名
+     * @param attr_1 属性名_1
+     * @param operator_1 比较符_1
+     * @param item_1 比较数值_1
+     * @param attr_2 属性名_2
+     * @param operator_2 比较符_2
+     * @param item_2 比较数值_2
+     * @return 答案
+     */
+    public static List<Answer> searchMultiAttrInSingleRangeByUnit(String category, String attr_1, String operator_1, String item_1, String attr_2, String operator_2, String item_2) {
+
+        return answerMapper.findMultiAttrInSingleRangeByUnit(category, attr_1, operator_1, item_1, attr_2, operator_2, item_2);
+    }
+
+    /**
+     * 多属性单类别单区间（时间数值混合型）
+     * @param category 类别名
+     * @param attr_1 属性名_1
+     * @param operator_1 比较符_1
+     * @param item_1 比较数值_1
+     * @param attr_2 属性名_2
+     * @param operator_2 比较符_2
+     * @param item_2 比较数值_2
+     * @return 答案
+     */
+    public static List<Answer> searchMultiAttrInSingleRangeByTimeAndUnit(String category, String attr_1, String operator_1, String item_1, String attr_2, String operator_2, String item_2) {
+
+        return answerMapper.findMultiAttrInSingleRangeByTimeAndUnit(category, attr_1, operator_1, item_1, attr_2, operator_2, item_2);
+    }
 }
