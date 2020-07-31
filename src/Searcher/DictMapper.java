@@ -35,44 +35,37 @@ public class DictMapper {
 
     private static Map<String, String> buildCountry() {
         String filepath = "data/dict_for_match_query/country.txt";
-        FileOperator fileOperator = new FileOperator(filepath);
-        return fileOperator.matchFileToMap();
+        return FileOperator.matchFileToMap(filepath);
     }
 
     private static Map<String, String> buildBigCategory() {
         String filepath = "data/dict_for_match_query/big_category.txt";
-        FileOperator fileOperator = new FileOperator(filepath);
-        return fileOperator.matchFileToMap();
+        return FileOperator.matchFileToMap(filepath);
     }
 
     private static Map<String, String> buildSmallCategory() {
         String filepath = "data/dict_for_match_query/small_category.txt";
-        FileOperator fileOperator = new FileOperator(filepath);
-        return fileOperator.matchFileToMap();
+        return FileOperator.matchFileToMap(filepath);
     }
 
     private static Map<String, String> buildEntity() {
         String filepath = "data/dict_for_match_query/entity.txt";
-        FileOperator fileOperator = new FileOperator(filepath);
-        return fileOperator.matchFileToMap();
+        return FileOperator.matchFileToMap(filepath);
     }
 
     private static Map<String, String> buildAttribute() {
         String filepath = "data/dict_for_match_query/attribute.txt";
-        FileOperator fileOperator = new FileOperator(filepath);
-        return fileOperator.matchFileToMap();
+        return FileOperator.matchFileToMap(filepath);
     }
 
     private static Map<String, String> buildCompare() {
         String filepath = "data/dict_for_match_query/compare.txt";
-        FileOperator fileOperator = new FileOperator(filepath);
-        return fileOperator.matchFileToMap();
+        return FileOperator.matchFileToMap(filepath);
     }
 
     private static Map<String, String> buildMost() {
         String filepath = "data/dict_for_match_query/most.txt";
-        FileOperator fileOperator = new FileOperator(filepath);
-        return fileOperator.matchFileToMap();
+        return FileOperator.matchFileToMap(filepath);
     }
 
     /**

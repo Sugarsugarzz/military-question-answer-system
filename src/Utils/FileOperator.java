@@ -9,36 +9,11 @@ public class FileOperator {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    private String filepath = null;
-
-    /**
-     * 无参构造函数
-     */
-    public FileOperator() {
-    }
-
-    /**
-     * 有参构造函数
-     * @param filepath 文件路径
-     */
-    public FileOperator(String filepath) {
-        this.filepath = filepath;
-        File file = new File(filepath);
-        if (!file.exists()) {
-            logger.error(filepath + " - 文件不存在！");
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                logger.error("路径：" + filepath + "  创建失败！", e);
-            }
-        }
-    }
-
     /**
      * Match文件转Map函数（Match File to Match Map）
      * @return Map函数
      */
-    public Map<String, String> matchFileToMap() {
+    public static Map<String, String> matchFileToMap(String filepath) {
 
         Map<String, String> map = new HashMap<>();
 
@@ -62,10 +37,32 @@ public class FileOperator {
     }
 
     /**
+     * Map函数转Match文件（Match Map to Match File）
+     * @param map Map函数
+     * @param filepath 生成文件路径
+     */
+    public static void mapToMatchFile(Map<String, String> map, String filepath) {
+
+        try {
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filepath)));
+            for (String key: map.keySet()) {
+                bw.write(key + "：" + map.get(key) + "\n");
+            }
+            bw.flush();
+            bw.close();
+        } catch (FileNotFoundException e) {
+            logger.error(filepath + " - 写文件未找到！", e);
+        } catch (IOException e) {
+            logger.error(filepath + " - 写文件发生错误！", e);
+        }
+
+    }
+
+    /**
      * Match文件转Segment文件（Match File to Segment File）
      * 将问句中所有可能涉及的实体词加入到分词器的词典中
      */
-    public void matchFileToSegFile() {
+    public static void matchFileToSegFile() {
 
         // 获取Match文件目录
         File file = new File("data/dict_for_match_query");
@@ -101,12 +98,36 @@ public class FileOperator {
     }
 
     /**
+     * Match文件转Segment文件（Match File to Segment File）
+     * 将问句中所有可能涉及的实体词加入到分词器的词典中
+     */
+    public static void matchFileToSegFile(String filepath, String target_filepath) {
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filepath));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(target_filepath)));
+            String str;
+            while ((str = br.readLine()) != null) {
+                for (String s : str.split("：")[1].split("\\|")) {
+                    bw.write(s + "\n");
+                }
+            }
+            bw.flush();
+            bw.close();
+        } catch (FileNotFoundException e) {
+            logger.error(filepath + " - 写文件未找到！", e);
+        } catch (IOException e) {
+            logger.error(filepath + " - 写文件发生错误！", e);
+        }
+    }
+
+    /**
      * 将实体List写入文件
      * 以  实体：实体  的形式，一般在getXXX列表后使用此方法。
      * @param entities 实体列表
      * @param filepath 文件路径
      */
-    public void entitiesToFile(List<String> entities, String filepath) {
+    public static void entitiesToFile(List<String> entities, String filepath) {
 
         try {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filepath)));
@@ -121,7 +142,6 @@ public class FileOperator {
             logger.error(filepath + " - 写文件发生错误！", e);
         }
     }
-
 }
 
 
