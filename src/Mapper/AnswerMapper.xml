@@ -3,6 +3,11 @@
 
 <mapper namespace="Mapper.AnswerMapper">
 
+    <insert id="saveQAInfo">
+        INSERT INTO history_qa(uid, time, question, answer)
+        VALUES (#{uid}, #{q_time}, #{question}, #{answer})
+    </insert>
+
     <select id="findByCountryAndCategory" resultType="Model.Answer">
         SELECT e.entity_id, e.entity_name
         FROM concepts c, entities e, entity_attr a

@@ -16,15 +16,29 @@ public class DbSearcher {
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
     static AnswerMapper answerMapper;
+    static SqlSession sqlSession;
 
     static {
         // 加载 MyBatis配置文件
         InputStream inputStream = DbSearcher.class.getClassLoader().getResourceAsStream("mybatis-config.xml");
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
         SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(inputStream);
-        SqlSession sqlSession = sqlSessionFactory.openSession();
 
+        sqlSession = sqlSessionFactory.openSession();
         answerMapper = sqlSession.getMapper(AnswerMapper.class);
+    }
+
+    /**
+     * 单轮问答信息存入数据库
+     * @param uid 用户id
+     * @param q_time 问答时间
+     * @param question 问句
+     * @param answer 答案JSON
+     */
+    public static void insertQAInfo(String uid, String q_time, String question, String answer) {
+
+        answerMapper.saveQAInfo(uid, q_time, question, answer);
+        sqlSession.commit();
     }
 
     /**

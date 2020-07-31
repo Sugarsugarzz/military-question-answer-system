@@ -3,6 +3,8 @@ package Test;
 import QA.MilitaryQA;
 import QA.MultiMilitaryQA;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,15 +14,16 @@ import org.apache.logging.log4j.Logger;
 public class TestQA {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
+    private static SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     public static void main(String[] args) {
 
         MultiMilitaryQA QA = new MultiMilitaryQA();
         
-        /*while (true) {
+        while (true) {
         	String question = new Scanner(System.in).next();
-        	QA.qa_main(question);
-        }*/
+        	QA.qa_main("小黑", question, sf.format(new Date()));
+        }
 
         // 多轮测试
 //        QA.qa_main("我想找中国的神舟七号");
@@ -55,7 +58,7 @@ public class TestQA {
 //        QA.qa_main("宇宙飞船里发射日期在2011年之后的有哪些？");
 
         // 单属性单类别多区间
-        QA.qa_main("发射日期小于2010年且大于2005年的宇宙飞船");
+//        QA.qa_main("小明", "发射日期小于2010年且大于2005年的宇宙飞船", sf.format(new Date()));
 
     }
 }

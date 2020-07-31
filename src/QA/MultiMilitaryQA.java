@@ -23,18 +23,18 @@ public class MultiMilitaryQA {
 	 * 在调用单轮问答基础上实现，加一层对问句的预处理过程
 	 * @param question 问句
 	 */
-	public void qa_main(String question) {
+	public void qa_main(String uid, String question, String q_time) {
     	
     	int numQA = QAs.size(); 
     	MilitaryQA oQA = new MilitaryQA();
     	if(numQA == 0)
-    		QAs.add(oQA.oqa_main(question));
+    		QAs.add(oQA.oqa_main(question, question, uid, q_time));
     	else {
     		// 多轮，获取历史Entity和Attr，将问句中的指代词替换为对应实体名
     		QuestionParser questionParser = new QuestionParser();
     		EAHistory eah = getHistory();
     		String newQuestion = questionParser.preProcessQuestion(eah, question);
-    		QAs.add(oQA.oqa_main(newQuestion));
+    		QAs.add(oQA.oqa_main(question, newQuestion, uid, q_time));
     	}
     }
 
