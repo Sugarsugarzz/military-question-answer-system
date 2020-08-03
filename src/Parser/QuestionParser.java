@@ -66,6 +66,11 @@ public class QuestionParser {
         // 初始化词性字典，防止多次查询模式叠加
         buildParserDict();
 
+        // 首先判断是否是 <热点> 和 <直达> 问题，否则，转 <百科> 和 <对比> 查询
+        boolean isHotOrNonstop = checkQuestion(question);
+        if (isHotOrNonstop)
+            return parser_dict;
+
         // 识别出问句中的<时间>，加入分词器词典
         Matcher m_time = Pattern.compile("[0-9]{4}年([0-9]{0,2}月)?([0-9]{0,2}日)?").matcher(question);
         while (m_time.find())
@@ -95,7 +100,61 @@ public class QuestionParser {
 
         return parser_dict;
     }
-    
+
+    /**
+     * 判断是否是 <热点> 或 <直达> 问题
+     * @param question 问句
+     * @return 标志符
+     */
+    private static boolean checkQuestion(String question) {
+        if (question.endsWith("热点")) {
+            parser_dict.get("pattern").add("3");
+            logger.info("词性匹配情况：" + parser_dict);
+            logger.info("问句模式：热点查询");
+        }
+
+        else if (question.endsWith("头条")) {
+            parser_dict.get("pattern").add("41");
+            logger.info("词性匹配情况：" + parser_dict);
+            logger.info("问句模式：直达 - 头条");
+        }
+
+        else if (question.endsWith("百科")) {
+            parser_dict.get("pattern").add("42");
+            logger.info("词性匹配情况：" + parser_dict);
+            logger.info("问句模式：直达 - 百科");
+        }
+
+        else if (question.endsWith("订阅")) {
+            parser_dict.get("pattern").add("43");
+            logger.info("词性匹配情况：" + parser_dict);
+            logger.info("问句模式：直达 - 订阅");
+        }
+
+        else if (question.endsWith("我的收藏")) {
+            parser_dict.get("pattern").add("44");
+            logger.info("词性匹配情况：" + parser_dict);
+            logger.info("问句模式：直达 - 我的收藏");
+        }
+
+        else if (question.endsWith("浏览历史")) {
+            parser_dict.get("pattern").add("45");
+            logger.info("词性匹配情况：" + parser_dict);
+            logger.info("问句模式：直达 - 浏览历史");
+        }
+
+        else if (question.endsWith("无内容")) {
+            parser_dict.get("pattern").add("46");
+            logger.info("词性匹配情况：" + parser_dict);
+            logger.info("问句模式：直达 - 无内容");
+        }
+
+        else {
+            return false;
+        }
+
+        return true;
+    }
     
     /**
      * 多轮问答中，处理问句中出现指代词的情况，将其替换为对应实体和属性

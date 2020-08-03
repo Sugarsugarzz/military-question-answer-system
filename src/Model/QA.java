@@ -4,16 +4,20 @@ import java.util.List;
 
 public class QA {
 
-    // 历史实体
+    // 单轮问答中的实体
     private List<String> entities;
-    // 历史属性
+    // 单轮问答中的属性
 	private List<String> attrs;
-    // 问题
+    // 问句
     private String question;
-    // 回答
-    private List<Answer> answer;
+    // 回答 JSON
+    private String answer;
 
-	public QA(List<String> entities, List<String> attrs, String question, List<Answer> answer) {
+	public QA() {
+
+	}
+
+	public QA(List<String> entities, List<String> attrs, String question, String answer) {
 		this.entities = entities;
 		this.attrs = attrs;
 		this.question = question;
@@ -39,14 +43,16 @@ public class QA {
 	public String getQuestion() {
 		return question;
 	}
+
 	public void setQuestion(String question) {
 		this.question = question;
 	}
-	
-	public List<Answer> getAnswer() {
+
+	public String getAnswer() {
 		return answer;
 	}
-	public void setAnswer(List<Answer> answer) {
+
+	public void setAnswer(String answer) {
 		this.answer = answer;
 	}
 
@@ -56,7 +62,7 @@ public class QA {
 				"entities=" + entities +
 				", attrs=" + attrs +
 				", question='" + question + '\'' +
-				", answer=" + answer +
+				", answer='" + answer + '\'' +
 				'}';
 	}
 }

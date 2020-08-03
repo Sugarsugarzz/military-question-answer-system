@@ -1,6 +1,5 @@
 package Test;
 
-import QA.MilitaryQA;
 import QA.MultiMilitaryQA;
 
 import java.text.SimpleDateFormat;
@@ -19,53 +18,61 @@ public class TestQA {
     public static void main(String[] args) {
 
         MultiMilitaryQA QA = new MultiMilitaryQA();
-        
+        String answer;
+
         while (true) {
         	String question = new Scanner(System.in).next();
         	QA.qa_main("小黑", question, sf.format(new Date()));
         }
 
         // 多轮测试
-//        QA.qa_main("小黑", "我想找中国的神舟七号", sf.format(new Date()));
-//        QA.qa_main("小黑", "歼-10战斗机的长度", sf.format(new Date()));
-//        QA.qa_main("小黑", "神舟六号载人飞船的长度", sf.format(new Date()));  // 神舟六号没有长度属性lol
-//        QA.qa_main("小黑", "他们的生产商", sf.format(new Date()));
+//        answer = QA.qa_main("小黑", "我想找中国的神舟七号", sf.format(new Date()));
+//        answer = QA.qa_main("小黑", "歼-10战斗机的长度", sf.format(new Date()));
+//        answer = QA.qa_main("小黑", "神舟六号载人飞船的长度", sf.format(new Date()));  // 神舟六号没有长度属性lol
+//        answer = QA.qa_main("小黑", "他们的生产商", sf.format(new Date()));
 
         // 国家及类别名
-//        QA.qa_main("小明", "中国的战斗机有哪些？", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "中国的战斗机有哪些？", sf.format(new Date()));
 
         // 单类别名
-//        QA.qa_main("小明", "战斗机有哪些？", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "战斗机有哪些？", sf.format(new Date()));
 
         // 单实体
-//        QA.qa_main("我想找中国的神舟七号");
+//        answer = QA.qa_main("小明", "我想找中国的神舟七号", sf.format(new Date()));
 
         // 多实体
-//        QA.qa_main("我想找中国的神舟五号和神舟七号");
+//        answer = QA.qa_main("小明", "我想找中国的神舟五号和神舟七号", sf.format(new Date()));
 
         // 单实体单属性/多属性
-//        QA.qa_main("神舟七号的长度、发射地点、生产商、原产国、简介？");
+//        answer = QA.qa_main("小明", "神舟七号的长度、发射地点、生产商、原产国、简介？", sf.format(new Date()));
 
         // 多实体单属性/多属性
-//        QA.qa_main("神舟五号、神舟七号和歼-20战斗机的长度、发射地点、生产商、原产国和简介？");
+//        answer = QA.qa_main("小明", "神舟五号、神舟七号和歼-20战斗机的长度、发射地点、生产商、原产国和简介？", sf.format(new Date()));
 
         // 全类别属性最值
-//        QA.qa_main("武器装备里长度最长的是哪个？");
+//        answer = QA.qa_main("小明", "武器装备里长度最长的是哪个？", sf.format(new Date()));
 
         // 单类别属性最值
-//        QA.qa_main("战斗机里长度最短的是哪个？");
+//        answer = QA.qa_main("小明", "战斗机里长度最短的是哪个？", sf.format(new Date()));
 
         // 单属性单类别单区间
-//        QA.qa_main("小明", "长度大于25米的战斗机有哪些？", sf.format(new Date()));
-//        QA.qa_main("发射日期大于2011年的宇宙飞船？");
-//        QA.qa_main("宇宙飞船里发射日期在2011年之后的有哪些？");
+//        answer = QA.qa_main("小明", "长度大于25米的战斗机有哪些？", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "发射日期大于2011年的宇宙飞船？", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "宇宙飞船里发射日期在2011年之后的有哪些？", sf.format(new Date()));
 
         // 单属性单类别多区间
-//        QA.qa_main("小明", "发射日期小于2010年且大于2005年的宇宙飞船", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "发射日期小于2010年且大于2005年的宇宙飞船", sf.format(new Date()));
 
         // 多属性单类别多区间
-//        QA.qa_main("小明", "长度大于25米且高度大于5米的战斗机有哪些？？", sf.format(new Date()));
-//        QA.qa_main("小黑", "首飞时间晚于2010年且高度大于4米的战斗机有哪些？？", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "长度大于25米且高度大于5米的战斗机有哪些？", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "首飞时间晚于2010年且高度大于4米的战斗机有哪些？", sf.format(new Date()));
+
+        // 热点模式 测试
+//        answer = QA.qa_main("小明", "我想看2020年8月3日的战斗机相关热点", sf.format(new Date()));
+
+        // 直达模式 测试
+//        answer = QA.qa_main("小明", "打开浏览历史", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "前往我的收藏", sf.format(new Date()));
 
     }
 }

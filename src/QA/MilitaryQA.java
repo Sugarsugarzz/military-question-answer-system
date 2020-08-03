@@ -1,12 +1,9 @@
 package QA;
 
-import Model.Answer;
 import Model.QA;
 import Parser.QuestionParser;
 import Searcher.AnswerSearcher;
 import Searcher.DbSearcher;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,7 +23,7 @@ public class MilitaryQA {
      * @param q_time 提问时间
      * @return QA实体类，包含该轮问答的词性字典、问句和答案
      */
-    public QA oqa_main(String originQuestion, String question, String uid, String q_time) {
+    public static QA oqa_main(String originQuestion, String question, String uid, String q_time) {
 
         logger.info("Question is ：" + question);
         // 问句解析
@@ -34,35 +31,12 @@ public class MilitaryQA {
         Map<String, List<String>> parser_dict = QuestionParser.parser(question);
         // 答案检索
         logger.info("Searching Answer...");
-        List<Answer> results = AnswerSearcher.getAnswer(parser_dict);
+        String answer = AnswerSearcher.getAnswer(parser_dict);
         // 打印答案
-        logger.info("Answer is ：" + results);
+        logger.info("Answer is ：" + answer);
         // 将该轮问答信息存入数据库
-        DbSearcher.insertQAInfo(uid, q_time, originQuestion, assembleJSON(results));
+        DbSearcher.insertQAInfo(uid, q_time, originQuestion, answer);
 
-        return new QA(parser_dict.get("n_entity"), parser_dict.get("n_attr"), question, results);
+        return new QA(parser_dict.get("n_entity"), parser_dict.get("n_attr"), question, answer);
     }
-
-    /**
-     * 组装答案JSON串
-     * @param results 答案实体列表
-     * @return JSON
-     */
-    public String assembleJSON(List<Answer> results) {
-
-        JSONArray jsonArray = new JSONArray();
-
-        for (Answer answer: results) {
-            JSONObject obj = new JSONObject();
-            obj.put("entity_id", answer.getEntity_id());
-            obj.put("entity_name", answer.getEntity_name());
-            obj.put("attr_name", answer.getAttr_name());
-            obj.put("attr_value", answer.getAttr_value());
-            jsonArray.add(obj);
-        }
-
-        return jsonArray.toJSONString();
-    }
-
-
 }
