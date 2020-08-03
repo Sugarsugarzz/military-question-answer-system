@@ -20,16 +20,16 @@ public class TestQA {
 
         MultiMilitaryQA QA = new MultiMilitaryQA();
         
-//        while (true) {
-//        	String question = new Scanner(System.in).next();
-//        	QA.qa_main("小黑", question, sf.format(new Date()));
-//        }
+        while (true) {
+        	String question = new Scanner(System.in).next();
+        	QA.qa_main("小黑", question, sf.format(new Date()));
+        }
 
         // 多轮测试
-//        QA.qa_main("我想找中国的神舟七号");
-//        QA.qa_main("歼-10战斗机的长度");
-//        QA.qa_main("神舟六号载人飞船的长度");
-//        QA.qa_main("他们的生产商");
+//        QA.qa_main("小黑", "我想找中国的神舟七号", sf.format(new Date()));
+//        QA.qa_main("小黑", "歼-10战斗机的长度", sf.format(new Date()));
+//        QA.qa_main("小黑", "神舟六号载人飞船的长度", sf.format(new Date()));  // 神舟六号没有长度属性lol
+//        QA.qa_main("小黑", "他们的生产商", sf.format(new Date()));
 
         // 国家及类别名
 //        QA.qa_main("小明", "中国的战斗机有哪些？", sf.format(new Date()));
@@ -65,7 +65,7 @@ public class TestQA {
 
         // 多属性单类别多区间
 //        QA.qa_main("小明", "长度大于25米且高度大于5米的战斗机有哪些？？", sf.format(new Date()));
-        QA.qa_main("小明", "首飞时间晚于2010年且高度大于4米的战斗机有哪些？？", sf.format(new Date()));
+//        QA.qa_main("小黑", "首飞时间晚于2010年且高度大于4米的战斗机有哪些？？", sf.format(new Date()));
 
     }
 }

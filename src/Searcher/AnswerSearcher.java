@@ -10,136 +10,130 @@ public class AnswerSearcher {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    private Map<String, List<List<String>>> patterns = buildPatterns();
+    static Map<String, List<List<String>>> patterns = new HashMap<>();
 
     /**
      * 初始化问句匹配模式
-     * @return 模式字典
      */
-    private Map<String, List<List<String>>> buildPatterns() {
-
-        Map<String, List<List<String>>> patterns_map = new HashMap<>();
-
+    static {
         // 模式 ：单实体
-        patterns_map.put("单类别名", new ArrayList<>());
-        patterns_map.get("单类别名").add(Arrays.asList("n_small"));
+        patterns.put("单类别名", new ArrayList<>());
+        patterns.get("单类别名").add(Arrays.asList("n_small"));
 
         // 模式 ：国家及类别名
-        patterns_map.put("国家及类别名", new ArrayList<>());
-        patterns_map.get("国家及类别名").add(Arrays.asList("n_country", "n_small"));
-        patterns_map.get("国家及类别名").add(Arrays.asList("n_small", "n_country"));
+        patterns.put("国家及类别名", new ArrayList<>());
+        patterns.get("国家及类别名").add(Arrays.asList("n_country", "n_small"));
+        patterns.get("国家及类别名").add(Arrays.asList("n_small", "n_country"));
 
         // 模式 ：单实体
-        patterns_map.put("单实体", new ArrayList<>());
-        patterns_map.get("单实体").add(Arrays.asList("n_entity"));
-        patterns_map.get("单实体").add(Arrays.asList("n_country", "n_entity"));
-        patterns_map.get("单实体").add(Arrays.asList("n_entity", "n_country"));
+        patterns.put("单实体", new ArrayList<>());
+        patterns.get("单实体").add(Arrays.asList("n_entity"));
+        patterns.get("单实体").add(Arrays.asList("n_country", "n_entity"));
+        patterns.get("单实体").add(Arrays.asList("n_entity", "n_country"));
 
         // 模式 ：多实体
-        patterns_map.put("多实体", new ArrayList<>());
-        patterns_map.get("多实体").add(Arrays.asList("n_entity", "n_entity"));
-        patterns_map.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity"));
-        patterns_map.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity"));
-        patterns_map.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity"));
-        patterns_map.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity"));
-        patterns_map.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity"));
-        patterns_map.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity", "n_entity"));
-        patterns_map.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity", "n_entity", "n_entity"));
+        patterns.put("多实体", new ArrayList<>());
+        patterns.get("多实体").add(Arrays.asList("n_entity", "n_entity"));
+        patterns.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity"));
+        patterns.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity"));
+        patterns.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity"));
+        patterns.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity"));
+        patterns.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity"));
+        patterns.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity", "n_entity"));
+        patterns.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity", "n_entity", "n_entity"));
 
         // 模式 ：单实体单属性/多属性
-        patterns_map.put("单实体单属性/多属性", new ArrayList<>());
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.put("单实体单属性/多属性", new ArrayList<>());
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
 
         // 模式 ：多实体单属性/多属性
-        patterns_map.put("多实体单属性/多属性", new ArrayList<>());
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns_map.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.put("多实体单属性/多属性", new ArrayList<>());
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
+        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
 
         // 模式 ：单属性单类别单区间
-        patterns_map.put("单属性单类别单区间", new ArrayList<>());
-        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_small"));
-        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit"));
-        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_small"));
-        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_small"));
-        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time"));
-        patterns_map.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare"));
+        patterns.put("单属性单类别单区间", new ArrayList<>());
+        patterns.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_small"));
+        patterns.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit"));
+        patterns.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_small"));
+        patterns.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_small"));
+        patterns.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time"));
+        patterns.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare"));
 
         // 模式 ：单属性单类别多区间
-        patterns_map.put("单属性单类别多区间", new ArrayList<>());
-        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_compare", "n_unit", "n_small"));
-        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_compare", "n_unit"));
-        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_compare", "n_time", "n_small"));
-        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_time", "n_compare", "n_small"));
-        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time", "n_compare", "n_time"));
-        patterns_map.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare", "n_time", "n_compare"));
+        patterns.put("单属性单类别多区间", new ArrayList<>());
+        patterns.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_compare", "n_unit", "n_small"));
+        patterns.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_compare", "n_unit"));
+        patterns.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_compare", "n_time", "n_small"));
+        patterns.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_time", "n_compare", "n_small"));
+        patterns.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time", "n_compare", "n_time"));
+        patterns.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare", "n_time", "n_compare"));
 
         // 模式 ：多属性单类别单区间
-        patterns_map.put("多属性单类别单区间", new ArrayList<>());
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_unit", "n_small"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_unit"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_attr", "n_compare", "n_unit", "n_small"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_attr", "n_compare", "n_unit", "n_small"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_time", "n_small"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_time", "n_compare", "n_small"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time", "n_attr", "n_compare", "n_unit"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare", "n_attr", "n_compare", "n_unit"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_time"));
-        patterns_map.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_time", "n_compare"));
+        patterns.put("多属性单类别单区间", new ArrayList<>());
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_unit", "n_small"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_unit"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_attr", "n_compare", "n_unit", "n_small"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_attr", "n_compare", "n_unit", "n_small"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_time", "n_small"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_time", "n_compare", "n_small"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time", "n_attr", "n_compare", "n_unit"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare", "n_attr", "n_compare", "n_unit"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_time"));
+        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_time", "n_compare"));
 
         // 模式 ：全类别属性最值
-        patterns_map.put("全类别属性最值", new ArrayList<>());
-        patterns_map.get("全类别属性最值").add(Arrays.asList("n_attr", "n_most"));
-        patterns_map.get("全类别属性最值").add(Arrays.asList("n_most", "n_attr"));
+        patterns.put("全类别属性最值", new ArrayList<>());
+        patterns.get("全类别属性最值").add(Arrays.asList("n_attr", "n_most"));
+        patterns.get("全类别属性最值").add(Arrays.asList("n_most", "n_attr"));
 
         // 模式 ：单类别属性最值
-        patterns_map.put("单类别属性最值", new ArrayList<>());
-        patterns_map.get("单类别属性最值").add(Arrays.asList("n_small", "n_attr", "n_most"));
-        patterns_map.get("单类别属性最值").add(Arrays.asList("n_small", "n_most", "n_attr"));
-        patterns_map.get("单类别属性最值").add(Arrays.asList("n_attr", "n_most", "n_small"));
-        patterns_map.get("单类别属性最值").add(Arrays.asList("n_attr", "n_small", "n_most"));
-
+        patterns.put("单类别属性最值", new ArrayList<>());
+        patterns.get("单类别属性最值").add(Arrays.asList("n_small", "n_attr", "n_most"));
+        patterns.get("单类别属性最值").add(Arrays.asList("n_small", "n_most", "n_attr"));
+        patterns.get("单类别属性最值").add(Arrays.asList("n_attr", "n_most", "n_small"));
+        patterns.get("单类别属性最值").add(Arrays.asList("n_attr", "n_small", "n_most"));
 
 //        logger.info("问句模式匹配字典初始化完成！");
-        return patterns_map;
     }
 
     /**
      * 判断问句模式，从数据库检索答案
      */
-    public List<Answer> getAnswer(Map<String, List<String>> parser_dict) {
+    public static List<Answer> getAnswer(Map<String, List<String>> parser_dict) {
 
         // 存储答案
         List<Answer> answers = new ArrayList<>();

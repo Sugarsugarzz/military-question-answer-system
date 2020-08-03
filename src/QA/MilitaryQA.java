@@ -18,9 +18,6 @@ public class MilitaryQA {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    private QuestionParser questionParser = new QuestionParser();
-    private AnswerSearcher answerSearcher = new AnswerSearcher();
-
     /**
      * 单轮问答主函数
      * @param originQuestion 原始问句
@@ -34,16 +31,16 @@ public class MilitaryQA {
         logger.info("Question is ：" + question);
         // 问句解析
         logger.info("Parsing Question...");
-        Map<String, List<String>> parser_dict = questionParser.parser(question);
+        Map<String, List<String>> parser_dict = QuestionParser.parser(question);
         // 答案检索
         logger.info("Searching Answer...");
-        List<Answer> results = answerSearcher.getAnswer(parser_dict);
+        List<Answer> results = AnswerSearcher.getAnswer(parser_dict);
         // 打印答案
         logger.info("Answer is ：" + results);
         // 将该轮问答信息存入数据库
         DbSearcher.insertQAInfo(uid, q_time, originQuestion, assembleJSON(results));
 
-        return new QA(parser_dict, question, results);
+        return new QA(parser_dict.get("n_entity"), parser_dict.get("n_attr"), question, results);
     }
 
     /**
