@@ -29,8 +29,9 @@ public class MultiMilitaryQA {
 			qa = MilitaryQA.oqa_main(question, question, uid, q_time);
 		}
     	else {
+			String standQuestion = QuestionParser.preProcessQuestion(question); //将原问题标准化
     		// 多轮，获取历史Entity和Attr，将问句中的指代词替换为对应实体名
-    		String newQuestion = QuestionParser.preProcessQuestion(getHistory(), question);
+			String newQuestion = QuestionParser.anaphoraResolution(getHistory(), standQuestion); //指代消解
 			qa = MilitaryQA.oqa_main(question, newQuestion, uid, q_time);
 		}
 		QAs.add(qa);
