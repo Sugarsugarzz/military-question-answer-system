@@ -3,6 +3,7 @@ package Test;
 import Utils.DbOperator;
 import Utils.FileOperator;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 
@@ -41,19 +42,46 @@ public class TestOperator {
 //            System.out.println("Key：" + entry.getKey() + ", Value：" + entry.getValue());
 //        }
 
+
+
         /*
             将 data/dict_for_match_query 下所有涉及的实体词，都加入到分词器的分词词典中
          */
 //        FileOperator.matchFileToSegFile();
 
+
+
         /*
             获取 Entity及其别名，以（实体：实体别名列表）形式写入match文件中，并将所有实体别名加入分词器词典
          */
-        Map<String, String > map = DbOperator.getEntitiesAndSameas();
-        String filepath = "data/dict_for_match_query/entity2.txt";
-        String target_filepath = "data/dict_for_segment/entity2.txt";
-        FileOperator.mapToMatchFile(map, filepath);
-        FileOperator.matchFileToSegFile(filepath, target_filepath);
+//        Map<String, String > map = DbOperator.getEntitiesAndSameas();
+//        String filepath = "data/dict_for_match_query/entity2.txt";
+//        String target_filepath = "data/dict_for_segment/entity2.txt";
+//        FileOperator.mapToMatchFile(map, filepath);
+//        FileOperator.matchFileToSegFile(filepath, target_filepath);
+
+
+        /*
+    ===================================================================================================================
+                              上面的方法基本弃用，本地match txt已存入数据库，从数据库读取。
+    ===================================================================================================================
+        */
+
+        /*
+            将 match file 存入数据库的 match_dict 表，以后直接从数据库读，不从本地读
+         */
+//        DbOperator.getMatchFileToDB();
+//        DbOperator.getEntitiesAndSameasToDB();
+//        DbOperator.getBigCategoryToDB();
+//        DbOperator.getSmallCategoryToDB();
+//        DbOperator.getAttributesToDB();
+
+        /*
+            根据数据库的 match_dict 表，获取分词词典到本地，加载到分词器中
+         */
+        DbOperator.getDBToSegmentDict();
+
+
 
 
 
