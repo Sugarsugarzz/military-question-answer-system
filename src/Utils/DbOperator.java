@@ -128,7 +128,7 @@ public class DbOperator {
         ResultSet rs = getResultSet(sql);
         try {
             while (rs.next()) {
-                map.put(rs.getString("entity_name"), rs.getString("entity_name"));
+                map.put(rs.getString("entity_name"), rs.getString("entity_name").replace(" ", ""));
             }
         } catch (SQLException e) {
             logger.error("读数据库出错！", e);
@@ -144,7 +144,7 @@ public class DbOperator {
                     // 打印出来额是有问题的，没有对应实体
                     System.out.println(rs.getString("entity_name_1"));
                 } else {
-                    map.put(rs.getString("entity_name_1"), map.get(rs.getString("entity_name_1")) + "|" + rs.getString("entity_name_2"));
+                    map.put(rs.getString("entity_name_1"), map.get(rs.getString("entity_name_1")) + "|" + rs.getString("entity_name_2").replace(" ", ""));
                 }
             }
         } catch (SQLException e) {

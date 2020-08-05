@@ -6,7 +6,9 @@ import com.hankcs.hanlp.seg.common.Term;
 
 import Model.EAHistory;
 
-import com.mysql.jdbc.StatementInterceptorV2;
+import com.time.nlp.TimeNormalizer;
+import com.time.nlp.TimeUnit;
+import com.time.util.DateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +24,7 @@ public class QuestionParser {
     static List<String> keywords1 = new ArrayList<>();
     static List<String> keywords2 = new ArrayList<>();
     static Map<String, List<String>> parser_dict = new HashMap<>();
-    static Map<String, Integer> chineseMap = new HashMap<String, Integer>();
+    static Map<String, Integer> chineseMap = new HashMap<>();
 
     static {
         // 初始化已定义的词性列表
@@ -35,6 +37,7 @@ public class QuestionParser {
         natures.add("n_most");
         natures.add("n_time");
         natures.add("n_unit");
+        natures.add("keywords");
         // 复数指代名词
         keywords1.add("它们");
         keywords1.add("他们");
@@ -115,48 +118,64 @@ public class QuestionParser {
     }
 
     /**
-     * 判断是否是 <热点> 或 <直达> 问题
+     * 判断是否是 <热点> 或 <直达> 问题，对于 <热点> 问题提取时间和关键词
      * @param question 问句
      * @return 标志符
      */
     private static boolean checkQuestion(String question) {
-        if (question.endsWith("热点")) {
+
+        if (question.contains("热点") || question.contains("REDIAN")) {
             parser_dict.get("pattern").add("3");
+            // 提取 起始时间 和 结束时间
+            question = question.replace("热点", "").replace("新闻", "").replace("想", "").replace("REDIAN", "");
+            Map<String, TimeUnit> TimeResults = new TimeNormalizer().parse(question);
+            for (String key : TimeResults.keySet()) {
+                question = question.replace(key, "");
+                parser_dict.get("n_time").add(DateUtil.formatDateDefault(TimeResults.get(key).getTime()));
+            }
+            // 提取 关键词
+            parser_dict.get("keywords").addAll(HanLP.extractKeyword(question, 5));
+            // 针对 n_time 长度为一的情况，将对应字段也加入，以便后面识别加入end_time
+            if (parser_dict.get("n_time").size() == 1) {
+                for (String key : TimeResults.keySet())
+                    parser_dict.get("n_unit").add(key);
+            }
+
             logger.info("词性匹配情况：" + parser_dict);
             logger.info("问句模式：热点查询");
         }
 
-        else if (question.endsWith("头条")) {
+        else if (question.contains("头条") || question.contains("TOUTIAO")) {
             parser_dict.get("pattern").add("41");
             logger.info("词性匹配情况：" + parser_dict);
             logger.info("问句模式：直达 - 头条");
         }
 
-        else if (question.endsWith("百科")) {
+        else if (question.contains("百科") || question.contains("BAIKE")) {
             parser_dict.get("pattern").add("42");
             logger.info("词性匹配情况：" + parser_dict);
             logger.info("问句模式：直达 - 百科");
         }
 
-        else if (question.endsWith("订阅")) {
+        else if (question.contains("订阅") || question.contains("DINGYUE")) {
             parser_dict.get("pattern").add("43");
             logger.info("词性匹配情况：" + parser_dict);
             logger.info("问句模式：直达 - 订阅");
         }
 
-        else if (question.endsWith("我的收藏")) {
+        else if (question.contains("我的收藏") || question.contains("WODESHOUCANG") || question.contains("SHOUCANG")) {
             parser_dict.get("pattern").add("44");
             logger.info("词性匹配情况：" + parser_dict);
             logger.info("问句模式：直达 - 我的收藏");
         }
 
-        else if (question.endsWith("浏览历史")) {
+        else if (question.contains("浏览历史") || question.contains("LIULANLISHI")) {
             parser_dict.get("pattern").add("45");
             logger.info("词性匹配情况：" + parser_dict);
             logger.info("问句模式：直达 - 浏览历史");
         }
 
-        else if (question.endsWith("无内容")) {
+        else if (question.contains("无内容") || question.contains("WUNEIRONG")) {
             parser_dict.get("pattern").add("46");
             logger.info("词性匹配情况：" + parser_dict);
             logger.info("问句模式：直达 - 无内容");
@@ -244,7 +263,7 @@ public class QuestionParser {
         standQuest = standQuest.toUpperCase();//字母全部大写
 
         //中文数字转阿拉伯数字
-        while (standQuest.indexOf("十")!=-1) { //判断问句中是否包含 “十”
+        while (standQuest.contains("十")) { //判断问句中是否包含 “十”
             StringBuilder sBuilder = new StringBuilder(standQuest);
             int num = 10;
             int index_ = standQuest.indexOf("十");

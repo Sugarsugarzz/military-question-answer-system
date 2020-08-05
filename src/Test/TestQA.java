@@ -27,8 +27,8 @@ public class TestQA {
 
         // 多轮测试
 //        answer = QA.qa_main("小黑", "我想找中国的神舟七号", sf.format(new Date()));
-//        answer = QA.qa_main("小黑", "歼-10战斗机的长度", sf.format(new Date()));
-//        answer = QA.qa_main("小黑", "神舟六号载人飞船的长度", sf.format(new Date()));  // 神舟六号没有长度属性lol
+//        answer = QA.qa_main("小黑", "歼10的长度", sf.format(new Date()));
+//        answer = QA.qa_main("小黑", "神舟六号的长度", sf.format(new Date()));  // 神舟六号没有长度属性lol
 //        answer = QA.qa_main("小黑", "他们的生产商", sf.format(new Date()));
 
         // 国家及类别名
@@ -68,7 +68,8 @@ public class TestQA {
 //        answer = QA.qa_main("小明", "首飞时间晚于2010年且高度大于4米的战斗机有哪些？", sf.format(new Date()));
 
         // 热点模式 测试
-//        answer = QA.qa_main("小明", "我想看2020年8月3日的战斗机相关热点", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "我想看上周有关歼20战斗机的热点新闻", sf.format(new Date()));
+//        answer = QA.qa_main("小明", "我想看去年五月有关歼20战斗机的热点新闻", sf.format(new Date()));
 
         // 直达模式 测试
 //        answer = QA.qa_main("小明", "打开浏览历史", sf.format(new Date()));

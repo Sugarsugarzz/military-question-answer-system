@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -16,8 +17,8 @@ public class AnswerSearcher {
 
     static Map<String, List<List<String>>> patterns = new HashMap<>();  // 问句匹配模式
 
-    static int Q_type = 1;  // 问题类型
-    static int A_type = 1;  // 答案类型
+    static int Q_type = 1;  // 问题类型 - 默认 百科
+    static int A_type = 2;  // 答案类型 - 默认 实体
 
     /**
      * 初始化问句匹配模式
@@ -173,7 +174,7 @@ public class AnswerSearcher {
 
         // 初始化
         Q_type = 1;
-        A_type = 1;
+        A_type = 2;
 
         // 存储从数据库获取的答案
         List<Answer> answers = new ArrayList<>();
@@ -182,8 +183,6 @@ public class AnswerSearcher {
         if (patterns.get("热点模式").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "热点模式"));
             Q_type = 3;
-            // 获取一下 Q_content、Q_start_time、Q_end_time
-            // 待完成
         }
 
         else if (patterns.get("直达模式-头条").contains(parser_dict.get("pattern"))) {
@@ -246,6 +245,7 @@ public class AnswerSearcher {
 
         else if (patterns.get("多实体").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "多实体"));
+            Q_type = 2;
             for (String entity: parser_dict.get("n_entity")) {
                 // 数据库检索答案
                 answers.addAll(DbSearcher.searchByEntity(DictMapper.Entity.get(entity)));
@@ -254,6 +254,7 @@ public class AnswerSearcher {
 
         else if (patterns.get("单实体单属性/多属性").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "单实体单属性/多属性"));
+            A_type = 1;
             String entity = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
             List<String> attrs = new ArrayList<>();
             for (String attr: parser_dict.get("n_attr")) {
@@ -265,6 +266,7 @@ public class AnswerSearcher {
 
         else if (patterns.get("多实体单属性/多属性").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "多实体单属性/多属性"));
+            A_type = 1;
             for (String entity: parser_dict.get("n_entity")) {
                 List<String> attrs = new ArrayList<>();
                 for (String attr: parser_dict.get("n_attr")) {
@@ -366,7 +368,7 @@ public class AnswerSearcher {
         }
 
         // 组装答案JSON
-        JSONObject jsonObject = assembleJSON(answers);
+        JSONObject jsonObject = assembleJSON(parser_dict, answers);
 
         return jsonObject.toJSONString();
     }
@@ -376,12 +378,13 @@ public class AnswerSearcher {
      * @param results 答案实体列表
      * @return JSON
      */
-    public static JSONObject assembleJSON(List<Answer> results) {
+    public static JSONObject assembleJSON(Map<String, List<String>> parser_dict, List<Answer> results) {
 
         JSONObject obj = new JSONObject();
         JSONArray jsonArray = new JSONArray();
 
         switch (Q_type) {
+
             case 1:
                 obj.put("Q_type", Q_type);
                 obj.put("A_type", A_type);
@@ -409,9 +412,39 @@ public class AnswerSearcher {
 
             case 3:
                 obj.put("Q_type", Q_type);
-                obj.put("Q_content", Arrays.asList("Keyword1", "Keyword2"));
-                obj.put("Q_start_time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                obj.put("Q_end_time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                obj.put("Q_content", parser_dict.get("keywords"));
+
+                if (parser_dict.get("n_time").size() == 0) {
+                    obj.put("Q_start_time", null);
+                    obj.put("Q_end_time", null);
+                } else if (parser_dict.get("n_time").size() == 1) {
+                    String start_time = parser_dict.get("n_time").get(0);
+                    String end_time = null;
+                    String word = parser_dict.get("n_unit").get(0);
+                    // 长度为1的在处理下，补充一个结束时间
+                    try {
+                        if (word.contains("日") || word.contains("天"))
+                            end_time = addTime(start_time, 1);
+                        else if (word.contains("周"))
+                            end_time = addTime(start_time, 2);
+                        else if (word.contains("月"))
+                            end_time = addTime(start_time, 3);
+                        else if (word.contains("年"))
+                            end_time = addTime(start_time, 4);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    obj.put("Q_start_time", start_time);
+                    obj.put("Q_end_time", end_time);
+                } else if (parser_dict.get("n_time").size() == 2) {
+                    Collections.sort(parser_dict.get("n_time"));
+                    obj.put("Q_start_time", parser_dict.get("n_time").get(0));
+                    obj.put("Q_end_time", parser_dict.get("n_time").get(1));
+                } else {
+                    Collections.sort(parser_dict.get("n_time"));
+                    obj.put("Q_start_time", parser_dict.get("n_time").get(0));
+                    obj.put("Q_end_time", parser_dict.get("n_time").get(parser_dict.get("n_time").size() - 1));
+                }
                 break;
 
             case 4:
@@ -423,4 +456,35 @@ public class AnswerSearcher {
         return obj;
     }
 
+    /**
+     * 根据语义补充一个结束日期
+     * @param date 日期字符串
+     * @param flag 天：1  周：2  月：3  年：4
+     * @return 增加后的日期字符串
+     */
+    private static String addTime(String date, int flag) throws ParseException {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date dt = sdf.parse(date);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dt);
+
+        switch (flag) {
+            case 1:  // 天
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                break;
+            case 2:  // 周
+                calendar.add(Calendar.DAY_OF_MONTH, 7);
+                break;
+            case 3:  // 月
+                calendar.add(Calendar.MONTH, 1);
+                break;
+            case 4:  // 年
+                calendar.add(Calendar.YEAR, 1);
+                break;
+        }
+
+        Date dt1 = calendar.getTime();
+        return sdf.format(dt1);
+    }
 }
