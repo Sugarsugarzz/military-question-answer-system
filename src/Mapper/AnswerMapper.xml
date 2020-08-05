@@ -3,6 +3,10 @@
 
 <mapper namespace="Mapper.AnswerMapper">
 
+    <select id="getMatchDict" resultType="Model.DictMatcher">
+        SELECT word, alias, label
+        FROM match_dict
+    </select>
     <insert id="saveQAInfo">
         INSERT INTO history_qa(uid, time, question, answer)
         VALUES (#{uid}, #{q_time}, #{question}, #{answer})

@@ -2,6 +2,7 @@ package Searcher;
 
 import Mapper.AnswerMapper;
 import Model.Answer;
+import Model.DictMatcher;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -26,6 +27,15 @@ public class DbSearcher {
 
         sqlSession = sqlSessionFactory.openSession();
         answerMapper = sqlSession.getMapper(AnswerMapper.class);
+    }
+
+    /**
+     * 获取 match_dict 表中的信息
+     * @return DictMatcher
+     */
+    public static List<DictMatcher> getMatchDict() {
+
+        return answerMapper.getMatchDict();
     }
 
     /**

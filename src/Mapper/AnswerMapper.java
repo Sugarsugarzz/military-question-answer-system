@@ -2,10 +2,14 @@ package Mapper;
 
 import Model.Answer;
 import java.util.List;
+
+import Model.DictMatcher;
 import org.apache.ibatis.annotations.Param;
 
 
 public interface AnswerMapper {
+
+    List<DictMatcher> getMatchDict();
 
     List<Answer> findByCountryAndCategory(@Param("country") String country, @Param("category") String category);
 

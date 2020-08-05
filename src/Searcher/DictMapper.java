@@ -1,8 +1,9 @@
 package Searcher;
 
-import Utils.FileOperator;
+import Model.DictMatcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -10,61 +11,39 @@ import java.util.regex.Pattern;
 
 public class DictMapper {
 
+    static Map<String, Map<String, String>> map;
+
+    static {
+        // match_dict 表中所有信息
+        List<DictMatcher>matchers = DbSearcher.getMatchDict();
+        map = new HashMap<>();
+        for (DictMatcher matcher : matchers) {
+            if (!map.containsKey(matcher.getLabel()))
+                map.put(matcher.getLabel(), new HashMap<>());
+            for (String key : matcher.getAlias().split("\\|")) {
+                map.get(matcher.getLabel()).put(key, matcher.getWord());
+            }
+        }
+    }
+
     /**
      * 构建（问句中涉及的词形式，数据库中标准词形式）的映射关系
      * 用于在数据库中检索答案
      */
-
     // 国家
-    public static Map<String, String> Country = buildCountry();
+    public static Map<String, String> Country = map.get("country");
     // 一级分类
-    public static Map<String, String> BigCategory = buildBigCategory();
+    public static Map<String, String> BigCategory = map.get("big_category");
     // 二级分类
-    public static Map<String, String> SmallCategory = buildSmallCategory();
+    public static Map<String, String> SmallCategory = map.get("small_category");
     // 实体
-    public static Map<String, String> Entity = buildEntity();
+    public static Map<String, String> Entity = map.get("entity");
     // 实体属性
-    public static Map<String, String> Attribute = buildAttribute();
+    public static Map<String, String> Attribute = map.get("attribute");
     // 比较词
-    public static Map<String, String> Compare = buildCompare();
+    public static Map<String, String> Compare = map.get("compare");
     // 最值
-    public static Map<String, String> Most = buildMost();
-
-
-    private static Map<String, String> buildCountry() {
-        String filepath = "data/dict_for_match_query/country.txt";
-        return FileOperator.matchFileToMap(filepath);
-    }
-
-    private static Map<String, String> buildBigCategory() {
-        String filepath = "data/dict_for_match_query/big_category.txt";
-        return FileOperator.matchFileToMap(filepath);
-    }
-
-    private static Map<String, String> buildSmallCategory() {
-        String filepath = "data/dict_for_match_query/small_category.txt";
-        return FileOperator.matchFileToMap(filepath);
-    }
-
-    private static Map<String, String> buildEntity() {
-        String filepath = "data/dict_for_match_query/entity.txt";
-        return FileOperator.matchFileToMap(filepath);
-    }
-
-    private static Map<String, String> buildAttribute() {
-        String filepath = "data/dict_for_match_query/attribute.txt";
-        return FileOperator.matchFileToMap(filepath);
-    }
-
-    private static Map<String, String> buildCompare() {
-        String filepath = "data/dict_for_match_query/compare.txt";
-        return FileOperator.matchFileToMap(filepath);
-    }
-
-    private static Map<String, String> buildMost() {
-        String filepath = "data/dict_for_match_query/most.txt";
-        return FileOperator.matchFileToMap(filepath);
-    }
+    public static Map<String, String> Most = map.get("most");
 
     /**
      * 将<时间>处理成标准形式

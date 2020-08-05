@@ -1,12 +1,5 @@
 package Test;
 
-import Utils.DbOperator;
-import Utils.FileOperator;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.Map;
-
 public class TestOperator {
     public static void main(String[] args) {
 
@@ -79,7 +72,7 @@ public class TestOperator {
         /*
             根据数据库的 match_dict 表，获取分词词典到本地，加载到分词器中
          */
-        DbOperator.getDBToSegmentDict();
+//        DbOperator.getDBToSegmentDict();
 
 
 
