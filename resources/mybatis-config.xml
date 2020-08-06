@@ -29,7 +29,7 @@
     </environments>
 
     <mappers>
-        <mapper resource="com/isiteam/qa/Mapper/AnswerMapper.xml"></mapper>
+        <mapper resource="casia/isiteam/qa/Mapper/AnswerMapper.xml"></mapper>
     </mappers>
 
 </configuration>
