@@ -26,6 +26,7 @@ public class MultiMilitaryQA {
     	int numQA = QAs.size();
     	QA qa;
     	if (numQA == 0) {
+			question = QuestionParser.preProcessQuestion(question); //将原问题标准化
 			qa = MilitaryQA.oqa_main(question, question, uid, q_time);
 		}
     	else {
