@@ -53,9 +53,17 @@ public class AnswerSearcher {
         patterns.put("直达模式-无内容", new ArrayList<>());
         patterns.get("直达模式-无内容").add(Arrays.asList("46"));
 
-        // 百科模式 ：单实体
-        patterns.put("单类别名", new ArrayList<>());
-        patterns.get("单类别名").add(Arrays.asList("n_small"));
+        // 辅助查询模式 ：大类别名，返回二级类别列表
+        patterns.put("大类别名", new ArrayList<>());
+        patterns.get("大类别名").add(Arrays.asList("n_big"));
+        patterns.get("大类别名").add(Arrays.asList("n_big", "n_big"));
+        patterns.get("大类别名").add(Arrays.asList("n_big", "n_big", "n_big"));
+
+        // 百科模式 ：小类别名，返回类别下所有实体列表
+        patterns.put("小类别名", new ArrayList<>());
+        patterns.get("小类别名").add(Arrays.asList("n_small"));
+        patterns.get("小类别名").add(Arrays.asList("n_small", "n_small"));
+        patterns.get("小类别名").add(Arrays.asList("n_small", "n_small", "n_small"));
 
         // 百科模式 ：国家及类别名
         patterns.put("国家及类别名", new ArrayList<>());
@@ -65,6 +73,7 @@ public class AnswerSearcher {
         // 百科模式 ：单实体
         patterns.put("单实体", new ArrayList<>());
         patterns.get("单实体").add(Arrays.asList("n_entity"));
+        patterns.get("单实体").add(Arrays.asList("n_entity", "n_small"));  // 特殊情况 歼20战斗机
         patterns.get("单实体").add(Arrays.asList("n_country", "n_entity"));
         patterns.get("单实体").add(Arrays.asList("n_entity", "n_country"));
 
@@ -221,11 +230,21 @@ public class AnswerSearcher {
             A_type = 6;
         }
 
-        else if (patterns.get("单类别名").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "单类别名"));
-            String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
-            // 数据库检索答案
-            answers = DbSearcher.searchByCategory(category);
+        else if (patterns.get("大类别名").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "大类别名"));
+            Q_type = 5;
+            for (String category : parser_dict.get("n_big")) {
+                // 数据库检索答案
+                answers.addAll(DbSearcher.searchByBigCategory(DictMapper.BigCategory.get(category)));
+            }
+        }
+
+        else if (patterns.get("小类别名").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "小类别名"));
+            for (String category : parser_dict.get("n_small")) {
+                // 数据库检索答案
+                answers.addAll(DbSearcher.searchBySmallCategory(DictMapper.SmallCategory.get(category)));
+            }
         }
 
         else if (patterns.get("国家及类别名").contains(parser_dict.get("pattern"))) {
@@ -450,6 +469,16 @@ public class AnswerSearcher {
             case 4:
                 obj.put("Q_type", Q_type);
                 obj.put("Answer", A_type);
+                break;
+
+            case 5:
+                obj.put("Q_type", Q_type);
+                for (Answer answer : results) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("concept_name", answer.getEntity_name());
+                    jsonArray.add(jsonObject);
+                }
+                obj.put("Answer", jsonArray);
                 break;
         }
 

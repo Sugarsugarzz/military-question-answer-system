@@ -13,7 +13,11 @@ public interface AnswerMapper {
 
     List<Answer> findByCountryAndCategory(@Param("country") String country, @Param("category") String category);
 
-    List<Answer> findByCategory(@Param("category") String category);
+    String findChildrenByBigCategory(@Param("category") String category);
+
+    List<Answer> findSmallCategoryByChildren(@Param("children") List<String> children);
+
+    List<Answer> findBySmallCategory(@Param("category") String category);
 
     List<Answer> findByEntity(@Param("entity") String entity);
 

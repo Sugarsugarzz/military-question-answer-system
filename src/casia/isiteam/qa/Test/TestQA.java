@@ -31,11 +31,14 @@ public class TestQA {
 //        answer = com.isitem.qa.QA.qa_main("小黑", "神舟六号的长度", sf.format(new Date()));  // 神舟六号没有长度属性lol
 //        answer = com.isitem.qa.QA.qa_main("小黑", "他们的生产商", sf.format(new Date()));
 
+        // 小类别名
+//        answer = com.isitem.qa.QA.qa_main("小明", "枪械和军用飞机", sf.format(new Date()));
+
+        // 小类别名
+//        answer = com.isitem.qa.QA.qa_main("小明", "战斗机有哪些？", sf.format(new Date()));
+
         // 国家及类别名
 //        answer = com.isitem.qa.QA.qa_main("小明", "中国的战斗机有哪些？", sf.format(new Date()));
-
-        // 单类别名
-//        answer = com.isitem.qa.QA.qa_main("小明", "战斗机有哪些？", sf.format(new Date()));
 
         // 单实体
 //        answer = com.isitem.qa.QA.qa_main("小明", "我想找中国的神舟七号", sf.format(new Date()));

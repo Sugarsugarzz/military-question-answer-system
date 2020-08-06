@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 public class DbSearcher {
@@ -63,13 +64,25 @@ public class DbSearcher {
     }
 
     /**
-     * 单类别名
-     * @param category 实体类别名
-     * @return 答案
+     * 单大类别名
+     * @param category 一级类别名
+     * @return 二级类别名列表
      */
-    public static List<Answer> searchByCategory(String category) {
+    public static List<Answer> searchByBigCategory(String category) {
 
-        return answerMapper.findByCategory(category);
+        String children = answerMapper.findChildrenByBigCategory(category);
+
+        return answerMapper.findSmallCategoryByChildren(Arrays.asList(children.split(",")));
+    }
+
+    /**
+     * 单小类别名
+     * @param category 二级类别名
+     * @return 类别下所有实体列表
+     */
+    public static List<Answer> searchBySmallCategory(String category) {
+
+        return answerMapper.findBySmallCategory(category);
     }
 
     /**
