@@ -164,7 +164,7 @@ public class DbOperator {
     /**
      * 将 country.txt most.txt compare.txt 键值信息存入 match_dict 数据库表
      */
-    public static void getMatchFileToDB() {
+    public static void getCountryCompareMostToDB() {
         // 获取文件路径
         File file = new File("data/dict_for_match_query");
         List<String> file_list = new ArrayList<>();
@@ -197,52 +197,67 @@ public class DbOperator {
     }
 
     /**
-     * 将 big_category 存入 match_dict 数据库表
+     * 将 big_category、small_category、attributes 存入match_dict 数据库表
      */
-    public static void getBigCategoryToDB() {
-        String sql = "SELECT concept_name FROM concepts WHERE level = 2";
+    public static void getConceptsAndSameasToDB() {
+
+        Map<String, String[]> map = new HashMap<>();
+
+        // 获取概念库
+        String sql = "SELECT concept_name, level FROM concepts WHERE level in (0, 2, 3)";
         ResultSet rs = getResultSet(sql);
-        sql = "INSERT INTO match_dict(word, alias, label) VALUES ('%s', '%s', '%s')";
         try {
             while (rs.next()) {
-                statement.executeUpdate(String.format(sql, rs.getString("concept_name"), rs.getString("concept_name"), "big_category"));
+                String label = null;
+                String concept = rs.getString("concept_name");
+                String[] tuple = new String[2];
+                if (rs.getInt("level") == 0)
+                    label = "attribute";
+                else if (rs.getInt("level") == 2)
+                    label = "big_category";
+                else if (rs.getInt("level") == 3)
+                    label = "small_category";
+                tuple[0] = label;
+                tuple[1] = concept;
+                map.put(concept, tuple);
             }
         } catch (SQLException e) {
-            logger.error("存储一级分类失败！", e);
+            logger.error("存储概念数据失败！", e);
+        }
+
+        // 再获取概念别名库
+        sql = "SELECT c.concept_name AS concept1, cs.concept_name AS concept2 FROM concepts c, concept_sameas cs "
+                + "WHERE c.c_id = cs.sameAs_id";
+        rs = getResultSet(sql);
+        try {
+            while (rs.next()) {
+                String concept1 = rs.getString("concept1");
+                String concept2 = rs.getString("concept2");
+                String[] tuple = map.get(concept1);
+                tuple[1] = map.get(concept1)[1] + "|" + concept2.replace(" ", "");
+                if (!map.containsKey(concept1)) {
+                    // 打印出来的是有问题的，没有对应实体
+                    System.out.println(concept1);
+                } else {
+                    map.put(concept1, tuple);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("读数据库出错！", e);
+        }
+
+        // 存入 match_dict 表
+        sql = "INSERT INTO match_dict(word, alias, label) VALUES ('%s', '%s', '%s')";
+
+        for (String key : map.keySet()) {
+            try {
+                statement.executeUpdate(String.format(sql, key, map.get(key)[1], map.get(key)[0]));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    /**
-     * 将 small_category 存入 match_dict 数据库表
-     */
-    public static void getSmallCategoryToDB() {
-        String sql = "SELECT concept_name FROM concepts WHERE level = 3";
-        ResultSet rs = getResultSet(sql);
-        sql = "INSERT INTO match_dict(word, alias, label) VALUES ('%s', '%s', '%s')";
-        try {
-            while (rs.next()) {
-                statement.executeUpdate(String.format(sql, rs.getString("concept_name"), rs.getString("concept_name"), "small_category"));
-            }
-        } catch (SQLException e) {
-            logger.error("存储二级分类失败！", e);
-        }
-    }
-
-    /**
-     * 将 attrbutes 存入 match_dict 数据库表
-     */
-    public static void getAttributesToDB() {
-        String sql = "SELECT concept_name FROM concepts WHERE level = 0";
-        ResultSet rs = getResultSet(sql);
-        sql = "INSERT INTO match_dict(word, alias, label) VALUES ('%s', '%s', '%s')";
-        try {
-            while (rs.next()) {
-                statement.executeUpdate(String.format(sql, rs.getString("concept_name"), rs.getString("concept_name"), "attribute"));
-            }
-        } catch (SQLException e) {
-            logger.error("存储属性失败！", e);
-        }
-    }
 
     /**
      * 将 entity及别名 存入 match_dict 数据库表
@@ -269,7 +284,7 @@ public class DbOperator {
         try {
             while (rs.next()) {
                 if (!map.containsKey(rs.getString("entity_name_1"))) {
-                    // 打印出来额是有问题的，没有对应实体
+                    // 打印出来的是有问题的，没有对应实体
                     System.out.println(rs.getString("entity_name_1"));
                 } else {
                     map.put(rs.getString("entity_name_1"), map.get(rs.getString("entity_name_1")) + "|" + rs.getString("entity_name_2").replace(" ", ""));

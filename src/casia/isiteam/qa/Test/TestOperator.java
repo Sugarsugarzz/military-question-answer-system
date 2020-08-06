@@ -1,5 +1,7 @@
 package casia.isiteam.qa.Test;
 
+import casia.isiteam.qa.Utils.DbOperator;
+
 public class TestOperator {
     public static void main(String[] args) {
 
@@ -63,16 +65,14 @@ public class TestOperator {
         /*
             将 match file 存入数据库的 match_dict 表，以后直接从数据库读，不从本地读
          */
-//        DbOperator.getMatchFileToDB();
+//        DbOperator.getCountryCompareMostToDB();
 //        DbOperator.getEntitiesAndSameasToDB();
-//        DbOperator.getBigCategoryToDB();
-//        DbOperator.getSmallCategoryToDB();
-//        DbOperator.getAttributesToDB();
+//        DbOperator.getConceptsAndSameasToDB();
 
         /*
             根据数据库的 match_dict 表，获取分词词典到本地，加载到分词器中
          */
-//        DbOperator.getDBToSegmentDict();
+        DbOperator.getDBToSegmentDict();
 
 
 
