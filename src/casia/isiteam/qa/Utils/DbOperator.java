@@ -40,124 +40,55 @@ public class DbOperator {
         return rs;
     }
 
-    /**
-     * 获取 Entities 表中的实体
-     * @return 实体列表
+    /*
+    ===================================================================================================================
+      一、将自定义的 concept 和 entity 别名上传到对应 sameas 表中的工具
+    ===================================================================================================================
      */
-    public static List<String> getEntities() {
-        String sql = "SELECT entity_name FROM entities";
-        ResultSet rs = getResultSet(sql);
+    public static void addConceptAliasToDB() {
 
-        List<String> res = new ArrayList<>();
+        // 获取 concepts 表中 concept_id 和 concept_name 键值关系
+        String sql = "SELECT c_id, concept_name FROM concepts";
+        ResultSet rs = getResultSet(sql);
+        Map<String, Integer> map = new HashMap<>();
         try {
             while (rs.next()) {
-                res.add(rs.getString("entity_name"));
+                System.out.println(rs.getString("concept_name") + " - " + rs.getInt("c_id"));
+                map.put(rs.getString("concept_name"), rs.getInt("c_id"));
             }
         } catch (SQLException e) {
-            logger.error("获取实体列表失败！", e);
+            e.printStackTrace();
         }
-        return res;
-    }
 
-    /**
-     * 获取 Concepts 表中的一级分类
-     * @return 一级分类列表
-     */
-    public static List<String> getBigCategory() {
-        String sql = "SELECT concept_name FROM concepts WHERE level = 2";
-        ResultSet rs = getResultSet(sql);
-
-        List<String> res = new ArrayList<>();
+        // 清空 concept_sameas 表
+        sql = "DELETE FROM concept_sameas";
         try {
-            while (rs.next()) {
-                res.add(rs.getString("concept_name"));
-            }
+            statement.executeUpdate(sql);
         } catch (SQLException e) {
-            logger.error("获取一级分类失败！", e);
-        }
-        return res;
-    }
-
-    /**
-     * 获取 Concepts 表中的二级分类
-     * @return 二级分类列表
-     */
-    public static List<String> getSmallCategory() {
-        String sql = "SELECT concept_name FROM concepts WHERE level = 3";
-        ResultSet rs = getResultSet(sql);
-
-        List<String> res = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                res.add(rs.getString("concept_name"));
-            }
-        } catch (SQLException e) {
-            logger.error("获取二级分类失败！", e);
-        }
-        return res;
-    }
-
-    /**
-     * 获取 Concepts 表中的属性
-     * @return 属性列表
-     */
-    public static List<String> getAttributes() {
-        String sql = "SELECT concept_name FROM concepts WHERE level = 0";
-        ResultSet rs = getResultSet(sql);
-
-        List<String> res = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                res.add(rs.getString("concept_name"));
-            }
-        } catch (SQLException e) {
-            logger.error("获取属性失败！", e);
-        }
-        return res;
-    }
-
-    /**
-     * 根据实体库及实体别名库，生成匹配列表（实体：实体别名列表）
-     * @return 实体别名：实体 列表
-     */
-    public static Map<String, String> getEntitiesAndSameas() {
-
-        Map<String, String> map = new HashMap<>();
-
-        // 先获取实体库
-        String sql = "SELECT entity_name FROM entities";
-        ResultSet rs = getResultSet(sql);
-        try {
-            while (rs.next()) {
-                map.put(rs.getString("entity_name"), rs.getString("entity_name").replace(" ", ""));
-            }
-        } catch (SQLException e) {
-            logger.error("读数据库出错！", e);
+            e.printStackTrace();
         }
 
-        // 再获取实体别名库
-        sql = "SELECT e.entity_name AS entity_name_1, s.entity_name AS entity_name_2 FROM entities e, entity_sameas s "
-                    + "WHERE e.entity_id = s.sameAs_id ORDER BY e.entity_id";
-        rs = getResultSet(sql);
+        // 读取 data/dict_for_sameas 下的自定义别名库，上传到数据库对应 sameas 表中
+        String filepath = "data/dict_for_sameas/concepts_alias.txt";
+        sql = "INSERT INTO concept_sameas(concept_name, sameAs_id) VALUES ('%s', %s)";
         try {
-            while (rs.next()) {
-                if (!map.containsKey(rs.getString("entity_name_1"))) {
-                    // 打印出来额是有问题的，没有对应实体
-                    System.out.println(rs.getString("entity_name_1"));
-                } else {
-                    map.put(rs.getString("entity_name_1"), map.get(rs.getString("entity_name_1")) + "|" + rs.getString("entity_name_2").replace(" ", ""));
+            BufferedReader br = new BufferedReader(new FileReader(filepath));
+            String str;
+            while ((str = br.readLine()) != null) {
+                String key = str.split("：")[0];
+                String[] aliases = str.split("：")[1].split("\\|");
+                for (String alias : aliases) {
+                    statement.executeUpdate(String.format(sql, alias, map.get(key)));
                 }
             }
-        } catch (SQLException e) {
-            logger.error("读数据库出错！", e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        return map;
     }
 
     /*
     ===================================================================================================================
-                              上面的方法基本弃用，本地match txt已存入数据库，从数据库读取。
+      二、将country.txt、most.txt、compare.txt、entities(entity_sameas)表、concepts(concept_sameas)表的数据存入match_dict表中
     ===================================================================================================================
      */
 
@@ -166,25 +97,33 @@ public class DbOperator {
      */
     public static void getCountryCompareMostToDB() {
         // 获取文件路径
-        File file = new File("data/dict_for_match_query");
+        File file = new File("data/dict_for_basic");
         List<String> file_list = new ArrayList<>();
         for (String filename : file.list()) {
             if (filename.equals("country.txt") || filename.equals("most.txt") || filename.equals("compare.txt"))
-            file_list.add("data/dict_for_match_query/" + filename);
+            file_list.add("data/dict_for_basic/" + filename);
+        }
+
+        // 清空 compare、country、most 标签项
+        String sql = "DELETE FROM match_dict WHERE label in ('compare', 'country', 'most')";
+        try {
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         // 存入数据库
+        sql = "INSERT INTO match_dict(word, alias, label) VALUES ('%s', '%s', '%s')";
         for (String filepath : file_list) {
             String[] names = filepath.split("/");
-            String name = names[names.length - 1].replace(".txt", "");
-            String sql = "INSERT INTO match_dict(word, alias, label) VALUES ('%s', '%s', '%s')";
+            String label = names[names.length - 1].replace(".txt", "");
             // 读键值
             try {
                 BufferedReader br = new BufferedReader(new FileReader(filepath));
                 String str;
                 while ((str = br.readLine()) != null) {
-                    System.out.println(String.format(sql, str.split("：")[0], str.split("：")[1], name));
-                    statement.executeUpdate(String.format(sql, str.split("：")[0], str.split("：")[1], name));
+                    statement.executeUpdate(String.format(sql, str.split("：")[0], str.split("：")[1], label));
+                    System.out.println(String.format(sql, str.split("：")[0], str.split("：")[1], label));
                 }
             } catch (FileNotFoundException e) {
                 logger.error(filepath + " - 写文件未找到！", e);
@@ -246,9 +185,16 @@ public class DbOperator {
             logger.error("读数据库出错！", e);
         }
 
+        // 清空 attribute、big_category、small_category 标签项
+        sql = "DELETE FROM match_dict WHERE label in ('attribute', 'big_category', 'small_category')";
+        try {
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         // 存入 match_dict 表
         sql = "INSERT INTO match_dict(word, alias, label) VALUES ('%s', '%s', '%s')";
-
         for (String key : map.keySet()) {
             try {
                 statement.executeUpdate(String.format(sql, key, map.get(key)[1], map.get(key)[0]));
@@ -304,8 +250,13 @@ public class DbOperator {
         }
     }
 
+    /*
+    ===================================================================================================================
+      三、将 match_dict 表中的数据获取到本地，加载到HanLP分词器的自定义词典中（未生效需先删除custom/CustomDictionary.txt.bin）
+    ===================================================================================================================
+     */
     /**
-     * 根据数据库的 match_dict 表，获取分词词典到本地
+     * 根据数据库的 match_dict 表，获取分词词典到本地，到 data/dict_for_segment 目录下
      */
     public static void getDBToSegmentDict() {
 
@@ -317,14 +268,12 @@ public class DbOperator {
             while (rs.next()) {
                 String alias = rs.getString("alias");
                 String label = rs.getString("label");
-                if (map.containsKey(label)) {
-                    for (String s : alias.split("\\|"))
-                        map.get(label).add(s);
-                } else {
+                if (!map.containsKey(label)) {
                     map.put(label, new ArrayList<>());
-                    for (String s : alias.split("\\|"))
-                        map.get(label).add(s);
+
                 }
+                for (String s : alias.split("\\|"))
+                    map.get(label).add(s);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -344,6 +293,8 @@ public class DbOperator {
                 e.printStackTrace();
             }
         }
-
     }
+
+
+
 }
