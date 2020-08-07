@@ -473,12 +473,10 @@ public class AnswerSearcher {
 
             case 5:
                 obj.put("Q_type", Q_type);
-                for (Answer answer : results) {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("concept_name", answer.getEntity_name());
-                    jsonArray.add(jsonObject);
-                }
-                obj.put("Answer", jsonArray);
+                List<String> categories = new ArrayList<>();
+                for (Answer answer : results)
+                    categories.add(answer.getEntity_name());
+                obj.put("Answer", categories);
                 break;
         }
 
