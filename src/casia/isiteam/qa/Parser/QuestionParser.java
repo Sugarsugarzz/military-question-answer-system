@@ -1,5 +1,6 @@
 package casia.isiteam.qa.Parser;
 
+import casia.isiteam.qa.Utils.ChineseNumberUtil;
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
 import com.hankcs.hanlp.seg.common.Term;
@@ -24,7 +25,6 @@ public class QuestionParser {
     static List<String> keywords1 = new ArrayList<>();
     static List<String> keywords2 = new ArrayList<>();
     static Map<String, List<String>> parser_dict = new HashMap<>();
-    static Map<String, Integer> chineseMap = new HashMap<>();
 
     static {
         // 初始化已定义的词性列表
@@ -50,17 +50,6 @@ public class QuestionParser {
         keywords2.add("这儿");
         keywords2.add("这个");
         keywords2.add("这里");
-        //中文数字转阿拉伯数字
-        chineseMap.put("一", 1);
-        chineseMap.put("二", 2);
-        chineseMap.put("三", 3);
-        chineseMap.put("四", 4);
-        chineseMap.put("五", 5);
-        chineseMap.put("六", 6);
-        chineseMap.put("七", 7);
-        chineseMap.put("八", 8);
-        chineseMap.put("九", 9);
-        chineseMap.put("十", 10);
     }
 
     /**
@@ -249,7 +238,6 @@ public class QuestionParser {
             	break;
             }
         }
-        System.out.println(newQuest);
         return newQuest;
     }
 
@@ -259,34 +247,8 @@ public class QuestionParser {
      */
     public static String preProcessQuestion(String question) {
 
-        String standQuest = question.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");  //去除中文、数字、英文、之外的内容
-        standQuest = standQuest.toUpperCase();//字母全部大写
-
-        //中文数字转阿拉伯数字
-        while (standQuest.contains("十")) { //判断问句中是否包含 “十”
-            StringBuilder sBuilder = new StringBuilder(standQuest);
-            int num = 10;
-            int index_ = standQuest.indexOf("十");
-            int start = index_;
-            int end = index_+1;
-            //判断“十”前面的字符是不是 “一”到“九”中的数字
-            if (index_>0 && chineseMap.containsKey(String.valueOf(standQuest.charAt(index_-1)))) {
-                num = chineseMap.get(String.valueOf(standQuest.charAt(index_-1)))*10;
-                start -= 1;
-            }
-            //判断“十”后面的字符是不是 “一”到“九”中的数字
-            if(index_<standQuest.length()-1 && chineseMap.containsKey(String.valueOf(standQuest.charAt(index_+1)))) {
-                num += chineseMap.get(String.valueOf(standQuest.charAt(index_+1)));
-                end += 1;
-            }
-            //将中文数字用阿拉伯数字替换
-            standQuest = sBuilder.replace(start, end, Integer.toString(num)).toString();
-        }
-        //不含“十”的情况，直接用chineseMap 中的键用值替换
-        for (Map.Entry<String, Integer> entry : chineseMap.entrySet()) {
-            standQuest = standQuest.replaceAll(entry.getKey(), Integer.toString(entry.getValue()));
-        }
-        return standQuest;
+        //去除中文、数字、英文、之外的内容
+        return ChineseNumberUtil.convertString(question.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "")).toUpperCase();
     }
 
 }

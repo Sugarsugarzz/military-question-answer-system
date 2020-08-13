@@ -27,12 +27,14 @@ public class MultiMilitaryQA {
     	QA qa;
     	if (numQA == 0) {
 			question = QuestionParser.preProcessQuestion(question); //将原问题标准化
+			System.out.println("处理后的Question - " + question);
 			qa = MilitaryQA.oqa_main(question, question, uid, q_time);
 		}
     	else {
 			String standQuestion = QuestionParser.preProcessQuestion(question); //将原问题标准化
     		// 多轮，获取历史Entity和Attr，将问句中的指代词替换为对应实体名
 			String newQuestion = QuestionParser.anaphoraResolution(getHistory(), standQuestion); //指代消解
+			System.out.println("处理后的Question - " + question);
 			qa = MilitaryQA.oqa_main(question, newQuestion, uid, q_time);
 		}
 		QAs.add(qa);

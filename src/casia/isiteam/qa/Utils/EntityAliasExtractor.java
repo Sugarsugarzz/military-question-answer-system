@@ -116,14 +116,21 @@ public class EntityAliasExtractor {
         // 实体最终的所有别名
         Set<String> aliases = new HashSet<>();
 
+        // 无论如何，先添加一个跟问句预处理相同处理的别名
+        aliases.add(ChineseNumberUtil.convertString(entity_name.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "")).toUpperCase());
+
         /* 一、添加预处理后的原生词条不同格式 - origin_words*/
         origin_words.add(entity_name);
         // 将汉字处理为对应数字
         origin_words.add(ChineseNumberUtil.convertString(entity_name));
         // 去掉 -
         origin_words.add(entity_name.replace("-", "").replace("－", ""));
+        origin_words.add(ChineseNumberUtil.convertString(entity_name.replace("-", "").replace("－", "")));
         // 去掉 空格
         origin_words.add(entity_name.replace(" ", ""));
+        origin_words.add(ChineseNumberUtil.convertString(entity_name.replace(" ", "")));
+        // 去掉除了中文、数字和英文的所有符号
+//        origin_words.add(ChineseNumberUtil.convertString(entity_name.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "")));
 
         /* 二、添加原生词条处理后的不同词条部分 - part_words */
         // 1、原生词条直接添加
@@ -141,7 +148,7 @@ public class EntityAliasExtractor {
                 pattern = Pattern.compile(p);
                 matcher = pattern.matcher(word);
                 if (matcher.find()) {
-                    aliases.add(matcher.group(2).toUpperCase().trim());  // 引号或括号内的直接添加到最终别名
+                    aliases.add(ChineseNumberUtil.convertString(matcher.group(2).replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "")).toUpperCase()); // 引号或括号内的直接添加到最终别名
                     part_words.add(matcher.group(1));
                     part_words.add(matcher.group(2));
                     part_words.add(matcher.group(3));
@@ -150,7 +157,7 @@ public class EntityAliasExtractor {
             }
         }
 
-        // 2.2 过滤结尾停用词 - part_words （结尾停用词还未标注完成，目前不需要过滤结尾停用词效果也还可以）
+        // 2.2 过滤结尾停用词 - part_words （结尾停用词还未标注完成，目前不需要过滤结尾停用词效果也可以）
 //        for (String word : part_words) {
 //            for (String entityStopWord : entityStopWords) {
 //                if (word.endsWith(entityStopWord))
@@ -184,7 +191,7 @@ public class EntityAliasExtractor {
                 pattern = Pattern.compile(p);
                 matcher = pattern.matcher(word);
                 if (matcher.find()) {
-                    aliases.add(matcher.group().toUpperCase().trim());
+                    aliases.add(ChineseNumberUtil.convertString(matcher.group().replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "")).toUpperCase());
                 }
             }
         }
@@ -213,7 +220,7 @@ public class EntityAliasExtractor {
                 // 最终过滤
                 if (alias.length() < 2)
                     continue;
-                if (alias.matches("^[0-9.-]+$") && alias.length() < 5)
+                if (alias.matches("^[\\d.-]+$"))
                     continue;
                 if (alias.matches("^[IV型号级]+$"))
                     continue;

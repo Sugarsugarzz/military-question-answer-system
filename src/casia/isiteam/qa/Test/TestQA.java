@@ -21,7 +21,7 @@ public class TestQA {
         String answer;
 
         while (true) {
-        	String question = new Scanner(System.in).next();
+        	String question = new Scanner(System.in).nextLine();
         	QA.qa_main("小黑", question, sf.format(new Date()));
         }
 
