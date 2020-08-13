@@ -212,37 +212,34 @@ public class DbOperator {
 
         Map<String, String> map = new HashMap<>();
 
-        // 先获取实体库
-        String sql = "SELECT entity_name FROM entities";
+        // 先获取实体库、再获取实体别名库
+        String sql = "SELECT e.entity_name AS entity_name_1, s.entity_name AS entity_name_2 FROM entities e, entity_sameas s "
+                + "WHERE e.entity_id = s.sameAs_id ORDER BY e.entity_id";
         ResultSet rs = getResultSet(sql);
         try {
             while (rs.next()) {
-                map.put(rs.getString("entity_name"), rs.getString("entity_name").replace(" ", ""));
-            }
-        } catch (SQLException e) {
-            logger.error("读数据库出错！", e);
-        }
-
-        // 再获取实体别名库
-        sql = "SELECT e.entity_name AS entity_name_1, s.entity_name AS entity_name_2 FROM entities e, entity_sameas s "
-                + "WHERE e.entity_id = s.sameAs_id ORDER BY e.entity_id";
-        rs = getResultSet(sql);
-        try {
-            while (rs.next()) {
                 if (!map.containsKey(rs.getString("entity_name_1"))) {
-                    // 打印出来的是有问题的，没有对应实体
-                    System.out.println(rs.getString("entity_name_1"));
-                } else {
-                    map.put(rs.getString("entity_name_1"), map.get(rs.getString("entity_name_1")) + "|" + rs.getString("entity_name_2").replace(" ", ""));
+                    map.put(rs.getString("entity_name_1"), rs.getString("entity_name_1").replace(" ", ""));
                 }
+                map.put(rs.getString("entity_name_1"), map.get(rs.getString("entity_name_1")) + "|" + rs.getString("entity_name_2").replace(" ", ""));
             }
         } catch (SQLException e) {
             logger.error("读数据库出错！", e);
         }
 
+        // 清空 attribute、big_category、small_category 标签项
+        sql = "DELETE FROM match_dict WHERE label in ('entity')";
+        try {
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // 存入 match_dict 表
         sql = "INSERT INTO match_dict(word, alias, label) VALUES ('%s', '%s', '%s')";
         for (String key : map.keySet()) {
             try {
+                System.out.println(key + " - " + map.get(key));
                 statement.executeUpdate(String.format(sql, key, map.get(key), "entity"));
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -261,16 +258,15 @@ public class DbOperator {
     public static void getDBToSegmentDict() {
 
         // 获取match_dict表中键值信息
-        String sql = "SELECT * FROM match_dict";
+        String sql = "SELECT alias, label FROM match_dict";
         ResultSet rs = getResultSet(sql);
-        Map<String, List<String>> map = new HashMap<>();
+        Map<String, Set<String>> map = new HashMap<>();
         try {
             while (rs.next()) {
                 String alias = rs.getString("alias");
                 String label = rs.getString("label");
                 if (!map.containsKey(label)) {
-                    map.put(label, new ArrayList<>());
-
+                    map.put(label, new HashSet<>());
                 }
                 for (String s : alias.split("\\|"))
                     map.get(label).add(s);
@@ -294,7 +290,4 @@ public class DbOperator {
             }
         }
     }
-
-
-
 }
