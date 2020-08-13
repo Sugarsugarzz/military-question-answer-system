@@ -53,7 +53,7 @@ public class TestQA {
 //        answer = com.isitem.qa.QA.qa_main("小明", "神舟五号、神舟七号和歼-20战斗机的长度、发射地点、生产商、原产国和简介？", sf.format(new Date()));
 
         // 全类别属性最值
-//        answer = com.isitem.qa.QA.qa_main("小明", "武器装备里长度最长的是哪个？", sf.format(new Date()));
+//        answer = com.isitem.qa.QA.qa_main("小明", "长度最长的是哪个？", sf.format(new Date()));
 
         // 单类别属性最值
 //        answer = com.isitem.qa.QA.qa_main("小明", "战斗机里长度最短的是哪个？", sf.format(new Date()));
