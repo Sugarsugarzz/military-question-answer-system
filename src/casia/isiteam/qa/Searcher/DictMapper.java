@@ -2,26 +2,37 @@ package casia.isiteam.qa.Searcher;
 
 import casia.isiteam.qa.Model.DictMatcher;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DictMapper {
 
-    static Map<String, Map<String, String>> map;
+    static Map<String, Map<String, String>> otherMap;
+    static Map<String, Set<String>> entityMap;
 
     static {
+        otherMap = new HashMap<>();
+        entityMap = new HashMap<>();
+
         // match_dict 表中所有信息
         List<DictMatcher>matchers = DbSearcher.getMatchDict();
-        map = new HashMap<>();
+
         for (DictMatcher matcher : matchers) {
-            if (!map.containsKey(matcher.getLabel()))
-                map.put(matcher.getLabel(), new HashMap<>());
-            for (String key : matcher.getAlias().split("\\|")) {
-                map.get(matcher.getLabel()).put(key, matcher.getWord());
+            if (matcher.getLabel().equals("entity")) {
+                // 别名 - 共有此别名的实体列表
+                for (String alias : matcher.getAlias().split("\\|")) {
+                    if (!entityMap.containsKey(alias))
+                        entityMap.put(alias, new HashSet<>());
+                    entityMap.get(alias).add(matcher.getWord());
+                }
+
+            } else {
+                // 标签 - （别名 - 概念名）
+                if (!otherMap.containsKey(matcher.getLabel()))
+                    otherMap.put(matcher.getLabel(), new HashMap<>());
+                for (String key : matcher.getAlias().split("\\|"))
+                    otherMap.get(matcher.getLabel()).put(key, matcher.getWord());
             }
         }
     }
@@ -31,19 +42,19 @@ public class DictMapper {
      * 用于在数据库中检索答案
      */
     // 国家
-    public static Map<String, String> Country = map.get("country");
+    public static Map<String, String> Country = otherMap.get("country");
     // 一级分类
-    public static Map<String, String> BigCategory = map.get("big_category");
+    public static Map<String, String> BigCategory = otherMap.get("big_category");
     // 二级分类
-    public static Map<String, String> SmallCategory = map.get("small_category");
+    public static Map<String, String> SmallCategory = otherMap.get("small_category");
     // 实体
-    public static Map<String, String> Entity = map.get("entity");
+    public static Map<String, Set<String>> Entity = entityMap;
     // 实体属性
-    public static Map<String, String> Attribute = map.get("attribute");
+    public static Map<String, String> Attribute = otherMap.get("attribute");
     // 比较词
-    public static Map<String, String> Compare = map.get("compare");
+    public static Map<String, String> Compare = otherMap.get("compare");
     // 最值
-    public static Map<String, String> Most = map.get("most");
+    public static Map<String, String> Most = otherMap.get("most");
 
     /**
      * 将<时间>处理成标准形式

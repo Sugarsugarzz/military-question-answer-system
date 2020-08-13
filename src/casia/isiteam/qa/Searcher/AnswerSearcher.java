@@ -257,32 +257,38 @@ public class AnswerSearcher {
 
         else if (patterns.get("单实体").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "单实体"));
-            String entity = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
-            // 数据库检索答案
-            answers = DbSearcher.searchByEntity(entity);
+            Set<String> entities = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
+            for (String entity : entities) {
+                // 数据库检索答案
+                answers.addAll(DbSearcher.searchByEntity(entity));
+            }
         }
 
         else if (patterns.get("多实体").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "多实体"));
             Q_type = 2;
             for (String entity: parser_dict.get("n_entity")) {
-                // 数据库检索答案
-                answers.addAll(DbSearcher.searchByEntity(DictMapper.Entity.get(entity)));
+                for (String enty : DictMapper.Entity.get(entity)) {
+                    // 数据库检索答案
+                    answers.addAll(DbSearcher.searchByEntity(enty));
+                }
             }
         }
 
         else if (patterns.get("单实体单属性/多属性").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "单实体单属性/多属性"));
             A_type = 1;
-            String entity = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
-            List<String> attrs = new ArrayList<>();
-            for (String attr: parser_dict.get("n_attr")) {
-                attrs.add(DictMapper.Attribute.get(attr));
+            Set<String> entities = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
+            for (String entity : entities) {
+                List<String> attrs = new ArrayList<>();
+                for (String attr: parser_dict.get("n_attr")) {
+                    attrs.add(DictMapper.Attribute.get(attr));
+                }
+                // 数据库检索答案
+                answers.addAll(DbSearcher.searchByEntityAndAttrs(entity, attrs));
             }
-            // 数据库检索答案
-            answers = DbSearcher.searchByEntityAndAttrs(entity, attrs);
         }
-
+        /* 4 */
         else if (patterns.get("多实体单属性/多属性").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "多实体单属性/多属性"));
             A_type = 1;
@@ -291,8 +297,10 @@ public class AnswerSearcher {
                 for (String attr: parser_dict.get("n_attr")) {
                     attrs.add(DictMapper.Attribute.get(attr));
                 }
-                // 数据库检索答案
-                answers.addAll(DbSearcher.searchByEntityAndAttrs(DictMapper.Entity.get(entity), attrs));
+                for (String enty : DictMapper.Entity.get(entity)) {
+                    // 数据库检索答案
+                    answers.addAll(DbSearcher.searchByEntityAndAttrs(enty, attrs));
+                }
             }
         }
 
