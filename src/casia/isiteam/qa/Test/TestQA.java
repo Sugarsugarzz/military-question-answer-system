@@ -22,7 +22,7 @@ public class TestQA {
 
         while (true) {
         	String question = new Scanner(System.in).nextLine();
-        	QA.qa_main("小黑", question, sf.format(new Date()));
+        	QA.qa_main("hahaha", question, sf.format(new Date()));
         }
 
         // 多轮测试

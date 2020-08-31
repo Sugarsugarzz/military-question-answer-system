@@ -49,10 +49,6 @@ public class AnswerSearcher {
         patterns.put("直达模式-浏览历史", new ArrayList<>());
         patterns.get("直达模式-浏览历史").add(Arrays.asList("45"));
 
-        // 直达模式：无内容
-        patterns.put("直达模式-无内容", new ArrayList<>());
-        patterns.get("直达模式-无内容").add(Arrays.asList("46"));
-
         // 辅助查询模式 ：大类别名，返回二级类别列表
         patterns.put("大类别名", new ArrayList<>());
         patterns.get("大类别名").add(Arrays.asList("n_big"));
@@ -222,12 +218,6 @@ public class AnswerSearcher {
             logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-浏览历史"));
             Q_type = 4;
             A_type = 5;
-        }
-
-        else if (patterns.get("直达模式-无内容").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-无内容"));
-            Q_type = 4;
-            A_type = 6;
         }
 
         else if (patterns.get("大类别名").contains(parser_dict.get("pattern"))) {

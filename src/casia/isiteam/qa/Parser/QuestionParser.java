@@ -164,12 +164,6 @@ public class QuestionParser {
             logger.info("问句模式：直达 - 浏览历史");
         }
 
-        else if (question.contains("无内容") || question.contains("WUNEIRONG")) {
-            parser_dict.get("pattern").add("46");
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：直达 - 无内容");
-        }
-
         else {
             return false;
         }
