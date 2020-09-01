@@ -1,6 +1,7 @@
 package casia.isiteam.qa.Searcher;
 
 import casia.isiteam.qa.Model.Answer;
+import casia.isiteam.qa.Utils.DBKit;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.logging.log4j.LogManager;
@@ -225,7 +226,7 @@ public class AnswerSearcher {
             Q_type = 5;
             for (String category : parser_dict.get("n_big")) {
                 // 数据库检索答案
-                answers.addAll(DbSearcher.searchByBigCategory(DictMapper.BigCategory.get(category)));
+                answers.addAll(DBKit.searchByBigCategory(DictMapper.BigCategory.get(category)));
             }
         }
 
@@ -233,7 +234,7 @@ public class AnswerSearcher {
             logger.info(String.format("与 %s 问句模式匹配成功！", "小类别名"));
             for (String category : parser_dict.get("n_small")) {
                 // 数据库检索答案
-                answers.addAll(DbSearcher.searchBySmallCategory(DictMapper.SmallCategory.get(category)));
+                answers.addAll(DBKit.searchBySmallCategory(DictMapper.SmallCategory.get(category)));
             }
         }
 
@@ -242,7 +243,7 @@ public class AnswerSearcher {
             String country = DictMapper.Country.get(parser_dict.get("n_country").get(0));
             String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
             // 数据库检索答案
-            answers = DbSearcher.searchByCountryAndCategory(country, category);
+            answers = DBKit.searchByCountryAndCategory(country, category);
         }
 
         else if (patterns.get("单实体").contains(parser_dict.get("pattern"))) {
@@ -250,7 +251,7 @@ public class AnswerSearcher {
             Set<String> entities = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
             for (String entity : entities) {
                 // 数据库检索答案
-                answers.addAll(DbSearcher.searchByEntity(entity));
+                answers.addAll(DBKit.searchByEntity(entity));
             }
         }
 
@@ -260,7 +261,7 @@ public class AnswerSearcher {
             for (String entity: parser_dict.get("n_entity")) {
                 for (String enty : DictMapper.Entity.get(entity)) {
                     // 数据库检索答案
-                    answers.addAll(DbSearcher.searchByEntity(enty));
+                    answers.addAll(DBKit.searchByEntity(enty));
                 }
             }
         }
@@ -275,7 +276,7 @@ public class AnswerSearcher {
                     attrs.add(DictMapper.Attribute.get(attr));
                 }
                 // 数据库检索答案
-                answers.addAll(DbSearcher.searchByEntityAndAttrs(entity, attrs));
+                answers.addAll(DBKit.searchByEntityAndAttrs(entity, attrs));
             }
         }
         /* 4 */
@@ -289,7 +290,7 @@ public class AnswerSearcher {
                 }
                 for (String enty : DictMapper.Entity.get(entity)) {
                     // 数据库检索答案
-                    answers.addAll(DbSearcher.searchByEntityAndAttrs(enty, attrs));
+                    answers.addAll(DBKit.searchByEntityAndAttrs(enty, attrs));
                 }
             }
         }
@@ -304,9 +305,9 @@ public class AnswerSearcher {
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
-                answers = DbSearcher.searchInSingleRangeByUnit(category, attr, operator, unit_items.get(0));
+                answers = DBKit.searchInSingleRangeByUnit(category, attr, operator, unit_items.get(0));
             } else {
-                answers = DbSearcher.searchInSingleRangeByTime(category, attr, operator, time_items.get(0));
+                answers = DBKit.searchInSingleRangeByTime(category, attr, operator, time_items.get(0));
             }
         }
 
@@ -321,10 +322,10 @@ public class AnswerSearcher {
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
-                answers = DbSearcher.searchInMultiRangeByUnit(category, attr, operator_1, unit_items.get(0),
+                answers = DBKit.searchInMultiRangeByUnit(category, attr, operator_1, unit_items.get(0),
                         operator_2, unit_items.get(1));
             } else {
-                answers = DbSearcher.searchInMultiRangeByTime(category, attr, operator_1, time_items.get(0),
+                answers = DBKit.searchInMultiRangeByTime(category, attr, operator_1, time_items.get(0),
                         operator_2, time_items.get(1));
             }
         }
@@ -341,15 +342,15 @@ public class AnswerSearcher {
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
-                answers = DbSearcher.searchMultiAttrInSingleRangeByUnit(category, attr_1, operator_1, unit_items.get(0),
+                answers = DBKit.searchMultiAttrInSingleRangeByUnit(category, attr_1, operator_1, unit_items.get(0),
                         attr_2, operator_2, unit_items.get(1));
             } else {
                 // 区分一下时间属性和数值属性的顺序
                 if (parser_dict.get("pattern").indexOf("n_unit") > parser_dict.get("pattern").indexOf("n_time")) {
-                    answers = DbSearcher.searchMultiAttrInSingleRangeByTimeAndUnit(category, attr_2, operator_2, unit_items.get(0),
+                    answers = DBKit.searchMultiAttrInSingleRangeByTimeAndUnit(category, attr_2, operator_2, unit_items.get(0),
                             attr_1, operator_1, time_items.get(0));
                 } else {
-                    answers = DbSearcher.searchMultiAttrInSingleRangeByTimeAndUnit(category, attr_1, operator_1, unit_items.get(0),
+                    answers = DBKit.searchMultiAttrInSingleRangeByTimeAndUnit(category, attr_1, operator_1, unit_items.get(0),
                             attr_2, operator_2, time_items.get(0));
                 }
             }
@@ -362,9 +363,9 @@ public class AnswerSearcher {
 
             // 数据库检索答案
             if (type.equals("max"))
-                answers.addAll(DbSearcher.searchMaxInAllCategory(attr));
+                answers.addAll(DBKit.searchMaxInAllCategory(attr));
             else if (type.equals("min"))
-                answers.addAll(DbSearcher.searchMinInAllCategory(attr));
+                answers.addAll(DBKit.searchMinInAllCategory(attr));
         }
 
         else if (patterns.get("单类别属性最值").contains(parser_dict.get("pattern"))) {
@@ -375,9 +376,9 @@ public class AnswerSearcher {
 
             // 数据库检索答案
             if (type.equals("max"))
-                answers.addAll(DbSearcher.searchMaxInSingleCategory(category, attr));
+                answers.addAll(DBKit.searchMaxInSingleCategory(category, attr));
             else if (type.equals("min"))
-                answers.addAll(DbSearcher.searchMinInSingleCategory(category, attr));
+                answers.addAll(DBKit.searchMinInSingleCategory(category, attr));
         }
 
         else {

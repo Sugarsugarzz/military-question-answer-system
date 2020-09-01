@@ -1,6 +1,7 @@
 package casia.isiteam.qa.Searcher;
 
 import casia.isiteam.qa.Model.DictMatcher;
+import casia.isiteam.qa.Utils.DBKit;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -16,7 +17,7 @@ public class DictMapper {
         entityMap = new HashMap<>();
 
         // match_dict 表中所有信息
-        List<DictMatcher>matchers = DbSearcher.getMatchDict();
+        List<DictMatcher>matchers = DBKit.getMatchDict();
 
         for (DictMatcher matcher : matchers) {
             if (matcher.getLabel().equals("entity")) {

@@ -14,38 +14,13 @@ public class EntityAliasExtractor {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    static Connection conn;
-    static PreparedStatement statement;
     static Pattern pattern;
     static Matcher matcher;
 
-    static Set<String> entityStopWords = new HashSet<>();
     static Set<String> conceptsStopWords = new HashSet<>();
 
     static {
-        // 1. 数据库
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://192.168.10.231:3307/military_qa?characterEncoding=UTF-8", "bj", "bj2016");
-            String sql = "INSERT INTO entity_sameas(entity_name, sameAs_id) VALUES (?, ?)";
-            statement = conn.prepareStatement(sql);
-        } catch (Exception e) {
-            logger.error("数据库连接发生错误： ", e);
-        }
-
-        // 2. 加载 entity 停用词
-//        String path = "data/dict_for_basic/entity_stopwords.txt";
-//        try {
-//            BufferedReader br = new BufferedReader(new FileReader(path));
-//            String word;
-//            while ((word = br.readLine()) != null) {
-//                entityStopWords.add(word);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-        // 3. 加载 concepts 列表
+        // 加载 concepts 列表
         String[] paths = {
                 "data/dict_for_segment/attribute.txt",
                 "data/dict_for_segment/big_category.txt",
@@ -63,41 +38,6 @@ public class EntityAliasExtractor {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    /**
-     * 从数据库读取数据
-     * @param sql 查询sql
-     * @return 查询结果
-     */
-    private static ResultSet getResultSet(String sql) {
-        ResultSet rs = null;
-        try {
-            Statement s = conn.createStatement();
-            rs = s.executeQuery(sql);
-        } catch (Exception e) {
-            logger.error("数据库读取发生错误： ", e);
-        }
-        return rs;
-    }
-
-    /**
-     * 调用主方法
-     * 读取所有实体名，调用 实体别名提取方法 getEntityAlias()
-     */
-    public static void addEntityAliasToDB() {
-
-        String sql = "SELECT entity_id, entity_name FROM entities";
-        ResultSet rs = getResultSet(sql);
-        try {
-            while (rs.next()) {
-                // 根据 entity_name ，提取所有别名
-                Set<String> aliases = getEntityAlias(rs.getInt("entity_id"), rs.getString("entity_name"));
-                saveEntityAlias(rs.getInt("entity_id"), rs.getString("entity_name"), aliases);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -207,37 +147,22 @@ public class EntityAliasExtractor {
      */
     public static void saveEntityAlias(int entity_id, String entity_name, Set<String> entity_aliases) {
 
-        Set<String> aliases = new HashSet<>();
-
         // 过滤 概念名词
         for (String stopWord : conceptsStopWords) {
             entity_aliases.remove(stopWord);
         }
 
-        try {
-            for (String alias : entity_aliases) {
+        for (String alias : entity_aliases) {
+            // 最终过滤
+            if (alias.length() < 2)
+                continue;
+            if (alias.matches("^[\\d.-]+$"))
+                continue;
+            if (alias.matches("^[IV型号级]+$"))
+                continue;
 
-                // 最终过滤
-                if (alias.length() < 2)
-                    continue;
-                if (alias.matches("^[\\d.-]+$"))
-                    continue;
-                if (alias.matches("^[IV型号级]+$"))
-                    continue;
-
-                aliases.add(alias);
-
-                statement.setString(1, alias);
-                statement.setInt(2, entity_id);
-                statement.executeUpdate();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            DBKit.insertEntitySameas(alias, entity_id);
         }
-
-
-        System.out.println("--------------------------------------------------");
-        System.out.println(entity_name + " - " + aliases);
     }
 
     public static void main(String[] args) {

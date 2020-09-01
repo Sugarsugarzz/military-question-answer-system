@@ -2,7 +2,7 @@ package casia.isiteam.qa.QA;
 
 import casia.isiteam.qa.Parser.QuestionParser;
 import casia.isiteam.qa.Searcher.AnswerSearcher;
-import casia.isiteam.qa.Searcher.DbSearcher;
+import casia.isiteam.qa.Utils.DBKit;
 import casia.isiteam.qa.Model.QA;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +35,7 @@ public class MilitaryQA {
         // 打印答案
         logger.info("Answer is ：" + answer);
         // 将该轮问答信息存入数据库
-        DbSearcher.insertQAInfo(uid, q_time, originQuestion, answer);
+        DBKit.insertQAInfo(uid, q_time, originQuestion, answer);
 
         return new QA(parser_dict.get("n_entity"), parser_dict.get("n_attr"), question, answer);
     }

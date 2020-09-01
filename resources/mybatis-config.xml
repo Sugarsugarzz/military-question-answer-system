@@ -12,7 +12,7 @@
         <!--    开启二级缓存    -->
 <!--        <setting name="cacheEnabled" value="true"/>-->
         <!--    设置数据库连接超时时间    -->
-        <setting name="defaultStatementTimeout" value="20"/>
+        <setting name="defaultStatementTimeout" value="15"/>
     </settings>
     
     <!-- 配置MyBatis运⾏环境 -->
@@ -32,6 +32,7 @@
 
     <mappers>
         <mapper resource="casia/isiteam/qa/Mapper/AnswerMapper.xml"></mapper>
+        <mapper resource="casia/isiteam/qa/Mapper/ResultMapper.xml"></mapper>
     </mappers>
 
 </configuration>

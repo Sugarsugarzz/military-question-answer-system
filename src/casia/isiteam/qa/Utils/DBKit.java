@@ -1,8 +1,10 @@
-package casia.isiteam.qa.Searcher;
+package casia.isiteam.qa.Utils;
 
 import casia.isiteam.qa.Mapper.AnswerMapper;
+import casia.isiteam.qa.Mapper.ResultMapper;
 import casia.isiteam.qa.Model.Answer;
 import casia.isiteam.qa.Model.DictMatcher;
+import casia.isiteam.qa.Model.Result;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -13,21 +15,23 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-public class DbSearcher {
+public class DBKit {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
     static AnswerMapper answerMapper;
+    static ResultMapper resultMapper;
     static SqlSession sqlSession;
 
     static {
         // 加载 MyBatis配置文件
-        InputStream inputStream = DbSearcher.class.getClassLoader().getResourceAsStream("mybatis-config.xml");
+        InputStream inputStream = DBKit.class.getClassLoader().getResourceAsStream("mybatis-config.xml");
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
         SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(inputStream);
 
         sqlSession = sqlSessionFactory.openSession();
         answerMapper = sqlSession.getMapper(AnswerMapper.class);
+        resultMapper = sqlSession.getMapper(ResultMapper.class);
     }
 
     /**
@@ -234,5 +238,108 @@ public class DbSearcher {
     public static List<Answer> searchMultiAttrInSingleRangeByTimeAndUnit(String category, String attr_1, String operator_1, String item_1, String attr_2, String operator_2, String item_2) {
 
         return answerMapper.findMultiAttrInSingleRangeByTimeAndUnit(category, attr_1, operator_1, item_1, attr_2, operator_2, item_2);
+    }
+
+    /*
+    ================================================= Utils =================================================
+     */
+
+    /**
+     * 获取 Concepts 表
+     */
+    public static List<Result> getConcepts() {
+        return resultMapper.getConcepts();
+    }
+
+    /**
+     * 清空 concept_sameas 表
+     */
+    public static void emptyConceptSameas() {
+        resultMapper.emptyConceptSameas();
+        sqlSession.commit();
+    }
+
+    /**
+     * 添加 concept 别名
+     * @param alias 别名
+     * @param sameasId 关联的id
+     */
+    public static void insertConceptSameas(String alias, Integer sameasId) {
+        resultMapper.insertConceptSameas(alias, sameasId);
+        sqlSession.commit();
+    }
+
+    /**
+     * 获取 Entities 表
+     */
+    public static List<Result> getEntities() {
+        return resultMapper.getEntities();
+    }
+
+    /**
+     * 清空 entity_sameas 表
+     */
+    public static void emptyEntitySameas() {
+        resultMapper.emptyEntitySameas();
+        sqlSession.commit();
+    }
+
+    /**
+     * 添加 entity 别名
+     * @param alias 别名
+     * @param entity_id 对应实体id
+     */
+    public static void insertEntitySameas(String alias, int entity_id) {
+        resultMapper.insertEntitySameas(alias, entity_id);
+        sqlSession.commit();
+    }
+
+    /**
+     * 根据标签清理 match_dict 表
+     * @param labels 标签
+     */
+    public static void emptyMatchDictByLabel(List<String> labels) {
+        resultMapper.emptyMatchDictByLabel(labels);
+        sqlSession.commit();
+    }
+
+    /**
+     * 存入 match_dict 表
+     * @param word 原词
+     * @param alias 别名
+     * @param label 标签
+     */
+    public static void insertMatchDict(String word, String alias, String label) {
+        resultMapper.insertMatchDict(word, alias, label);
+        sqlSession.commit();
+    }
+
+    /**
+     * 根据 level 获取 concepts
+     * @param levels comcept level
+     */
+    public static List<Result> getConceptsByLevel(List<Integer> levels) {
+        return resultMapper.getConceptsByLevel(levels);
+    }
+
+    /**
+     * 获取 concepts 别名
+     */
+    public static List<Result> getConceptsSameas() {
+        return resultMapper.getConceptsSameas();
+    }
+
+    /**
+     * 获取 entities 别名
+     */
+    public static List<Result> getEntitiesSameas() {
+        return resultMapper.getEntitiesSameas();
+    }
+
+    /**
+     * 获取 match_dict 的 alias 和 label
+     */
+    public static List<Result> getSimpleMatchDict() {
+        return resultMapper.getSimpleMatchDict();
     }
 }
