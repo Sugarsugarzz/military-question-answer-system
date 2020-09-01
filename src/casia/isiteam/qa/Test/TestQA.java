@@ -31,7 +31,7 @@ public class TestQA {
 //        answer = com.isitem.qa.QA.qa_main("小黑", "神舟六号的长度", sf.format(new Date()));  // 神舟六号没有长度属性lol
 //        answer = com.isitem.qa.QA.qa_main("小黑", "他们的生产商", sf.format(new Date()));
 
-        // 小类别名
+        // 大类别名
 //        answer = com.isitem.qa.QA.qa_main("小明", "枪械和军用飞机", sf.format(new Date()));
 
         // 小类别名
