@@ -22,8 +22,8 @@
             <transactionManager type="JDBC"></transactionManager>
             <!-- POOLED配置JDBC数据源连接池 -->
             <dataSource type="POOLED">
-                <property name="driver" value="com.mysql.jdbc.Driver"></property>
-                <property name="url" value="jdbc:mysql://192.168.10.231:3307/military_qa?characterEncoding=UTF-8"></property>
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"></property>
+                <property name="url" value="jdbc:mysql://192.168.10.231:3307/military_qa?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false"></property>
                 <property name="username" value="bj"></property>
                 <property name="password" value="bj2016"></property>
             </dataSource>
@@ -31,8 +31,7 @@
     </environments>
 
     <mappers>
-        <mapper resource="casia/isiteam/qa/Mapper/AnswerMapper.xml"></mapper>
-        <mapper resource="casia/isiteam/qa/Mapper/ResultMapper.xml"></mapper>
+        <package name="casia.isiteam.qa.Mapper"/>
     </mappers>
 
 </configuration>

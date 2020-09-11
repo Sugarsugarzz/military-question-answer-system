@@ -11,6 +11,8 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +27,16 @@ public class DBKit {
 
     static {
         // 加载 MyBatis配置文件
-        InputStream inputStream = DBKit.class.getClassLoader().getResourceAsStream("mybatis-config.xml");
+        InputStream inputStream;
+        try {
+            inputStream = new FileInputStream(new File(System.getProperty("user.dir") + "/qa_config/mybatis-config.xml"));
+        } catch (Exception e) {
+            inputStream = DBKit.class.getClassLoader().getResourceAsStream("qa_config/mybatis-config.xml");
+            if (inputStream == null) {
+                inputStream = DBKit.class.getClassLoader().getResourceAsStream("mybatis-config.xml");
+            }
+        }
+
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
         SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(inputStream);
 
