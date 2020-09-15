@@ -289,6 +289,34 @@ DbOperator.getDBToSegmentDict();
   	}]
   }
   ```
+  
+  当对比项有多个近似词条时，也会同时返回。可以取第一个和最后一个进行前台属性比较，其余近似词条在其他对比板块，进行两两比较。
+  
+- 示例
+
+  Question：**我想对比一下巴雷特和神舟七号**
+
+  ```java
+  {
+  	"Q_type": 2,
+  	"Answer": [{
+  		"entity_name": "巴雷特XM109狙击步枪",
+  		"entity_id": 95
+  	}, {
+  		"entity_name": "巴雷特M90狙击步枪",
+  		"entity_id": 58
+  	}, {
+  		"entity_name": "巴雷特M98B狙击步枪",
+  		"entity_id": 151
+  	}, {
+  		"entity_name": "巴雷特Light Fifty M82A1狙击步枪",
+  		"entity_id": 132
+  	}, {
+  		"entity_name": "神舟七号",
+  		"entity_id": 35
+  	}]
+  }
+  ```
 
 #### 3. 热点模式（Q_type = 3）
 
