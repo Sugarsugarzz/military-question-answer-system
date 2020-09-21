@@ -12,7 +12,7 @@
         <!--    开启二级缓存    -->
 <!--        <setting name="cacheEnabled" value="true"/>-->
         <!--    设置数据库连接超时时间    -->
-        <setting name="defaultStatementTimeout" value="15"/>
+        <setting name="defaultStatementTimeout" value="300"/>
     </settings>
     
     <!-- 配置MyBatis运⾏环境 -->
