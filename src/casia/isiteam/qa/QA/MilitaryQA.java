@@ -25,7 +25,8 @@ public class MilitaryQA {
      */
     public static QA oqa_main(String originQuestion, String question, String uid, String q_time) {
 
-        logger.info("Question is ：" + question);
+        logger.info("Original Question is : " + originQuestion);
+        logger.info("Processed Question is ：" + question);
         // 问句解析
         logger.info("Parsing Question...");
         Map<String, List<String>> parser_dict = QuestionParser.parser(question);

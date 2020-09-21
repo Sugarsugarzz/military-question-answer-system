@@ -17,7 +17,7 @@ public class DictMapper {
         entityMap = new HashMap<>();
 
         // match_dict 表中所有信息
-        List<DictMatcher>matchers = DBKit.getMatchDict();
+        List<DictMatcher> matchers = DBKit.getMatchDict();
 
         for (DictMatcher matcher : matchers) {
             if (matcher.getLabel().equals("entity")) {

@@ -26,29 +26,37 @@ public class AnswerSearcher {
      */
     static {
 
-        // 热点模式
-        patterns.put("热点模式", new ArrayList<>());
-        patterns.get("热点模式").add(Arrays.asList("3"));
+        // 热点查询模式
+        patterns.put("热点查询模式", new ArrayList<>());
+        patterns.get("热点查询模式").add(Arrays.asList("3"));
+
+        // 期刊查询模式
+        patterns.put("期刊查询模式", new ArrayList<>());
+        patterns.get("期刊查询模式").add(Arrays.asList("4"));
+
+        // 报告查询模式
+        patterns.put("报告查询模式", new ArrayList<>());
+        patterns.get("报告查询模式").add(Arrays.asList("5"));
 
         // 直达模式：头条
         patterns.put("直达模式-头条", new ArrayList<>());
-        patterns.get("直达模式-头条").add(Arrays.asList("41"));
+        patterns.get("直达模式-头条").add(Arrays.asList("61"));
 
         // 直达模式：百科
         patterns.put("直达模式-百科", new ArrayList<>());
-        patterns.get("直达模式-百科").add(Arrays.asList("42"));
+        patterns.get("直达模式-百科").add(Arrays.asList("62"));
 
         // 直达模式：订阅
         patterns.put("直达模式-订阅", new ArrayList<>());
-        patterns.get("直达模式-订阅").add(Arrays.asList("43"));
+        patterns.get("直达模式-订阅").add(Arrays.asList("63"));
 
         // 直达模式：我的收藏
         patterns.put("直达模式-我的收藏", new ArrayList<>());
-        patterns.get("直达模式-我的收藏").add(Arrays.asList("44"));
+        patterns.get("直达模式-我的收藏").add(Arrays.asList("64"));
 
         // 直达模式：浏览历史
         patterns.put("直达模式-浏览历史", new ArrayList<>());
-        patterns.get("直达模式-浏览历史").add(Arrays.asList("45"));
+        patterns.get("直达模式-浏览历史").add(Arrays.asList("65"));
 
         // 辅助查询模式 ：大类别名，返回二级类别列表
         patterns.put("大类别名", new ArrayList<>());
@@ -70,7 +78,7 @@ public class AnswerSearcher {
         // 百科模式 ：单实体
         patterns.put("单实体", new ArrayList<>());
         patterns.get("单实体").add(Arrays.asList("n_entity"));
-        patterns.get("单实体").add(Arrays.asList("n_entity", "n_small"));  // 特殊情况 歼20战斗机
+        patterns.get("单实体").add(Arrays.asList("n_entity", "n_small"));
         patterns.get("单实体").add(Arrays.asList("n_country", "n_entity"));
         patterns.get("单实体").add(Arrays.asList("n_entity", "n_country"));
 
@@ -186,44 +194,54 @@ public class AnswerSearcher {
         List<Answer> answers = new ArrayList<>();
 
         // 模式匹配
-        if (patterns.get("热点模式").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "热点模式"));
+        if (patterns.get("热点查询模式").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "热点查询模式"));
             Q_type = 3;
+        }
+
+        else if (patterns.get("期刊查询模式").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "期刊查询模式"));
+            Q_type = 4;
+        }
+
+        else if (patterns.get("报告查询模式").contains(parser_dict.get("pattern"))) {
+            logger.info(String.format("与 %s 问句模式匹配成功！", "报告查询模式"));
+            Q_type = 5;
         }
 
         else if (patterns.get("直达模式-头条").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-头条"));
-            Q_type = 4;
+            Q_type = 6;
             A_type = 1;
         }
 
         else if (patterns.get("直达模式-百科").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-百科"));
-            Q_type = 4;
+            Q_type = 6;
             A_type = 2;
         }
 
         else if (patterns.get("直达模式-订阅").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-订阅"));
-            Q_type = 4;
+            Q_type = 6;
             A_type = 3;
         }
 
         else if (patterns.get("直达模式-我的收藏").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-我的收藏"));
-            Q_type = 4;
+            Q_type = 6;
             A_type = 4;
         }
 
         else if (patterns.get("直达模式-浏览历史").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-浏览历史"));
-            Q_type = 4;
+            Q_type = 6;
             A_type = 5;
         }
 
         else if (patterns.get("大类别名").contains(parser_dict.get("pattern"))) {
             logger.info(String.format("与 %s 问句模式匹配成功！", "大类别名"));
-            Q_type = 5;
+            Q_type = 7;
             for (String category : parser_dict.get("n_big")) {
                 // 数据库检索答案
                 answers.addAll(DBKit.searchByBigCategory(DictMapper.BigCategory.get(category)));
@@ -393,20 +411,21 @@ public class AnswerSearcher {
 
     /**
      * 组装JSON
-     * @param results 答案实体列表
+     * @param answers 答案实体列表
      * @return JSON
      */
-    public static JSONObject assembleJSON(Map<String, List<String>> parser_dict, List<Answer> results) {
+    public static JSONObject assembleJSON(Map<String, List<String>> parser_dict, List<Answer> answers) {
 
         JSONObject obj = new JSONObject();
         JSONArray jsonArray = new JSONArray();
 
         switch (Q_type) {
 
+            // 百科模式
             case 1:
                 obj.put("Q_type", Q_type);
                 obj.put("A_type", A_type);
-                for (Answer answer: results) {
+                for (Answer answer: answers) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("entity_id", answer.getEntity_id());
                     jsonObject.put("entity_name", answer.getEntity_name());
@@ -417,9 +436,10 @@ public class AnswerSearcher {
                 obj.put("Answer", jsonArray);
                 break;
 
+            // 对比模式
             case 2:
                 obj.put("Q_type", Q_type);
-                for (Answer answer: results) {
+                for (Answer answer: answers) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("entity_id", answer.getEntity_id());
                     jsonObject.put("entity_name", answer.getEntity_name());
@@ -428,7 +448,14 @@ public class AnswerSearcher {
                 obj.put("Answer", jsonArray);
                 break;
 
+            // 热点查询模式
             case 3:
+
+            // 期刊查询模式
+            case 4:
+
+            // 报告查询模式
+            case 5:
                 obj.put("Q_type", Q_type);
                 obj.put("Q_content", parser_dict.get("keywords"));
 
@@ -441,23 +468,19 @@ public class AnswerSearcher {
                     String word = parser_dict.get("n_unit").get(0);
                     // 长度为1的在处理下，补充一个结束时间
                     try {
-                        if (word.contains("日") || word.contains("天") || word.contains("号"))
-                            end_time = addTime(start_time, 1);
-                        else if (word.contains("周"))
-                            end_time = addTime(start_time, 2);
+                        if (word.contains("年"))
+                            end_time = addTime(start_time, 4);
                         else if (word.contains("月"))
                             end_time = addTime(start_time, 3);
-                        else if (word.contains("年"))
-                            end_time = addTime(start_time, 4);
+                        else if (word.contains("周"))
+                            end_time = addTime(start_time, 2);
+                        else if (word.contains("日") || word.contains("天") || word.contains("号"))
+                            end_time = addTime(start_time, 1);
                     } catch (ParseException e) {
-                        e.printStackTrace();
+                        logger.error("查询模式补充结束时间出现错误：" + e);
                     }
                     obj.put("Q_start_time", start_time);
                     obj.put("Q_end_time", end_time);
-                } else if (parser_dict.get("n_time").size() == 2) {
-                    Collections.sort(parser_dict.get("n_time"));
-                    obj.put("Q_start_time", parser_dict.get("n_time").get(0));
-                    obj.put("Q_end_time", parser_dict.get("n_time").get(1));
                 } else {
                     Collections.sort(parser_dict.get("n_time"));
                     obj.put("Q_start_time", parser_dict.get("n_time").get(0));
@@ -465,15 +488,17 @@ public class AnswerSearcher {
                 }
                 break;
 
-            case 4:
+            // 直达模式
+            case 6:
                 obj.put("Q_type", Q_type);
                 obj.put("Answer", A_type);
                 break;
 
-            case 5:
+            // 辅助模式
+            case 7:
                 obj.put("Q_type", Q_type);
                 List<String> categories = new ArrayList<>();
-                for (Answer answer : results)
+                for (Answer answer : answers)
                     categories.add(answer.getEntity_name());
                 obj.put("Answer", categories);
                 break;
@@ -496,18 +521,14 @@ public class AnswerSearcher {
         calendar.setTime(dt);
 
         switch (flag) {
-            case 1:  // 天
-                calendar.add(Calendar.DAY_OF_MONTH, 1);
-                break;
-            case 2:  // 周
-                calendar.add(Calendar.DAY_OF_MONTH, 7);
-                break;
-            case 3:  // 月
-                calendar.add(Calendar.MONTH, 1);
-                break;
-            case 4:  // 年
-                calendar.add(Calendar.YEAR, 1);
-                break;
+            // 天
+            case 1:  calendar.add(Calendar.DAY_OF_MONTH, 1); break;
+            // 周
+            case 2:  calendar.add(Calendar.DAY_OF_MONTH, 7); break;
+            // 月
+            case 3:  calendar.add(Calendar.MONTH, 1); break;
+            // 年
+            case 4:  calendar.add(Calendar.YEAR, 1); break;
         }
 
         Date dt1 = calendar.getTime();
