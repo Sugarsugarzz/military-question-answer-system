@@ -11,6 +11,8 @@ public class DbOperator {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
+    public static final String rootpath= "";
+
     /*
     ===================================================================================================================
       一、将自定义的 concept 和 entity 别名上传到对应 sameas 表中的工具
@@ -32,7 +34,7 @@ public class DbOperator {
         logger.info("清空 concept_sameas 表完成.");
 
         // 读取 data/dict_for_sameas 下的自定义别名库，上传到数据库对应 sameas 表中
-        String filepath = "data/dict_for_sameas/concepts_alias.txt";
+        String filepath = rootpath + "data/dict_for_sameas/concepts_alias.txt";
         try {
             BufferedReader br = new BufferedReader(new FileReader(filepath));
             String str;
@@ -82,11 +84,11 @@ public class DbOperator {
     public static void getCountryCompareMostToDB() {
         logger.info("正在将 country、most 和 compare 文件的映射信息存入 match_dict 表...");
         // 获取文件路径
-        File file = new File("data/dict_for_basic");
+        File file = new File(rootpath + "data/dict_for_basic");
         List<String> file_list = new ArrayList<>();
         for (String filename : file.list()) {
             if (filename.equals("country.txt") || filename.equals("most.txt") || filename.equals("compare.txt")) {
-                file_list.add("data/dict_for_basic/" + filename);
+                file_list.add(rootpath + "data/dict_for_basic/" + filename);
             }
         }
         logger.info("获取文件路径成功.");
@@ -226,7 +228,7 @@ public class DbOperator {
 
         // 存入本地txt
         for (String key : map.keySet()) {
-            String filepath = "data/dict_for_segment/" + key + ".txt";
+            String filepath = rootpath + "data/dict_for_segment/" + key + ".txt";
             try {
                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filepath)));
                 for (String s : map.get(key)) {
