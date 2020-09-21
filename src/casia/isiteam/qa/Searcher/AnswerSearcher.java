@@ -63,6 +63,8 @@ public class AnswerSearcher {
         patterns.get("大类别名").add(Arrays.asList("n_big"));
         patterns.get("大类别名").add(Arrays.asList("n_big", "n_big"));
         patterns.get("大类别名").add(Arrays.asList("n_big", "n_big", "n_big"));
+        patterns.get("大类别名").add(Arrays.asList("n_country", "n_big"));
+        patterns.get("大类别名").add(Arrays.asList("n_big", "n_country"));
 
         // 百科模式 ：小类别名，返回类别下所有实体列表
         patterns.put("小类别名", new ArrayList<>());
