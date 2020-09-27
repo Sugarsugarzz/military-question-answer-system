@@ -21,9 +21,11 @@ public class DBKit {
 
     private static Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    static AnswerMapper answerMapper;
-    static ResultMapper resultMapper;
-    static SqlSession sqlSession;
+//    static AnswerMapper answerMapper;
+//    static ResultMapper resultMapper;
+//    static SqlSession sqlSession;
+
+    private static SqlSessionFactory sqlSessionFactory = null;
 
     static {
         // 加载 MyBatis配置文件
@@ -38,11 +40,16 @@ public class DBKit {
         }
 
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
-        SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(inputStream);
+        sqlSessionFactory = sqlSessionFactoryBuilder.build(inputStream);
 
-        sqlSession = sqlSessionFactory.openSession();
-        answerMapper = sqlSession.getMapper(AnswerMapper.class);
-        resultMapper = sqlSession.getMapper(ResultMapper.class);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+//        answerMapper = sqlSession.getMapper(AnswerMapper.class);
+//        resultMapper = sqlSession.getMapper(ResultMapper.class);
+    }
+
+    private static <T> T getMapper(Class<T> clazz) {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        return sqlSession.getMapper(clazz);
     }
 
     /**
@@ -50,8 +57,12 @@ public class DBKit {
      * @return DictMatcher
      */
     public static List<DictMatcher> getMatchDict() {
-
-        return answerMapper.getMatchDict();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).getMatchDict();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -62,9 +73,13 @@ public class DBKit {
      * @param answer 答案JSON
      */
     public static void insertQAInfo(String uid, String q_time, String question, String answer) {
-
-        answerMapper.saveQAInfo(uid, q_time, question, answer);
-        sqlSession.commit();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            sqlSession.getMapper(AnswerMapper.class).saveQAInfo(uid, q_time, question, answer);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -74,8 +89,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchByCountryAndCategory(String country, String category) {
-
-        return answerMapper.findByCountryAndCategory(country, category);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findByCountryAndCategory(country, category);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -84,10 +103,13 @@ public class DBKit {
      * @return 二级类别名列表
      */
     public static List<Answer> searchByBigCategory(String category) {
-
-        String children = answerMapper.findChildrenByBigCategory(category);
-
-        return answerMapper.findSmallCategoryByChildren(Arrays.asList(children.split(",")));
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            String children = sqlSession.getMapper(AnswerMapper.class).findChildrenByBigCategory(category);
+            return sqlSession.getMapper(AnswerMapper.class).findSmallCategoryByChildren(Arrays.asList(children.split(",")));
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -96,8 +118,12 @@ public class DBKit {
      * @return 类别下所有实体列表
      */
     public static List<Answer> searchBySmallCategory(String category) {
-
-        return answerMapper.findBySmallCategory(category);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findBySmallCategory(category);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -106,8 +132,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchByEntity(String entity) {
-
-        return answerMapper.findByEntity(entity);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findByEntity(entity);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -117,8 +147,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchByEntityAndAttrs(String entity, List<String> attrs) {
-
-        return answerMapper.findByEntityAndAttrs(entity, attrs);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findByEntityAndAttrs(entity, attrs);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -127,8 +161,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchMaxInAllCategory(String attr) {
-
-        return answerMapper.findMaxByAttrInAllCategory(attr);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findMaxByAttrInAllCategory(attr);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -137,8 +175,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchMinInAllCategory(String attr) {
-
-        return answerMapper.findMinByAttrInAllCategory(attr);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findMinByAttrInAllCategory(attr);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -148,8 +190,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchMaxInSingleCategory(String category, String attr) {
-
-        return answerMapper.findMaxByAttrInSingleCategory(category, attr);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findMaxByAttrInSingleCategory(category, attr);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -159,8 +205,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchMinInSingleCategory(String category, String attr) {
-
-        return answerMapper.findMinByAttrInSingleCategory(category, attr);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findMinByAttrInSingleCategory(category, attr);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -172,8 +222,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchInSingleRangeByUnit(String category, String attr, String operator, String item) {
-
-        return answerMapper.findInSingleRangeByUnit(category, attr, operator, item);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findInSingleRangeByUnit(category, attr, operator, item);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -185,8 +239,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchInSingleRangeByTime(String category, String attr, String operator, String item) {
-
-        return answerMapper.findInSingleRangeByTime(category, attr, operator, item);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findInSingleRangeByTime(category, attr, operator, item);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -200,8 +258,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchInMultiRangeByUnit(String category, String attr, String operator_1, String item_1, String operator_2, String item_2) {
-
-        return answerMapper.findInMultiRangeByUnit(category, attr, operator_1, item_1, operator_2, item_2);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findInMultiRangeByUnit(category, attr, operator_1, item_1, operator_2, item_2);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -215,8 +277,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchInMultiRangeByTime(String category, String attr, String operator_1, String item_1, String operator_2, String item_2) {
-
-        return answerMapper.findInMultiRangeByTime(category, attr, operator_1, item_1, operator_2, item_2);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findInMultiRangeByTime(category, attr, operator_1, item_1, operator_2, item_2);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -231,8 +297,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchMultiAttrInSingleRangeByUnit(String category, String attr_1, String operator_1, String item_1, String attr_2, String operator_2, String item_2) {
-
-        return answerMapper.findMultiAttrInSingleRangeByUnit(category, attr_1, operator_1, item_1, attr_2, operator_2, item_2);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findMultiAttrInSingleRangeByUnit(category, attr_1, operator_1, item_1, attr_2, operator_2, item_2);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -247,8 +317,12 @@ public class DBKit {
      * @return 答案
      */
     public static List<Answer> searchMultiAttrInSingleRangeByTimeAndUnit(String category, String attr_1, String operator_1, String item_1, String attr_2, String operator_2, String item_2) {
-
-        return answerMapper.findMultiAttrInSingleRangeByTimeAndUnit(category, attr_1, operator_1, item_1, attr_2, operator_2, item_2);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(AnswerMapper.class).findMultiAttrInSingleRangeByTimeAndUnit(category, attr_1, operator_1, item_1, attr_2, operator_2, item_2);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /*
@@ -259,15 +333,25 @@ public class DBKit {
      * 获取 Concepts 表
      */
     public static List<Result> getConcepts() {
-        return resultMapper.getConcepts();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(ResultMapper.class).getConcepts();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
      * 清空 concept_sameas 表
      */
     public static void emptyConceptSameas() {
-        resultMapper.emptyConceptSameas();
-        sqlSession.commit();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            sqlSession.getMapper(ResultMapper.class).emptyConceptSameas();
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -276,23 +360,38 @@ public class DBKit {
      * @param sameasId 关联的id
      */
     public static void insertConceptSameas(String alias, Integer sameasId) {
-        resultMapper.insertConceptSameas(alias, sameasId);
-        sqlSession.commit();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            sqlSession.getMapper(ResultMapper.class).insertConceptSameas(alias, sameasId);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
      * 获取 Entities 表
      */
     public static List<Result> getEntities() {
-        return resultMapper.getEntities();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(ResultMapper.class).getEntities();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
      * 清空 entity_sameas 表
      */
     public static void emptyEntitySameas() {
-        resultMapper.emptyEntitySameas();
-        sqlSession.commit();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            sqlSession.getMapper(ResultMapper.class).emptyEntitySameas();
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -301,8 +400,13 @@ public class DBKit {
      * @param entity_id 对应实体id
      */
     public static void insertEntitySameas(String alias, int entity_id) {
-        resultMapper.insertEntitySameas(alias, entity_id);
-        sqlSession.commit();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            sqlSession.getMapper(ResultMapper.class).insertEntitySameas(alias, entity_id);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -310,8 +414,13 @@ public class DBKit {
      * @param labels 标签
      */
     public static void emptyMatchDictByLabel(List<String> labels) {
-        resultMapper.emptyMatchDictByLabel(labels);
-        sqlSession.commit();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            sqlSession.getMapper(ResultMapper.class).emptyMatchDictByLabel(labels);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -321,8 +430,13 @@ public class DBKit {
      * @param label 标签
      */
     public static void insertMatchDict(String word, String alias, String label) {
-        resultMapper.insertMatchDict(word, alias, label);
-        sqlSession.commit();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            sqlSession.getMapper(ResultMapper.class).insertMatchDict(word, alias, label);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
@@ -330,27 +444,47 @@ public class DBKit {
      * @param levels comcept level
      */
     public static List<Result> getConceptsByLevel(List<Integer> levels) {
-        return resultMapper.getConceptsByLevel(levels);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(ResultMapper.class).getConceptsByLevel(levels);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
      * 获取 concepts 别名
      */
     public static List<Result> getConceptsSameas() {
-        return resultMapper.getConceptsSameas();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(ResultMapper.class).getConceptsSameas();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
      * 获取 entities 别名
      */
     public static List<Result> getEntitiesSameas() {
-        return resultMapper.getEntitiesSameas();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(ResultMapper.class).getEntitiesSameas();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**
      * 获取 match_dict 的 alias 和 label
      */
     public static List<Result> getSimpleMatchDict() {
-        return resultMapper.getSimpleMatchDict();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.getMapper(ResultMapper.class).getSimpleMatchDict();
+        } finally {
+            sqlSession.close();
+        }
     }
 }
