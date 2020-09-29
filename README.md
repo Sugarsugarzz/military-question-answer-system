@@ -5,6 +5,7 @@
 | 2020.08.07 | 1.0    | 唐     |                                |
 | 2020.09.01 | 1.1    | 唐     | 补充别名处理方法说明及问句类型 |
 | 2020.09.21 | 1.2    | 唐     | 补充期刊、报告的查询模式       |
+| 2020.09.29 | 1.3    | 唐     | 实现接口化，简化调用方式       |
 
 ### 2. 调用说明
 
@@ -19,7 +20,7 @@
 - 调用类方法
 
   ```java
-  String qa_main(String uid, String question, String q_time)
+  String qa_main(String uid, String question)
   ```
 
 - 调用参数说明
@@ -33,8 +34,8 @@
 - 调用示例
 
   ```java
-  MultiMilitaryQA QA = new MultiMilitaryQA();
-  String answer = QA.qa_main("用户id", "中国的战斗机有哪些？", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+  MultiMilitaryQA QA = new MultiMilitaryQA();  // 一个多轮问答会话
+  String answer = QA.qa_main("用户id", "中国的战斗机有哪些？");
   ```
 
 - 返回结果

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD casia.isiteam.militaryqa.mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="casia.isiteam.militaryqa.mapper.ResultMapper">
+
+    <select id="getConcepts" resultType="casia.isiteam.militaryqa.model.Result">
+        SELECT c_id, concept_name FROM concepts
+    </select>
+
+    <delete id="emptyConceptSameas">
+        DELETE FROM concept_sameas
+    </delete>
+
+    <insert id="insertConceptSameas">
+        INSERT INTO concept_sameas(concept_name, sameAs_id)
+        VALUES (#{alias}, ${sameasId})
+    </insert>
+
+    <select id="getEntities" resultType="casia.isiteam.militaryqa.model.Result">
+        SELECT entity_id, entity_name FROM entities
+    </select>
+
+    <delete id="emptyEntitySameas">
+        DELETE FROM entity_sameas
+    </delete>
+
+    <insert id="insertEntitySameas">
+        INSERT INTO entity_sameas(entity_name, sameAs_id)
+        VALUES (#{alias}, ${entity_id})
+    </insert>
+
+    <delete id="emptyMatchDictByLabel">
+        DELETE FROM match_dict
+        <where>
+            label in
+            <foreach collection="labels" item="label" open="(" close=")" separator=",">
+                #{label}
+            </foreach>
+        </where>
+    </delete>
+
+    <insert id="insertMatchDict">
+        INSERT INTO match_dict(word, alias, label)
+        VALUES (#{word}, #{alias}, #{label})
+    </insert>
+
+    <select id="getConceptsByLevel" resultType="casia.isiteam.militaryqa.model.Result">
+        SELECT concept_name, `level`
+        FROM concepts
+        <where>
+            `level` in
+            <foreach collection="levels" item="lvl" open="(" close=")" separator=",">
+                ${lvl}
+            </foreach>
+        </where>
+    </select>
+
+    <select id="getConceptsSameas" resultType="casia.isiteam.militaryqa.model.Result">
+        SELECT c.concept_name AS concept1, cs.concept_name AS concept2
+        FROM concepts c, concept_sameas cs
+        WHERE c.c_id = cs.sameAs_id
+    </select>
+
+    <select id="getEntitiesSameas" resultType="casia.isiteam.militaryqa.model.Result">
+        SELECT e.entity_name AS entity_name_1, s.entity_name AS entity_name_2
+        FROM entities e, entity_sameas s
+        WHERE e.entity_id = s.sameAs_id
+    </select>
+
+    <select id="getSimpleMatchDict" resultType="casia.isiteam.militaryqa.model.Result">
+        SELECT alias, label FROM match_dict
+    </select>
+
+</mapper>
