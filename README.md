@@ -31,7 +31,7 @@
 #### 调用示例
 
 ```http
-GET http://id:port/sensitive?uid=用户id&q=战斗机有哪些？
+GET http://id:port/qa?uid=用户id&q=战斗机有哪些？
 ```
 
 ### 3. 问答方法返回字段说明
