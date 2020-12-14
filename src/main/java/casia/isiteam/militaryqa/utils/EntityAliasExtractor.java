@@ -5,9 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -149,12 +147,14 @@ public class EntityAliasExtractor {
     public static void saveEntityAlias(int entity_id, String entity_name, Set<String> entity_aliases) {
 
         // 过滤 概念名词
-        for (String stopWord : conceptsStopWords) {
-            entity_aliases.remove(stopWord);
-        }
+        List<String> tempList = new ArrayList<>();
+        entity_aliases.forEach(alias -> { if (conceptsStopWords.contains(alias)) tempList.add(alias); });
+        tempList.forEach(entity_aliases::remove);
 
         for (String alias : entity_aliases) {
             // 最终过滤
+            if (alias.equals("MM"))
+                continue;
             if (alias.length() < 2)
                 continue;
             if (alias.matches("^[\\d.-]+$"))

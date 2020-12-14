@@ -82,6 +82,7 @@
     </dependencies>
 
     <build>
+        <finalName>service-military-qa-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

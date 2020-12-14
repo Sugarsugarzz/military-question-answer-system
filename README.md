@@ -480,4 +480,7 @@ DbOperator.getDBToSegmentDict();
    DbOperator.getDBToSegmentDict();
    ```
 
-### 
+### 6. 打包方式
+1. mvn clean
+2. 运行
+3. mvn package
