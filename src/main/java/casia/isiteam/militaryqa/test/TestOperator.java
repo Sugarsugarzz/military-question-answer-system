@@ -15,7 +15,7 @@ public class TestOperator {
         DbFieldUpdater.getEntitiesAndSameasToDB();  // 4minutes
 
         // 根据数据库的 match_dict 表，获取分词词典到本地，加载到分词器中
-        DbFieldUpdater.getDBToSegmentDict();
+//        DbFieldUpdater.getDBToSegmentDict();
 
     }
 }

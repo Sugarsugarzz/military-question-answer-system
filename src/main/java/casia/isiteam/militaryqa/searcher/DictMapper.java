@@ -2,6 +2,8 @@ package casia.isiteam.militaryqa.searcher;
 
 import casia.isiteam.militaryqa.model.DictMatcher;
 import casia.isiteam.militaryqa.utils.DBKit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -9,10 +11,30 @@ import java.util.regex.Pattern;
 
 public class DictMapper {
 
+    private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
+
     static Map<String, Map<String, String>> otherMap;
     static Map<String, Set<String>> entityMap;
 
+    public static Map<String, String> Country;          // 国家
+    public static Map<String, String> BigCategory;      // 一级分类
+    public static Map<String, String> SmallCategory;    // 二级分类
+    public static Map<String, Set<String>> Entity;      // 实体
+    public static Map<String, String> Attribute;        // 实体属性
+    public static Map<String, String> Compare;          // 比较词
+    public static Map<String, String> Most;             // 最值
+
     static {
+        initDictMapper();
+    }
+
+    /**
+     * 构建（问句中涉及的词形式，数据库中标准词形式）的映射关系
+     * 用于在数据库中检索答案
+     */
+    public static void  initDictMapper() {
+
+        logger.info("正在更新 DictMapper...");
         otherMap = new HashMap<>();
         entityMap = new HashMap<>();
 
@@ -36,26 +58,19 @@ public class DictMapper {
                     otherMap.get(matcher.getLabel()).put(key, matcher.getWord());
             }
         }
+
+        Country = otherMap.get("country");
+        BigCategory = otherMap.get("big_category");
+        SmallCategory = otherMap.get("small_category");
+        Entity = entityMap;
+        Attribute = otherMap.get("attribute");
+        Compare = otherMap.get("compare");
+        Most = otherMap.get("most");
+
+        logger.info("DictMapper 更新完成...");
     }
 
-    /**
-     * 构建（问句中涉及的词形式，数据库中标准词形式）的映射关系
-     * 用于在数据库中检索答案
-     */
-    // 国家
-    public static Map<String, String> Country = otherMap.get("country");
-    // 一级分类
-    public static Map<String, String> BigCategory = otherMap.get("big_category");
-    // 二级分类
-    public static Map<String, String> SmallCategory = otherMap.get("small_category");
-    // 实体
-    public static Map<String, Set<String>> Entity = entityMap;
-    // 实体属性
-    public static Map<String, String> Attribute = otherMap.get("attribute");
-    // 比较词
-    public static Map<String, String> Compare = otherMap.get("compare");
-    // 最值
-    public static Map<String, String> Most = otherMap.get("most");
+
 
     /**
      * 将<时间>处理成标准形式

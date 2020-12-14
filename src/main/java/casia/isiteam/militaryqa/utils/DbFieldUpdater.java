@@ -1,6 +1,7 @@
 package casia.isiteam.militaryqa.utils;
 
 import casia.isiteam.militaryqa.model.Result;
+import com.hankcs.hanlp.dictionary.CustomDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -205,12 +206,51 @@ public class DbFieldUpdater {
       三、将 match_dict 表中的数据获取到本地，加载到HanLP分词器的自定义词典中（未生效可以先删除custom/CustomDictionary.txt.bin）
     ===================================================================================================================
      */
-    /**
-     * 根据数据库的 match_dict 表，获取分词词典到本地，到 data/dict_for_segment 目录下
-     */
-    public static void getDBToSegmentDict() {
+//    /**
+//     * 根据数据库的 match_dict 表，获取分词词典到本地，到 data/dict_for_segment 目录下
+//     */
+//    public static void getDBToSegmentDict() {
+//
+//        logger.info("正在获取 match_dict 表到本地 data/dict_for_segment 目录下...");
+//
+//        // 存（所属标签 - 词条）
+//        Map<String, Set<String>> map = new HashMap<>();
+//        // 获取match_dict表信息
+//        List<Result> matchers = DBKit.getSimpleMatchDict();
+//        for (Result matcher : matchers) {
+//            if (!map.containsKey(matcher.getLabel())) {
+//                map.put(matcher.getLabel(), new HashSet<>());
+//            }
+//            for (String alias : matcher.getAlias().split("\\|")) {
+//                map.get(matcher.getLabel()).add(alias);
+//            }
+//        }
+//        logger.info("获取 match_dict 成功.");
+//
+//        // 存入本地txt
+//        for (String key : map.keySet()) {
+//            String filepath = rootpath + "data/dict_for_segment/" + key + ".txt";
+//            try {
+//                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filepath)));
+//                for (String s : map.get(key)) {
+//                    bw.write(s + "\n");
+//                }
+//                bw.flush();
+//                bw.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        logger.info("获取 match_dict 表到本地 data/dict_for_segment 目录下成功！");
+//    }
 
-        logger.info("正在获取 match_dict 表到本地 data/dict_for_segment 目录下...");
+    /**
+     * 根据数据库的 match_dict 表，读取到 HanLP 的 CustomDictionary 中
+     */
+    public static void getDBToCustomDictionary() {
+
+        logger.info("正在获取 match_dict 表到 CustomDictionary...");
 
         // 存（所属标签 - 词条）
         Map<String, Set<String>> map = new HashMap<>();
@@ -226,21 +266,23 @@ public class DbFieldUpdater {
         }
         logger.info("获取 match_dict 成功.");
 
-        // 存入本地txt
-        for (String key : map.keySet()) {
-            String filepath = rootpath + "data/dict_for_segment/" + key + ".txt";
-            try {
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filepath)));
-                for (String s : map.get(key)) {
-                    bw.write(s + "\n");
-                }
-                bw.flush();
-                bw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        // label -> nature
+        Map<String, String> natureMap = new HashMap<>();
+        natureMap.put("country", "n_country");
+        natureMap.put("entity", "n_entity");
+        natureMap.put("attribute", "n_attr");
+        natureMap.put("big_category", "n_big");
+        natureMap.put("small_category", "n_small");
+        natureMap.put("compare", "n_compare");
+        natureMap.put("most", "n_most");
 
-        logger.info("获取 match_dict 表到本地 data/dict_for_segment 目录下成功！");
+        // 加载到 CustomDictionary
+        map.keySet().forEach(label -> {
+            map.get(label).forEach(word -> {
+                CustomDictionary.add(word, natureMap.get(label));
+            });
+        });
+
+        logger.info("获取 match_dict 表到 CustomDictionary 成功！");
     }
 }

@@ -1,5 +1,7 @@
 package casia.isiteam.militaryqa;
 
+import casia.isiteam.militaryqa.searcher.DictMapper;
+import casia.isiteam.militaryqa.utils.DbFieldUpdater;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,6 +10,7 @@ public class MilitaryqaApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(MilitaryqaApplication.class, args);
+        DbFieldUpdater.getDBToCustomDictionary();  // init customdictionary
     }
 
 }

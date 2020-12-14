@@ -2,6 +2,9 @@ package casia.isiteam.militaryqa.controller;
 
 import casia.isiteam.militaryqa.main.MultiMilitaryQA;
 import casia.isiteam.militaryqa.parser.QuestionParser;
+import casia.isiteam.militaryqa.searcher.DictMapper;
+import casia.isiteam.militaryqa.utils.DbFieldUpdater;
+import com.hankcs.hanlp.dictionary.CustomDictionary;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,5 +31,32 @@ public class IndexController {
     @RequestMapping("/hello")
     public String test() {
         return "hello World";
+    }
+
+    @RequestMapping("/updatedbfield")
+    public String updateDb() {
+        try {
+            DbFieldUpdater.addEntityAliasToDB(); // entity  6000 entities for 15min
+
+            DbFieldUpdater.getConceptsAndSameasToDB();
+            DbFieldUpdater.getEntitiesAndSameasToDB();
+
+            DbFieldUpdater.getDBToCustomDictionary();
+            DictMapper.initDictMapper();
+            return "success";
+        } catch (Exception e) {
+            return "fail - " + e;
+        }
+    }
+
+    @RequestMapping("/updatedict")
+    public String update() {
+        try {
+            DbFieldUpdater.getDBToCustomDictionary();
+            DictMapper.initDictMapper();
+            return "success";
+        } catch (Exception e) {
+            return "fail - " + e;
+        }
     }
 }
