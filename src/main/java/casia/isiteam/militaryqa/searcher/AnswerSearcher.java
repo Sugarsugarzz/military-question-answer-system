@@ -406,9 +406,9 @@ public class AnswerSearcher {
         }
 
         // 组装答案JSON
-        JSONObject jsonObject = assembleJSON(parser_dict, answers);
+        JSONObject obj = assembleJSON(parser_dict, answers);
 
-        return jsonObject.toJSONString();
+        return obj.toJSONString();
     }
 
     /**

@@ -31,5 +31,6 @@ jdbc.properties
 # Log
 qa_system_log
 output
+logs
 
 

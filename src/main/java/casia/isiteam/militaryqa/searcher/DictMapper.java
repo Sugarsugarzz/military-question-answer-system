@@ -13,16 +13,20 @@ public class DictMapper {
 
     private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
-    static Map<String, Map<String, String>> otherMap;
-    static Map<String, Set<String>> entityMap;
-
-    public static Map<String, String> Country;          // 国家
-    public static Map<String, String> BigCategory;      // 一级分类
-    public static Map<String, String> SmallCategory;    // 二级分类
-    public static Map<String, Set<String>> Entity;      // 实体
-    public static Map<String, String> Attribute;        // 实体属性
-    public static Map<String, String> Compare;          // 比较词
-    public static Map<String, String> Most;             // 最值
+    // 国家
+    public static Map<String, String> Country = new HashMap<>();
+    // 一级分类
+    public static Map<String, String> BigCategory = new HashMap<>();
+    // 二级分类
+    public static Map<String, String> SmallCategory = new HashMap<>();
+    // 实体
+    public static Map<String, Set<String>> Entity = new HashMap<>();
+    // 实体属性
+    public static Map<String, String> Attribute = new HashMap<>();
+    // 比较词
+    public static Map<String, String> Compare = new HashMap<>();
+    // 最值
+    public static Map<String, String> Most = new HashMap<>();
 
     static {
         initDictMapper();
@@ -35,42 +39,46 @@ public class DictMapper {
     public static void  initDictMapper() {
 
         logger.info("正在更新 DictMapper...");
-        otherMap = new HashMap<>();
-        entityMap = new HashMap<>();
 
         // match_dict 表中所有信息
         List<DictMatcher> matchers = DBKit.getMatchDict();
 
         for (DictMatcher matcher : matchers) {
-            if (matcher.getLabel().equals("entity")) {
+            if ("entity".equals(matcher.getLabel())) {
                 // 别名 - 共有此别名的实体列表
-                for (String alias : matcher.getAlias().split("\\|")) {
-                    if (!entityMap.containsKey(alias))
-                        entityMap.put(alias, new HashSet<>());
-                    entityMap.get(alias).add(matcher.getWord());
-                }
+                String[] aliases = matcher.getAlias().split("\\|");
+                Arrays.stream(aliases).forEach(alias -> {
+                    if (!Entity.containsKey(alias)) {
+                        // 一个别名对应多个实体
+                        Entity.put(alias, new HashSet<>());
+                    }
+                    Entity.get(alias).add(matcher.getWord());
+                });
 
             } else {
                 // 标签 - （别名 - 概念名）
-                if (!otherMap.containsKey(matcher.getLabel()))
-                    otherMap.put(matcher.getLabel(), new HashMap<>());
-                for (String key : matcher.getAlias().split("\\|"))
-                    otherMap.get(matcher.getLabel()).put(key, matcher.getWord());
+                String[] aliases = matcher.getAlias().split("\\|");
+
+                switch (matcher.getLabel()) {
+                    case "country":
+                        Arrays.stream(aliases).forEach(alias -> Country.put(alias, matcher.getWord())); break;
+                    case "big_category":
+                        Arrays.stream(aliases).forEach(alias -> BigCategory.put(alias, matcher.getWord())); break;
+                    case "small_category":
+                        Arrays.stream(aliases).forEach(alias -> SmallCategory.put(alias, matcher.getWord())); break;
+                    case "attribute":
+                        Arrays.stream(aliases).forEach(alias -> Attribute.put(alias, matcher.getWord())); break;
+                    case "compare":
+                        Arrays.stream(aliases).forEach(alias -> Compare.put(alias, matcher.getWord())); break;
+                    case "most":
+                        Arrays.stream(aliases).forEach(alias -> Most.put(alias, matcher.getWord())); break;
+                    default:  break;
+                }
             }
         }
 
-        Country = otherMap.get("country");
-        BigCategory = otherMap.get("big_category");
-        SmallCategory = otherMap.get("small_category");
-        Entity = entityMap;
-        Attribute = otherMap.get("attribute");
-        Compare = otherMap.get("compare");
-        Most = otherMap.get("most");
-
         logger.info("DictMapper 更新完成...");
     }
-
-
 
     /**
      * 将<时间>处理成标准形式

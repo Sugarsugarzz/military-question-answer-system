@@ -13,7 +13,7 @@ public class CleanerConfig {
 
 //    @Scheduled(cron = "0/5 * * * * ?")
     @Scheduled(cron = "0 0 0 * * ?")
-    public void clearQAs() {
+    public void clearQas() {
         MultiMilitaryQA.QAs.clear();
         QuestionParser.isUsingPronounMap.clear();
     }

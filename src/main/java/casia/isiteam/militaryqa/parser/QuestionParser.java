@@ -1,6 +1,6 @@
 package casia.isiteam.militaryqa.parser;
 
-import casia.isiteam.militaryqa.model.EAHistory;
+import casia.isiteam.militaryqa.model.EaHistory;
 import casia.isiteam.militaryqa.utils.ChineseNumberUtil;
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
@@ -26,8 +26,6 @@ public class QuestionParser {
     static List<String> keywords1 = new ArrayList<>();
     static List<String> keywords2 = new ArrayList<>();
     static Map<String, List<String>> parser_dict = new HashMap<>();
-    public static boolean isUsingPronoun = false;
-    public static boolean isUsingPronounPre = false;
     // [0] 为前状态，[1] 为当前状态
     public static Map<String, boolean[]> isUsingPronounMap = new HashMap<>();
 
@@ -63,8 +61,9 @@ public class QuestionParser {
      * 初始化词性字典(每轮都调用初始化，防止模式多次叠加)
      */
     private static void buildParserDict() {
-        for (String nature: natures)
+        for (String nature: natures) {
             parser_dict.put(nature, new ArrayList<>());
+        }
         // pattern存问句词性模式
         parser_dict.put("pattern", new ArrayList<>());
     }
@@ -80,21 +79,24 @@ public class QuestionParser {
 
         // 首先判断是否是 <热点> <期刊> <报告> 和 <直达> 问题，否则，转 <百科> 和 <对比> 查询
         boolean flag = checkQuestion(question);
-        if (flag)
+        if (flag) {
             return parser_dict;
+        }
 
         // 识别出问句中的<时间>，加入分词器词典
         Matcher m_time = Pattern.compile("[0-9]{4}年([0-9]{0,2}月)?([0-9]{0,2}日)?").matcher(question);
-        while (m_time.find())
+        while (m_time.find()) {
             CustomDictionary.add(m_time.group(), "n_time");
+        }
 
         // 识别出问句中的<单位数值>，加入分词器词典
         String[] units = { "海里", "英里", "吨", "公里", "公里/节", "公里/小时", "毫米", "节", "克", "里", "米", "千克", "千米",
                 "千米/时", "千米/小时", "千米每小时", "余英里", "约海里", "最大海里", "厘米", "分米", "人", "位"};
         String unit_regex = String.format("([0-9]+(.[0-9]+)?)(%s)+", String.join("|", units));
         Matcher m_unit = Pattern.compile(unit_regex).matcher(question);
-        while (m_unit.find())
+        while (m_unit.find()) {
             CustomDictionary.add(m_unit.group(), "n_unit");
+        }
 
         // 利用HanLP分词，遍历词和词性
         List<Term> terms = HanLP.segment(question);
@@ -187,20 +189,22 @@ public class QuestionParser {
      */
     private static void extractTimeAndKeywords(String question) {
         // 提取 起始时间 和 结束时间
-        Map<String, TimeUnit> TimeResults = new TimeNormalizer().parse(question);
-        for (String key : TimeResults.keySet()) {
-            if (question.contains("神舟") && key.contains("号"))
+        Map<String, TimeUnit> timeResults = new TimeNormalizer().parse(question);
+        for (String key : timeResults.keySet()) {
+            if (question.contains("神舟") && key.contains("号")) {
                 continue;
+            }
             question = question.replace(key, "");
-            parser_dict.get("n_time").add(DateUtil.formatDateDefault(TimeResults.get(key).getTime()));
+            parser_dict.get("n_time").add(DateUtil.formatDateDefault(timeResults.get(key).getTime()));
         }
         // 提取 关键词
         parser_dict.get("keywords").addAll(HanLP.extractKeyword(question, 5));
         // 针对 n_time 长度为一的情况，将对应字段也加入，以便后面识别加入end_time
         if (parser_dict.get("n_time").size() == 1) {
-            for (String key : TimeResults.keySet()) {
-                if (question.contains("神舟") && key.contains("号"))
+            for (String key : timeResults.keySet()) {
+                if (question.contains("神舟") && key.contains("号")) {
                     continue;
+                }
                 parser_dict.get("n_unit").add(key);
             }
         }
@@ -210,7 +214,7 @@ public class QuestionParser {
      * 多轮问答中，处理问句中出现指代词的情况，将其替换为对应实体和属性
      * @return 构造的新问句
      */
-    public static String anaphoraResolution(EAHistory eah, String question, String uid) {
+    public static String anaphoraResolution(EaHistory eah, String question, String uid) {
 
         isUsingPronounMap.get(uid)[0] = isUsingPronounMap.get(uid)[1];
         isUsingPronounMap.get(uid)[1] = false;
@@ -281,10 +285,9 @@ public class QuestionParser {
 
     /**
      * 问句预处理
-     * @return 将问句标准化，删除特殊符号等无用信息，将字母转化成大写，将文字转数字（如十转为10）
+     * @return 将问句标准化，仅保留中文、数字和英文，并转化成大写，将文字转数字（如十转为10）
      */
     public static String preProcessQuestion(String question) {
-        //去除中文、数字、英文、之外的内容
         return ChineseNumberUtil.convertString(question.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "")).toUpperCase();
     }
 
