@@ -1,6 +1,5 @@
-package casia.isiteam.militaryqa.test;
+package casia.isiteam.militaryqa;
 
-import casia.isiteam.militaryqa.main.MultiMilitaryQA;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,13 +14,11 @@ public class TestQA {
 
     public static void main(String[] args) {
 
-        MultiMilitaryQA QA = new MultiMilitaryQA();
-        String answer;
 
-        while (true) {
-        	String question = new Scanner(System.in).nextLine();
-        	QA.qa_main("999", question);
-        }
+//        while (true) {
+//        	String question = new Scanner(System.in).nextLine();
+//        	QA.qa_main("999", question);
+//        }
 
         // 多轮测试
 //        answer = com.isitem.qa.QA.qa_main("小黑", "我想找中国的神舟七号", sf.format(new Date()));

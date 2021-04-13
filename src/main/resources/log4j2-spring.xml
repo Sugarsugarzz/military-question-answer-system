@@ -2,8 +2,8 @@
 <Configuration>
     <Properties>
         <!-- 定义日志格式 -->
-        <Property name="file.log.pattern">%d{YYYY-MM-dd HH:mm:ss} [%C] %-5level %logger{36} -  %msg%n</Property>
-        <Property name="console.log.pattern">%highlight{%d{YYYY-MM-dd HH:mm:ss} [%C] %-5level %logger{36}} -  %msg%n</Property>
+        <Property name="file.log.pattern">%d{YYYY-MM-dd HH:mm:ss} [%C] %-5level -  %msg%n</Property>
+        <Property name="console.log.pattern">%highlight{%d{YYYY-MM-dd HH:mm:ss} [%C] %-5level } -  %msg%n</Property>
         <!-- 定义文件名变量 -->
         <Property name="err.filename">logs/err.log</Property>
         <Property name="err.pattern">logs/err.%i.log.gz</Property>

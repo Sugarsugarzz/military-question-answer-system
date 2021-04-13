@@ -1,25 +1,41 @@
 package casia.isiteam.militaryqa.common;
 
+import casia.isiteam.militaryqa.model.Qa;
+
 import java.util.*;
 
 public class Constant {
 
     /**
+     * 存储多轮信息
+     */
+    public static Map<String, ArrayList<Qa>> Qas = new HashMap<>();
+
+    /**
+     * 是否使用人称代词，[0]为前状态，[1]为当前状态
+     */
+    public static Map<String, boolean[]> isUsingPronounMap = new HashMap<>();
+
+    /**
      * 单数代词
      */
     public static List<String> singularPronouns = new ArrayList<>();
+
     /**
      * 复数代词
      */
     public static List<String> pluralPronouns = new ArrayList<>();
+
     /**
      * 词性列表
      */
     public static List<String> natures = new ArrayList<>();
+
     /**
      * 问句匹配模板
      */
     public static Map<String, List<List<String>>> patterns = new HashMap<>();
+
 
     static {
         // 单数代词

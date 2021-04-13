@@ -1,6 +1,6 @@
-package casia.isiteam.militaryqa.config;
+package casia.isiteam.militaryqa.config.schedule;
 
-import casia.isiteam.militaryqa.main.MultiMilitaryQA;
+import casia.isiteam.militaryqa.common.Constant;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -8,12 +8,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 @Configuration
 @EnableScheduling
-public class CleanerConfig {
+public class ScheduleConfig {
 
 //    @Scheduled(cron = "0/5 * * * * ?")
     @Scheduled(cron = "0 0 0 * * ?")
     public void clearQas() {
-        MultiMilitaryQA.Qas.clear();
-        MultiMilitaryQA.isUsingPronounMap.clear();
+        Constant.Qas.clear();
+        Constant.isUsingPronounMap.clear();
     }
 }

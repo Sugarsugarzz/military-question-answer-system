@@ -1,47 +1,48 @@
-package casia.isiteam.militaryqa.searcher;
+package casia.isiteam.militaryqa.service;
 
+import casia.isiteam.militaryqa.mapper.AnswerMapper;
 import casia.isiteam.militaryqa.model.DictMatcher;
-import casia.isiteam.militaryqa.utils.DBKit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DictMapper {
+@Slf4j
+@Service
+public class DictMapperService {
 
-    private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
+    @Autowired
+    AnswerMapper answerMapper;
 
-    // 国家
+    /** 国家 */
     public static Map<String, String> Country = new HashMap<>();
-    // 一级分类
+    /** 一级分类 */
     public static Map<String, String> BigCategory = new HashMap<>();
-    // 二级分类
+    /** 二级分类 */
     public static Map<String, String> SmallCategory = new HashMap<>();
-    // 实体
+    /** 实体 */
     public static Map<String, Set<String>> Entity = new HashMap<>();
-    // 实体属性
+    /** 实体属性 */
     public static Map<String, String> Attribute = new HashMap<>();
-    // 比较词
+    /** 比较词 */
     public static Map<String, String> Compare = new HashMap<>();
-    // 最值
+    /** 最值 */
     public static Map<String, String> Most = new HashMap<>();
 
-    static {
-        initDictMapper();
-    }
 
     /**
      * 构建（问句中涉及的词形式，数据库中标准词形式）的映射关系
      * 用于在数据库中检索答案
      */
-    public static void  initDictMapper() {
+    public void initDictMapper() {
 
-        logger.info("正在更新 DictMapper...");
-
+        log.info("【DicMapper】正在更新 DictMapper...");
+        clearDictMapper();
         // match_dict 表中所有信息
-        List<DictMatcher> matchers = DBKit.getMatchDict();
+        List<DictMatcher> matchers = answerMapper.getMatchDict();
 
         for (DictMatcher matcher : matchers) {
             if ("entity".equals(matcher.getLabel())) {
@@ -77,7 +78,20 @@ public class DictMapper {
             }
         }
 
-        logger.info("DictMapper 更新完成...");
+        log.info("【DictMapper】更新完成.");
+    }
+
+    /**
+     * 清空DictMapper
+     */
+    public void clearDictMapper() {
+        Country.clear();
+        BigCategory.clear();
+        SmallCategory.clear();
+        Entity.clear();
+        Attribute.clear();
+        Compare.clear();
+        Most.clear();
     }
 
     /**
@@ -95,10 +109,12 @@ public class DictMapper {
             String year = "", month = "", day = "", date = "";
             if (m_year.find()) {
                 year = m_year.group().replace("年", "");
-                if (m_month.find())
+                if (m_month.find()) {
                     month = m_month.group().replace("月", "");
-                if (m_day.find())
+                }
+                if (m_day.find()) {
                     day = m_day.group().replace("日", "");
+                }
                 date = year + "-" + dateCompletion(month) + "-" + dateCompletion(day);
             }
             time_items.add(date);
@@ -116,8 +132,9 @@ public class DictMapper {
         List<String> unit_items = new ArrayList<>();
         for (String item: units) {
             Matcher m_unit = Pattern.compile("[0-9]+(.[0-9]+)?").matcher(item);
-            while (m_unit.find())
+            while (m_unit.find()) {
                 unit_items.add(m_unit.group());
+            }
         }
 //        System.out.println(unit_items);
         return unit_items;
@@ -129,10 +146,12 @@ public class DictMapper {
      * @return 处理后的日期
      */
     private static String dateCompletion(String date) {
-        if (date.equals(""))
+        if ("".equals(date)) {
             date = "01";
-        if (Integer.parseInt(date) < 10 && date.length() < 2)
+        }
+        if (Integer.parseInt(date) < 10 && date.length() < 2) {
             date = "0" + date;
+        }
         return date;
     }
 

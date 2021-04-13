@@ -1,7 +1,9 @@
 package casia.isiteam.militaryqa.utils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import casia.isiteam.militaryqa.mapper.ResultMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,9 +11,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
+@Component
 public class EntityAliasExtractor {
 
-    private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
+    @Autowired
+    ResultMapper resultMapper;
 
     static Pattern pattern;
     static Matcher matcher;
@@ -48,7 +53,7 @@ public class EntityAliasExtractor {
      * @param entity_name 实体名
      * @return 实体别名列表
      */
-    public static Set<String> getEntityAlias(int entity_id, String entity_name) {
+    public Set<String> getEntityAlias(int entity_id, String entity_name) {
 
         // 实体名的不同格式
         Set<String> origin_words = new HashSet<>();
@@ -144,8 +149,7 @@ public class EntityAliasExtractor {
      * @param entity_id 实体id
      * @param entity_aliases 实体别名列表
      */
-    public static void saveEntityAlias(int entity_id, String entity_name, Set<String> entity_aliases) {
-
+    public void saveEntityAlias(int entity_id, String entity_name, Set<String> entity_aliases) {
         // 过滤 概念名词
         List<String> tempList = new ArrayList<>();
         entity_aliases.forEach(alias -> { if (conceptsStopWords.contains(alias)) tempList.add(alias); });
@@ -153,26 +157,21 @@ public class EntityAliasExtractor {
 
         for (String alias : entity_aliases) {
             // 最终过滤
-            if (alias.equals("MM"))
+            if (alias.equals("MM") || alias.length() < 2 || alias.matches("^[\\d.-]+$") || alias.matches("^[IV型号级]+$")) {
                 continue;
-            if (alias.length() < 2)
-                continue;
-            if (alias.matches("^[\\d.-]+$"))
-                continue;
-            if (alias.matches("^[IV型号级]+$"))
-                continue;
-
-            DBKit.insertEntitySameas(alias, entity_id);
+            }
+            resultMapper.insertEntitySameas(alias, entity_id);
         }
     }
 
     public static void main(String[] args) {
-//        addEntityAliasToDB();
-//        Set<String> aliases = getEntityAlias(1, "鹰击82-潜射反舰导弹(YJ-82/C-802)");
-//        saveEntityAlias(1, aliases);
-        getEntityAlias(1, "麦克唐纳F-15E“打击鹰” 双座双发打击战斗机");
-//        getEntityAlias(1, "麦道DC-8“SuperSixty” 4发涡轮风扇远程客机");
-//        getEntityAlias(1, "韦伯利0.455英寸MarkIV转轮手枪");
-//        getEntityAlias(1, "BAe146/Avro RJ4发涡扇短程支线飞机");
+        EntityAliasExtractor extractor = new EntityAliasExtractor();
+//        extractor.addEntityAliasToDB();
+//        Set<String> aliases = extractor.getEntityAlias(1, "鹰击82-潜射反舰导弹(YJ-82/C-802)");
+//        extractor.saveEntityAlias(1, aliases);
+        extractor.getEntityAlias(1, "麦克唐纳F-15E“打击鹰” 双座双发打击战斗机");
+//        extractor.getEntityAlias(1, "麦道DC-8“SuperSixty” 4发涡轮风扇远程客机");
+//        extractor.getEntityAlias(1, "韦伯利0.455英寸MarkIV转轮手枪");
+//        extractor.getEntityAlias(1, "BAe146/Avro RJ4发涡扇短程支线飞机");
     }
 }

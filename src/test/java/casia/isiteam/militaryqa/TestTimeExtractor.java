@@ -1,4 +1,4 @@
-package casia.isiteam.militaryqa.test;
+package casia.isiteam.militaryqa;
 
 import com.time.nlp.TimeNormalizer;
 import com.time.nlp.TimeUnit;
