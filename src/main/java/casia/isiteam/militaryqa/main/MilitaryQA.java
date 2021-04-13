@@ -28,10 +28,12 @@ public class MilitaryQA {
         log.info("Processed Question is ：{}", question);
         // 问句解析
         log.info("Parsing Question...");
-        Map<String, List<String>> parserDict = QuestionParser.parser(question);
+        QuestionParser questionParser = new QuestionParser();
+        Map<String, List<String>> parserDict = questionParser.parser(question);
         // 答案检索
         log.info("Searching Answer...");
-        String answer = AnswerSearcher.getAnswer(parserDict);
+        AnswerSearcher answerSearcher = new AnswerSearcher();
+        String answer = answerSearcher.getAnswer(parserDict);
         // 打印答案
         log.info("Answer is ：{}", answer);
         // 将该轮问答信息存入数据库

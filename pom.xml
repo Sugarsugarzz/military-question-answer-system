@@ -62,8 +62,8 @@
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.1.23</version>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.1.14</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>

@@ -1,6 +1,5 @@
 package casia.isiteam.militaryqa;
 
-import casia.isiteam.militaryqa.searcher.DictMapper;
 import casia.isiteam.militaryqa.utils.DbFieldUpdater;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

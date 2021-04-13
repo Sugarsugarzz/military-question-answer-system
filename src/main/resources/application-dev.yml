@@ -3,12 +3,11 @@ server:
 
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://127.0.0.1:3306/military_qa?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
     druid:
+      url: jdbc:mysql://127.0.0.1:3306/military_qa?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
       initial-size: 1
       min-idle: 5
       max-active: 20
@@ -24,6 +23,5 @@ spring:
 
 # 整合mybatis
 mybatis:
-  mapper-locations: classpath:mybatis/mapper/*.xml
-logging:
-  config: classpath:log4j2.xml
+  mapper-locations: classpath:mapper/*.xml
+

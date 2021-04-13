@@ -21,12 +21,12 @@ import java.util.regex.Pattern;
 @Component
 public class QuestionParser {
 
-    static Map<String, List<String>> parser_dict = new HashMap<>();
+    Map<String, List<String>> parser_dict = new HashMap<>();
 
     /**
      * 初始化词性字典(每轮都调用初始化，防止模式多次叠加)
      */
-    private static void buildParserDict() {
+    private void buildParserDict() {
         for (String nature: Constant.natures) {
             parser_dict.put(nature, new ArrayList<>());
         }
@@ -38,7 +38,7 @@ public class QuestionParser {
      * 问句模式解析
      * @return 词性字典
      */
-    public static Map<String, List<String>> parser(String question) {
+    public Map<String, List<String>> parser(String question) {
 
         // 初始化词性字典，防止多次查询模式叠加
         buildParserDict();
@@ -86,7 +86,7 @@ public class QuestionParser {
      * @param question 问句
      * @return 标志符
      */
-    private static boolean checkQuestion(String question) {
+    private boolean checkQuestion(String question) {
 
         if (question.contains("热点") || question.contains("REDIAN")) {
             parser_dict.get("pattern").add("3");
@@ -153,7 +153,7 @@ public class QuestionParser {
      * 提取问句中的起始、结束时间，以及关键词
      * @param question 问句
      */
-    private static void extractTimeAndKeywords(String question) {
+    private void extractTimeAndKeywords(String question) {
         // 提取 起始时间 和 结束时间
         Map<String, TimeUnit> timeResults = new TimeNormalizer().parse(question);
         for (String key : timeResults.keySet()) {

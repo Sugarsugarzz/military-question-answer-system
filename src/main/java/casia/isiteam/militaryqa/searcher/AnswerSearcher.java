@@ -19,14 +19,14 @@ import java.util.*;
 public class AnswerSearcher {
 
     // 问题类型 - 默认 百科
-    static int Q_type = 1;
+    int Q_type = 1;
     // 答案类型 - 默认 实体
-    static int A_type = 2;
+    int A_type = 2;
 
     /**
      * 判断问句模式，从数据库检索答案
      */
-    public static String getAnswer(Map<String, List<String>> parser_dict) {
+    public String getAnswer(Map<String, List<String>> parser_dict) {
 
         // 初始化
         Q_type = 1;
@@ -258,7 +258,7 @@ public class AnswerSearcher {
      * @param answers 答案实体列表
      * @return JSON
      */
-    public static JSONObject assembleJson(Map<String, List<String>> parserDict, List<Answer> answers) {
+    public JSONObject assembleJson(Map<String, List<String>> parserDict, List<Answer> answers) {
 
         JSONObject obj = new JSONObject();
         JSONArray jsonArray = new JSONArray();

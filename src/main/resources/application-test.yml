@@ -24,6 +24,5 @@ spring:
 
 # 整合mybatis
 mybatis:
-  mapper-locations: classpath:mybatis/mapper/*.xml
-logging:
-  config: classpath:log4j2.xml
+  mapper-locations: classpath:mapper/*.xml
+
