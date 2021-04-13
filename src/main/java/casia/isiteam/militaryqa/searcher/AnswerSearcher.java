@@ -1,187 +1,27 @@
 package casia.isiteam.militaryqa.searcher;
 
+import casia.isiteam.militaryqa.common.Constant;
 import casia.isiteam.militaryqa.model.Answer;
 import casia.isiteam.militaryqa.utils.DBKit;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-
+@Slf4j
+@Component
 public class AnswerSearcher {
 
-    private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
-
-    static Map<String, List<List<String>>> patterns = new HashMap<>();  // 问句匹配模式
-
-    static int Q_type = 1;  // 问题类型 - 默认 百科
-    static int A_type = 2;  // 答案类型 - 默认 实体
-
-    /**
-     * 初始化问句匹配模式
-     */
-    static {
-
-        // 热点查询模式
-        patterns.put("热点查询模式", new ArrayList<>());
-        patterns.get("热点查询模式").add(Arrays.asList("3"));
-
-        // 期刊查询模式
-        patterns.put("期刊查询模式", new ArrayList<>());
-        patterns.get("期刊查询模式").add(Arrays.asList("4"));
-
-        // 报告查询模式
-        patterns.put("报告查询模式", new ArrayList<>());
-        patterns.get("报告查询模式").add(Arrays.asList("5"));
-
-        // 直达模式：头条
-        patterns.put("直达模式-头条", new ArrayList<>());
-        patterns.get("直达模式-头条").add(Arrays.asList("61"));
-
-        // 直达模式：百科
-        patterns.put("直达模式-百科", new ArrayList<>());
-        patterns.get("直达模式-百科").add(Arrays.asList("62"));
-
-        // 直达模式：订阅
-        patterns.put("直达模式-订阅", new ArrayList<>());
-        patterns.get("直达模式-订阅").add(Arrays.asList("63"));
-
-        // 直达模式：我的收藏
-        patterns.put("直达模式-我的收藏", new ArrayList<>());
-        patterns.get("直达模式-我的收藏").add(Arrays.asList("64"));
-
-        // 直达模式：浏览历史
-        patterns.put("直达模式-浏览历史", new ArrayList<>());
-        patterns.get("直达模式-浏览历史").add(Arrays.asList("65"));
-
-        // 辅助查询模式 ：大类别名，返回二级类别列表
-        patterns.put("大类别名", new ArrayList<>());
-        patterns.get("大类别名").add(Arrays.asList("n_big"));
-        patterns.get("大类别名").add(Arrays.asList("n_big", "n_big"));
-        patterns.get("大类别名").add(Arrays.asList("n_big", "n_big", "n_big"));
-        patterns.get("大类别名").add(Arrays.asList("n_country", "n_big"));
-        patterns.get("大类别名").add(Arrays.asList("n_big", "n_country"));
-
-        // 百科模式 ：小类别名，返回类别下所有实体列表
-        patterns.put("小类别名", new ArrayList<>());
-        patterns.get("小类别名").add(Arrays.asList("n_small"));
-        patterns.get("小类别名").add(Arrays.asList("n_small", "n_small"));
-        patterns.get("小类别名").add(Arrays.asList("n_small", "n_small", "n_small"));
-
-        // 百科模式 ：国家及类别名
-        patterns.put("国家及类别名", new ArrayList<>());
-        patterns.get("国家及类别名").add(Arrays.asList("n_country", "n_small"));
-        patterns.get("国家及类别名").add(Arrays.asList("n_small", "n_country"));
-
-        // 百科模式 ：单实体
-        patterns.put("单实体", new ArrayList<>());
-        patterns.get("单实体").add(Arrays.asList("n_entity"));
-        patterns.get("单实体").add(Arrays.asList("n_entity", "n_small"));
-        patterns.get("单实体").add(Arrays.asList("n_country", "n_entity"));
-        patterns.get("单实体").add(Arrays.asList("n_entity", "n_country"));
-
-        // 百科模式 ：多实体
-        patterns.put("多实体", new ArrayList<>());
-        patterns.get("多实体").add(Arrays.asList("n_entity", "n_entity"));
-        patterns.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity"));
-        patterns.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity"));
-        patterns.get("多实体").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity"));
-        patterns.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity"));
-        patterns.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity"));
-        patterns.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity", "n_entity"));
-        patterns.get("多实体").add(Arrays.asList("n_country", "n_entity", "n_entity", "n_entity", "n_entity", "n_entity"));
-
-        // 百科模式 ：单实体单属性/多属性
-        patterns.put("单实体单属性/多属性", new ArrayList<>());
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("单实体单属性/多属性").add(Arrays.asList("n_country", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-
-        // 百科模式 ：多实体单属性/多属性
-        patterns.put("多实体单属性/多属性", new ArrayList<>());
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-        patterns.get("多实体单属性/多属性").add(Arrays.asList("n_entity", "n_entity", "n_entity", "n_entity", "n_entity", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr", "n_attr"));
-
-        // 百科模式 ：单属性单类别单区间
-        patterns.put("单属性单类别单区间", new ArrayList<>());
-        patterns.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_small"));
-        patterns.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit"));
-        patterns.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_small"));
-        patterns.get("单属性单类别单区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_small"));
-        patterns.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time"));
-        patterns.get("单属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare"));
-
-        // 百科模式 ：单属性单类别多区间
-        patterns.put("单属性单类别多区间", new ArrayList<>());
-        patterns.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_compare", "n_unit", "n_small"));
-        patterns.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_compare", "n_unit"));
-        patterns.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_compare", "n_time", "n_small"));
-        patterns.get("单属性单类别多区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_time", "n_compare", "n_small"));
-        patterns.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time", "n_compare", "n_time"));
-        patterns.get("单属性单类别多区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare", "n_time", "n_compare"));
-
-        // 百科模式 ：多属性单类别单区间
-        patterns.put("多属性单类别单区间", new ArrayList<>());
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_unit", "n_small"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_unit"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_time", "n_attr", "n_compare", "n_unit", "n_small"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_time", "n_compare", "n_attr", "n_compare", "n_unit", "n_small"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_time", "n_small"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_attr", "n_compare", "n_unit", "n_attr", "n_time", "n_compare", "n_small"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_time", "n_attr", "n_compare", "n_unit"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_time", "n_compare", "n_attr", "n_compare", "n_unit"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_compare", "n_time"));
-        patterns.get("多属性单类别单区间").add(Arrays.asList("n_small", "n_attr", "n_compare", "n_unit", "n_attr", "n_time", "n_compare"));
-
-        // 百科模式 ：全类别属性最值
-        patterns.put("全类别属性最值", new ArrayList<>());
-        patterns.get("全类别属性最值").add(Arrays.asList("n_attr", "n_most"));
-        patterns.get("全类别属性最值").add(Arrays.asList("n_most", "n_attr"));
-
-        // 百科模式 ：单类别属性最值
-        patterns.put("单类别属性最值", new ArrayList<>());
-        patterns.get("单类别属性最值").add(Arrays.asList("n_small", "n_attr", "n_most"));
-        patterns.get("单类别属性最值").add(Arrays.asList("n_small", "n_most", "n_attr"));
-        patterns.get("单类别属性最值").add(Arrays.asList("n_attr", "n_most", "n_small"));
-        patterns.get("单类别属性最值").add(Arrays.asList("n_attr", "n_small", "n_most"));
-
-//        logger.info("问句模式匹配字典初始化完成！");
-    }
+    // 问题类型 - 默认 百科
+    static int Q_type = 1;
+    // 答案类型 - 默认 实体
+    static int A_type = 2;
 
     /**
      * 判断问句模式，从数据库检索答案
@@ -196,53 +36,53 @@ public class AnswerSearcher {
         List<Answer> answers = new ArrayList<>();
 
         // 模式匹配
-        if (patterns.get("热点查询模式").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "热点查询模式"));
+        if (Constant.patterns.get("热点查询模式").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "热点查询模式");
             Q_type = 3;
         }
 
-        else if (patterns.get("期刊查询模式").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "期刊查询模式"));
+        else if (Constant.patterns.get("期刊查询模式").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "期刊查询模式");
             Q_type = 4;
         }
 
-        else if (patterns.get("报告查询模式").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "报告查询模式"));
+        else if (Constant.patterns.get("报告查询模式").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "报告查询模式");
             Q_type = 5;
         }
 
-        else if (patterns.get("直达模式-头条").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-头条"));
+        else if (Constant.patterns.get("直达模式-头条").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "直达模式-头条");
             Q_type = 6;
             A_type = 1;
         }
 
-        else if (patterns.get("直达模式-百科").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-百科"));
+        else if (Constant.patterns.get("直达模式-百科").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "直达模式-百科");
             Q_type = 6;
             A_type = 2;
         }
 
-        else if (patterns.get("直达模式-订阅").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-订阅"));
+        else if (Constant.patterns.get("直达模式-订阅").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "直达模式-订阅");
             Q_type = 6;
             A_type = 3;
         }
 
-        else if (patterns.get("直达模式-我的收藏").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-我的收藏"));
+        else if (Constant.patterns.get("直达模式-我的收藏").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "直达模式-我的收藏");
             Q_type = 6;
             A_type = 4;
         }
 
-        else if (patterns.get("直达模式-浏览历史").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "直达模式-浏览历史"));
+        else if (Constant.patterns.get("直达模式-浏览历史").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "直达模式-浏览历史");
             Q_type = 6;
             A_type = 5;
         }
 
-        else if (patterns.get("大类别名").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "大类别名"));
+        else if (Constant.patterns.get("大类别名").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "大类别名");
             Q_type = 7;
             for (String category : parser_dict.get("n_big")) {
                 // 数据库检索答案
@@ -250,24 +90,24 @@ public class AnswerSearcher {
             }
         }
 
-        else if (patterns.get("小类别名").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "小类别名"));
+        else if (Constant.patterns.get("小类别名").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "小类别名");
             for (String category : parser_dict.get("n_small")) {
                 // 数据库检索答案
                 answers.addAll(DBKit.searchBySmallCategory(DictMapper.SmallCategory.get(category)));
             }
         }
 
-        else if (patterns.get("国家及类别名").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "国家及类别名"));
+        else if (Constant.patterns.get("国家及类别名").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "国家及类别名");
             String country = DictMapper.Country.get(parser_dict.get("n_country").get(0));
             String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
             // 数据库检索答案
             answers = DBKit.searchByCountryAndCategory(country, category);
         }
 
-        else if (patterns.get("单实体").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "单实体"));
+        else if (Constant.patterns.get("单实体").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "单实体");
             Set<String> entities = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
             for (String entity : entities) {
                 // 数据库检索答案
@@ -275,8 +115,8 @@ public class AnswerSearcher {
             }
         }
 
-        else if (patterns.get("多实体").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "多实体"));
+        else if (Constant.patterns.get("多实体").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "多实体");
             Q_type = 2;
             for (String entity: parser_dict.get("n_entity")) {
                 for (String enty : DictMapper.Entity.get(entity)) {
@@ -286,8 +126,8 @@ public class AnswerSearcher {
             }
         }
 
-        else if (patterns.get("单实体单属性/多属性").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "单实体单属性/多属性"));
+        else if (Constant.patterns.get("单实体单属性/多属性").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "单实体单属性/多属性");
             A_type = 1;
             Set<String> entities = DictMapper.Entity.get(parser_dict.get("n_entity").get(0));
             for (String entity : entities) {
@@ -299,9 +139,9 @@ public class AnswerSearcher {
                 answers.addAll(DBKit.searchByEntityAndAttrs(entity, attrs));
             }
         }
-        /* 4 */
-        else if (patterns.get("多实体单属性/多属性").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "多实体单属性/多属性"));
+
+        else if (Constant.patterns.get("多实体单属性/多属性").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "多实体单属性/多属性");
             A_type = 1;
             for (String entity: parser_dict.get("n_entity")) {
                 List<String> attrs = new ArrayList<>();
@@ -315,8 +155,8 @@ public class AnswerSearcher {
             }
         }
 
-        else if (patterns.get("单属性单类别单区间").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "单属性单类别单区间"));
+        else if (Constant.patterns.get("单属性单类别单区间").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "单属性单类别单区间");
             String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
             String operator = DictMapper.Compare.get(parser_dict.get("n_compare").get(0));
             String attr = DictMapper.Attribute.get(parser_dict.get("n_attr").get(0));
@@ -331,8 +171,8 @@ public class AnswerSearcher {
             }
         }
 
-        else if (patterns.get("单属性单类别多区间").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "单属性单类别多区间"));
+        else if (Constant.patterns.get("单属性单类别多区间").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "单属性单类别多区间");
             String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
             String operator_1 = DictMapper.Compare.get(parser_dict.get("n_compare").get(0));
             String operator_2 = DictMapper.Compare.get(parser_dict.get("n_compare").get(1));
@@ -350,8 +190,8 @@ public class AnswerSearcher {
             }
         }
 
-        else if (patterns.get("多属性单类别单区间").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "多属性单类别单区间"));
+        else if (Constant.patterns.get("多属性单类别单区间").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "多属性单类别单区间");
             String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
             String operator_1 = DictMapper.Compare.get(parser_dict.get("n_compare").get(0));
             String operator_2 = DictMapper.Compare.get(parser_dict.get("n_compare").get(1));
@@ -376,37 +216,39 @@ public class AnswerSearcher {
             }
         }
 
-        else if (patterns.get("全类别属性最值").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "全类别属性最值"));
+        else if (Constant.patterns.get("全类别属性最值").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "全类别属性最值");
             String type = DictMapper.Most.get(parser_dict.get("n_most").get(0));
             String attr = DictMapper.Attribute.get(parser_dict.get("n_attr").get(0));
 
             // 数据库检索答案
-            if (type.equals("max"))
+            if ("max".equals(type)) {
                 answers.addAll(DBKit.searchMaxInAllCategory(attr));
-            else if (type.equals("min"))
+            } else if ("min".equals(type)) {
                 answers.addAll(DBKit.searchMinInAllCategory(attr));
+            }
         }
 
-        else if (patterns.get("单类别属性最值").contains(parser_dict.get("pattern"))) {
-            logger.info(String.format("与 %s 问句模式匹配成功！", "单类别属性最值"));
+        else if (Constant.patterns.get("单类别属性最值").contains(parser_dict.get("pattern"))) {
+            log.info("与 {} 问句模式匹配成功！", "单类别属性最值");
             String category = DictMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
             String type = DictMapper.Most.get(parser_dict.get("n_most").get(0));
             String attr = DictMapper.Attribute.get(parser_dict.get("n_attr").get(0));
 
             // 数据库检索答案
-            if (type.equals("max"))
+            if ("max".equals(type)) {
                 answers.addAll(DBKit.searchMaxInSingleCategory(category, attr));
-            else if (type.equals("min"))
+            } else if ("min".equals(type)) {
                 answers.addAll(DBKit.searchMinInSingleCategory(category, attr));
+            }
         }
 
         else {
-            logger.info("未找到相应问句模板！");
+            log.info("未找到相应问句模板！");
         }
 
         // 组装答案JSON
-        JSONObject obj = assembleJSON(parser_dict, answers);
+        JSONObject obj = assembleJson(parser_dict, answers);
 
         return obj.toJSONString();
     }
@@ -416,7 +258,7 @@ public class AnswerSearcher {
      * @param answers 答案实体列表
      * @return JSON
      */
-    public static JSONObject assembleJSON(Map<String, List<String>> parser_dict, List<Answer> answers) {
+    public static JSONObject assembleJson(Map<String, List<String>> parserDict, List<Answer> answers) {
 
         JSONObject obj = new JSONObject();
         JSONArray jsonArray = new JSONArray();
@@ -459,34 +301,35 @@ public class AnswerSearcher {
             // 报告查询模式
             case 5:
                 obj.put("Q_type", Q_type);
-                obj.put("Q_content", parser_dict.get("keywords"));
+                obj.put("Q_content", parserDict.get("keywords"));
 
-                if (parser_dict.get("n_time").size() == 0) {
+                if (parserDict.get("n_time").size() == 0) {
                     obj.put("Q_start_time", null);
                     obj.put("Q_end_time", null);
-                } else if (parser_dict.get("n_time").size() == 1) {
-                    String start_time = parser_dict.get("n_time").get(0);
-                    String end_time = null;
-                    String word = parser_dict.get("n_unit").get(0);
+                } else if (parserDict.get("n_time").size() == 1) {
+                    String startTime = parserDict.get("n_time").get(0);
+                    String endTime = null;
+                    String word = parserDict.get("n_unit").get(0);
                     // 长度为1的在处理下，补充一个结束时间
                     try {
-                        if (word.contains("年"))
-                            end_time = addTime(start_time, 4);
-                        else if (word.contains("月"))
-                            end_time = addTime(start_time, 3);
-                        else if (word.contains("周"))
-                            end_time = addTime(start_time, 2);
-                        else if (word.contains("日") || word.contains("天") || word.contains("号"))
-                            end_time = addTime(start_time, 1);
-                    } catch (ParseException e) {
-                        logger.error("查询模式补充结束时间出现错误：" + e);
+                        if (word.contains("年")) {
+                            endTime = DateUtil.formatDateTime(DateUtil.offset(DateUtil.parse(startTime), DateField.YEAR, 1));
+                        } else if (word.contains("月")) {
+                            endTime = DateUtil.formatDateTime(DateUtil.offset(DateUtil.parse(startTime), DateField.MONTH, 1));
+                        } else if (word.contains("周")) {
+                            endTime = DateUtil.formatDateTime(DateUtil.offset(DateUtil.parse(startTime), DateField.DAY_OF_MONTH, 7));
+                        } else if (word.contains("日") || word.contains("天") || word.contains("号")) {
+                            endTime = DateUtil.formatDateTime(DateUtil.offset(DateUtil.parse(startTime), DateField.DAY_OF_MONTH, 1));
+                        }
+                    } catch (Exception e) {
+                        log.error("查询模式补充结束时间出现错误：", e);
                     }
-                    obj.put("Q_start_time", start_time);
-                    obj.put("Q_end_time", end_time);
+                    obj.put("Q_start_time", startTime);
+                    obj.put("Q_end_time", endTime);
                 } else {
-                    Collections.sort(parser_dict.get("n_time"));
-                    obj.put("Q_start_time", parser_dict.get("n_time").get(0));
-                    obj.put("Q_end_time", parser_dict.get("n_time").get(parser_dict.get("n_time").size() - 1));
+                    Collections.sort(parserDict.get("n_time"));
+                    obj.put("Q_start_time", parserDict.get("n_time").get(0));
+                    obj.put("Q_end_time", parserDict.get("n_time").get(parserDict.get("n_time").size() - 1));
                 }
                 break;
 
@@ -500,40 +343,15 @@ public class AnswerSearcher {
             case 7:
                 obj.put("Q_type", Q_type);
                 List<String> categories = new ArrayList<>();
-                for (Answer answer : answers)
+                for (Answer answer : answers) {
                     categories.add(answer.getEntity_name());
+                }
                 obj.put("Answer", categories);
                 break;
+
+            default: break;
         }
 
         return obj;
-    }
-
-    /**
-     * 根据语义补充一个结束日期
-     * @param date 日期字符串
-     * @param flag 天：1  周：2  月：3  年：4
-     * @return 增加后的日期字符串
-     */
-    private static String addTime(String date, int flag) throws ParseException {
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date dt = sdf.parse(date);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(dt);
-
-        switch (flag) {
-            // 天
-            case 1:  calendar.add(Calendar.DAY_OF_MONTH, 1); break;
-            // 周
-            case 2:  calendar.add(Calendar.DAY_OF_MONTH, 7); break;
-            // 月
-            case 3:  calendar.add(Calendar.MONTH, 1); break;
-            // 年
-            case 4:  calendar.add(Calendar.YEAR, 1); break;
-        }
-
-        Date dt1 = calendar.getTime();
-        return sdf.format(dt1);
     }
 }

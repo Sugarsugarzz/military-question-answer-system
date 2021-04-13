@@ -26,7 +26,7 @@ public class Qa {
 	 */
     private String question;
 	/**
-	 * 回答 JSON
+	 * 答案 JSON
 	 */
 	private String answer;
 }

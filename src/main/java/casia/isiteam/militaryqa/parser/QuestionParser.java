@@ -1,15 +1,14 @@
 package casia.isiteam.militaryqa.parser;
 
-import casia.isiteam.militaryqa.model.EaHistory;
-import casia.isiteam.militaryqa.utils.ChineseNumberUtil;
+import casia.isiteam.militaryqa.common.Constant;
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
 import com.hankcs.hanlp.seg.common.Term;
 import com.time.nlp.TimeNormalizer;
 import com.time.nlp.TimeUnit;
 import com.time.util.DateUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,50 +17,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
+@Component
 public class QuestionParser {
 
-    private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
-
-    static List<String> natures = new ArrayList<>();
-    static List<String> keywords1 = new ArrayList<>();
-    static List<String> keywords2 = new ArrayList<>();
     static Map<String, List<String>> parser_dict = new HashMap<>();
-    // [0] 为前状态，[1] 为当前状态
-    public static Map<String, boolean[]> isUsingPronounMap = new HashMap<>();
-
-    static {
-        // 初始化已定义的词性列表
-        natures.add("n_country");
-        natures.add("n_entity");
-        natures.add("n_attr");
-        natures.add("n_big");
-        natures.add("n_small");
-        natures.add("n_compare");
-        natures.add("n_most");
-        natures.add("n_time");
-        natures.add("n_unit");
-        natures.add("keywords");
-        // 复数指代名词
-        keywords1.add("它们");
-        keywords1.add("他们");
-        keywords1.add("她们");
-        keywords1.add("2者");
-        keywords1.add("这些");
-        // 单数指代名词
-        keywords2.add("它");
-        keywords2.add("他");
-        keywords2.add("她");
-        keywords2.add("这");
-        keywords2.add("这儿");
-        keywords2.add("这个");
-        keywords2.add("这里");
-    }
 
     /**
      * 初始化词性字典(每轮都调用初始化，防止模式多次叠加)
      */
     private static void buildParserDict() {
-        for (String nature: natures) {
+        for (String nature: Constant.natures) {
             parser_dict.put(nature, new ArrayList<>());
         }
         // pattern存问句词性模式
@@ -102,15 +68,15 @@ public class QuestionParser {
         List<Term> terms = HanLP.segment(question);
         for (Term term : terms) {
 //            System.out.println(term.nature + " - " + term.word);
-            if (natures.contains(term.nature.toString())) {
+            if (Constant.natures.contains(term.nature.toString())) {
                 parser_dict.get(term.nature.toString()).add(term.word);
                 parser_dict.get("pattern").add(term.nature.toString());
             }
         }
 
-//        logger.info("问句解析完成。");
-        logger.info("词性匹配情况：" + parser_dict);
-        logger.info("问句模式：" + parser_dict.get("pattern"));
+//        log.info("问句解析完成。");
+        log.info("词性匹配情况：{}", parser_dict);
+        log.info("问句模式：{}", parser_dict.get("pattern"));
 
         return parser_dict;
     }
@@ -126,54 +92,54 @@ public class QuestionParser {
             parser_dict.get("pattern").add("3");
             question = question.replace("热点", "").replace("REDIAN", "").replace("新闻", "").replace("想", "").replace("现在", "");
             extractTimeAndKeywords(question);
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：热点查询模式");
+            log.info("词性匹配情况：{}", parser_dict);
+            log.info("问句模式：热点查询模式");
         }
 
         else if (question.contains("期刊") || question.contains("QIKAN")) {
             parser_dict.get("pattern").add("4");
             question = question.replace("期刊", "").replace("QIKAN", "").replace("新闻", "").replace("想", "").replace("现在", "");
             extractTimeAndKeywords(question);
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：期刊查询模式");
+            log.info("词性匹配情况：{}", parser_dict);
+            log.info("问句模式：期刊查询模式");
         }
 
         else if (question.contains("报告") || question.contains("BAOGAO")) {
             parser_dict.get("pattern").add("5");
             question = question.replace("报告", "").replace("BAOGAO", "").replace("新闻", "").replace("想", "").replace("现在", "");
             extractTimeAndKeywords(question);
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：报告查询模式");
+            log.info("词性匹配情况：{}", parser_dict);
+            log.info("问句模式：报告查询模式");
         }
 
         else if (question.contains("头条") || question.contains("TOUTIAO")) {
             parser_dict.get("pattern").add("61");
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：直达 - 头条");
+            log.info("词性匹配情况：{}", parser_dict);
+            log.info("问句模式：直达 - 头条");
         }
 
         else if (question.contains("百科") || question.contains("BAIKE")) {
             parser_dict.get("pattern").add("62");
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：直达 - 百科");
+            log.info("词性匹配情况：{}", parser_dict);
+            log.info("问句模式：直达 - 百科");
         }
 
         else if (question.contains("订阅") || question.contains("DINGYUE")) {
             parser_dict.get("pattern").add("63");
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：直达 - 订阅");
+            log.info("词性匹配情况：{}", parser_dict);
+            log.info("问句模式：直达 - 订阅");
         }
 
         else if (question.contains("我的收藏") || question.contains("WODESHOUCANG") || question.contains("收藏") || question.contains("SHOUCANG")) {
             parser_dict.get("pattern").add("64");
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：直达 - 我的收藏");
+            log.info("词性匹配情况：{}", parser_dict);
+            log.info("问句模式：直达 - 我的收藏");
         }
 
         else if (question.contains("浏览历史") || question.contains("LIULANLISHI") || question.contains("浏览") || question.contains("LIULAN")) {
             parser_dict.get("pattern").add("65");
-            logger.info("词性匹配情况：" + parser_dict);
-            logger.info("问句模式：直达 - 浏览历史");
+            log.info("词性匹配情况：{}", parser_dict);
+            log.info("问句模式：直达 - 浏览历史");
         }
 
         else {
@@ -209,86 +175,4 @@ public class QuestionParser {
             }
         }
     }
-    
-    /**
-     * 多轮问答中，处理问句中出现指代词的情况，将其替换为对应实体和属性
-     * @return 构造的新问句
-     */
-    public static String anaphoraResolution(EaHistory eah, String question, String uid) {
-
-        isUsingPronounMap.get(uid)[0] = isUsingPronounMap.get(uid)[1];
-        isUsingPronounMap.get(uid)[1] = false;
-
-        // 利用HanLP分词，遍历词和词性
-        List<Term> terms = HanLP.segment(question);
-        String newQuest = question;
-        
-        Boolean flagAttr = false, flagEntity = false;
-        for (Term term : terms) {
-            if (term.nature.toString().equals("n_entity")) {
-                flagEntity = true;
-            }
-            if (term.nature.toString().equals("n_attr")) {
-            	flagAttr = true;
-            }
-        }
-        
-        for (Term term : terms) {
-            // 指示代词（复数）
-            if (keywords1.contains(term.word)) {
-                // 问句同时出现实体和属性的情况（如：神舟七号和它们的长度是多少？）
-                if (flagEntity && flagAttr) {
-                	String str= String.join("，", eah.getHistEntities());
-                	newQuest = question.replace(term.word, str);
-                    isUsingPronounMap.get(uid)[1] = true;
-                }
-                // 问句中只出现的实体（如：神舟七号和它们的呢？）
-                else if (flagEntity) {
-                	ArrayList<String> strs = new ArrayList<>();
-                	strs.addAll(eah.getHistEntities());
-                	strs.addAll(eah.getHistAttrs());
-                	String str= String.join("，", strs);
-                	newQuest = question.replace(term.word, str);
-                    isUsingPronounMap.get(uid)[1] = true;
-                }
-                // 问句中只出现的属性（如：它们的长度是多少？）
-                else if (flagAttr) {
-                	String str= String.join("，", eah.getHistEntities());
-                	newQuest = question.replace(term.word, str);
-                    isUsingPronounMap.get(uid)[1] = true;
-                } else {
-                    String str = String.join("，", eah.getHistEntities());
-                    newQuest = question.replace(term.word, str);
-                    isUsingPronounMap.get(uid)[1] = true;
-                }
-                break;
-            }
-            // 指示代词（单数）
-            else if (keywords2.contains(term.word)) {
-                // 问句同时出现实体和属性的情况（如：神舟七号和它的长度是多少？）
-            	if (flagEntity && flagAttr) {
-                	newQuest = question.replace(term.word, eah.getLastEntity());
-                }
-                // 问句中只出现的实体（如：神舟七号和它的呢？）
-            	else if (flagEntity) {
-                	newQuest = question.replace(term.word, eah.getLastEntity() + "，" + eah.getLastAttr());
-                }
-                // 问句中只出现的属性（如：它的长度是多少？）
-            	else if (flagAttr) {
-                	newQuest = question.replace(term.word, eah.getLastEntity());
-                }
-            	break;
-            }
-        }
-        return newQuest;
-    }
-
-    /**
-     * 问句预处理
-     * @return 将问句标准化，仅保留中文、数字和英文，并转化成大写，将文字转数字（如十转为10）
-     */
-    public static String preProcessQuestion(String question) {
-        return ChineseNumberUtil.convertString(question.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "")).toUpperCase();
-    }
-
 }
