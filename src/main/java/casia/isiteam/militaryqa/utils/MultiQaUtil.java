@@ -1,6 +1,7 @@
 package casia.isiteam.militaryqa.utils;
 
 import casia.isiteam.militaryqa.common.Constant;
+import casia.isiteam.militaryqa.common.QaStatusCache;
 import casia.isiteam.militaryqa.model.EaHistory;
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
@@ -28,8 +29,8 @@ public class MultiQaUtil {
      */
     public String anaphoraResolution(EaHistory eah, String question, String uid) {
 
-        Constant.isUsingPronounMap.get(uid)[0] = Constant.isUsingPronounMap.get(uid)[1];
-        Constant.isUsingPronounMap.get(uid)[1] = false;
+        QaStatusCache.isUsingPronounMap.get(uid)[0] = QaStatusCache.isUsingPronounMap.get(uid)[1];
+        QaStatusCache.isUsingPronounMap.get(uid)[1] = false;
 
         // 利用HanLP分词，遍历词和词性
         List<Term> terms = HanLP.segment(question);
@@ -52,7 +53,7 @@ public class MultiQaUtil {
                 if (flagEntity && flagAttr) {
                     String str= String.join("，", eah.getHistEntities());
                     newQuest = question.replace(term.word, str);
-                    Constant.isUsingPronounMap.get(uid)[1] = true;
+                    QaStatusCache.isUsingPronounMap.get(uid)[1] = true;
                 }
                 // 问句中只出现的实体（如：神舟七号和它们的呢？）
                 else if (flagEntity) {
@@ -61,17 +62,17 @@ public class MultiQaUtil {
                     strs.addAll(eah.getHistAttrs());
                     String str= String.join("，", strs);
                     newQuest = question.replace(term.word, str);
-                    Constant.isUsingPronounMap.get(uid)[1] = true;
+                    QaStatusCache.isUsingPronounMap.get(uid)[1] = true;
                 }
                 // 问句中只出现的属性（如：它们的长度是多少？）
                 else if (flagAttr) {
                     String str= String.join("，", eah.getHistEntities());
                     newQuest = question.replace(term.word, str);
-                    Constant.isUsingPronounMap.get(uid)[1] = true;
+                    QaStatusCache.isUsingPronounMap.get(uid)[1] = true;
                 } else {
                     String str = String.join("，", eah.getHistEntities());
                     newQuest = question.replace(term.word, str);
-                    Constant.isUsingPronounMap.get(uid)[1] = true;
+                    QaStatusCache.isUsingPronounMap.get(uid)[1] = true;
                 }
                 break;
             }
@@ -100,14 +101,14 @@ public class MultiQaUtil {
      * @return 历史信息存储实体类 EAHistory
      */
     public EaHistory getHistory(String uid) {
-        int numQas = Constant.Qas.get(uid).size();
+        int numQas = QaStatusCache.Qas.get(uid).size();
         Set<String> histAttrs = new LinkedHashSet<>();
         Set<String> histEntities = new LinkedHashSet<>();
         String lastAttr = "", lastEntity = "";
 
         for (int i = numQas - 1; i >= 0; i--) {
-            histEntities.addAll(Constant.Qas.get(uid).get(i).getEntities());
-            histAttrs.addAll(Constant.Qas.get(uid).get(i).getAttrs());
+            histEntities.addAll(QaStatusCache.Qas.get(uid).get(i).getEntities());
+            histAttrs.addAll(QaStatusCache.Qas.get(uid).get(i).getAttrs());
         }
         if (histAttrs.size() > 0) {
             lastAttr = histAttrs.iterator().next();

@@ -1,8 +1,10 @@
 package casia.isiteam.militaryqa.service;
 
-import casia.isiteam.militaryqa.common.Constant;
+import casia.isiteam.militaryqa.common.AliasMapper;
+import casia.isiteam.militaryqa.common.QuestionTemplate;
 import casia.isiteam.militaryqa.mapper.AnswerMapper;
 import casia.isiteam.militaryqa.model.Answer;
+import casia.isiteam.militaryqa.utils.ProcessUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -38,133 +40,133 @@ public class AnswerSearcherService {
         List<Answer> answers = new ArrayList<>();
 
         // 模式匹配
-        if (Constant.patterns.get("热点查询模式").contains(parser_dict.get("pattern"))) {
+        if (QuestionTemplate.patterns.get("热点查询模式").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "热点查询模式");
             Q_type = 3;
         }
 
-        else if (Constant.patterns.get("期刊查询模式").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("期刊查询模式").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "期刊查询模式");
             Q_type = 4;
         }
 
-        else if (Constant.patterns.get("报告查询模式").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("报告查询模式").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "报告查询模式");
             Q_type = 5;
         }
 
-        else if (Constant.patterns.get("直达模式-头条").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("直达模式-头条").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "直达模式-头条");
             Q_type = 6;
             A_type = 1;
         }
 
-        else if (Constant.patterns.get("直达模式-百科").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("直达模式-百科").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "直达模式-百科");
             Q_type = 6;
             A_type = 2;
         }
 
-        else if (Constant.patterns.get("直达模式-订阅").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("直达模式-订阅").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "直达模式-订阅");
             Q_type = 6;
             A_type = 3;
         }
 
-        else if (Constant.patterns.get("直达模式-我的收藏").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("直达模式-我的收藏").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "直达模式-我的收藏");
             Q_type = 6;
             A_type = 4;
         }
 
-        else if (Constant.patterns.get("直达模式-浏览历史").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("直达模式-浏览历史").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "直达模式-浏览历史");
             Q_type = 6;
             A_type = 5;
         }
 
-        else if (Constant.patterns.get("大类别名").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("大类别名").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "大类别名");
             Q_type = 7;
             for (String category : parser_dict.get("n_big")) {
                 // 数据库检索答案
-                String childCategories = answerMapper.findChildrenByBigCategory(DictMapperService.BigCategory.get(category));
+                String childCategories = answerMapper.findChildrenByBigCategory(AliasMapper.BigCategory.get(category));
                 answers.addAll(answerMapper.findSmallCategoryByChildren(Arrays.asList(childCategories.split(","))));
             }
         }
 
-        else if (Constant.patterns.get("小类别名").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("小类别名").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "小类别名");
             for (String category : parser_dict.get("n_small")) {
                 // 数据库检索答案
-                answers.addAll(answerMapper.findBySmallCategory(DictMapperService.SmallCategory.get(category)));
+                answers.addAll(answerMapper.findBySmallCategory(AliasMapper.SmallCategory.get(category)));
             }
         }
 
-        else if (Constant.patterns.get("国家及类别名").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("国家及类别名").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "国家及类别名");
-            String country = DictMapperService.Country.get(parser_dict.get("n_country").get(0));
-            String category = DictMapperService.SmallCategory.get(parser_dict.get("n_small").get(0));
+            String country = AliasMapper.Country.get(parser_dict.get("n_country").get(0));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
             // 数据库检索答案
             answers = answerMapper.findByCountryAndCategory(country, category);
         }
 
-        else if (Constant.patterns.get("单实体").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("单实体").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单实体");
-            Set<String> entities = DictMapperService.Entity.get(parser_dict.get("n_entity").get(0));
+            Set<String> entities = AliasMapper.Entity.get(parser_dict.get("n_entity").get(0));
             for (String entity : entities) {
                 // 数据库检索答案
                 answers.addAll(answerMapper.findByEntity(entity));
             }
         }
 
-        else if (Constant.patterns.get("多实体").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("多实体").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "多实体");
             Q_type = 2;
             for (String entity: parser_dict.get("n_entity")) {
-                for (String enty : DictMapperService.Entity.get(entity)) {
+                for (String enty : AliasMapper.Entity.get(entity)) {
                     // 数据库检索答案
                     answers.addAll(answerMapper.findByEntity(enty));
                 }
             }
         }
 
-        else if (Constant.patterns.get("单实体单属性/多属性").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("单实体单属性/多属性").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单实体单属性/多属性");
             A_type = 1;
-            Set<String> entities = DictMapperService.Entity.get(parser_dict.get("n_entity").get(0));
+            Set<String> entities = AliasMapper.Entity.get(parser_dict.get("n_entity").get(0));
             for (String entity : entities) {
                 List<String> attrs = new ArrayList<>();
                 for (String attr: parser_dict.get("n_attr")) {
-                    attrs.add(DictMapperService.Attribute.get(attr));
+                    attrs.add(AliasMapper.Attribute.get(attr));
                 }
                 // 数据库检索答案
                 answers.addAll(answerMapper.findByEntityAndAttrs(entity, attrs));
             }
         }
 
-        else if (Constant.patterns.get("多实体单属性/多属性").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("多实体单属性/多属性").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "多实体单属性/多属性");
             A_type = 1;
             for (String entity: parser_dict.get("n_entity")) {
                 List<String> attrs = new ArrayList<>();
                 for (String attr: parser_dict.get("n_attr")) {
-                    attrs.add(DictMapperService.Attribute.get(attr));
+                    attrs.add(AliasMapper.Attribute.get(attr));
                 }
-                for (String enty : DictMapperService.Entity.get(entity)) {
+                for (String enty : AliasMapper.Entity.get(entity)) {
                     // 数据库检索答案
                     answers.addAll(answerMapper.findByEntityAndAttrs(enty, attrs));
                 }
             }
         }
 
-        else if (Constant.patterns.get("单属性单类别单区间").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("单属性单类别单区间").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单属性单类别单区间");
-            String category = DictMapperService.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String operator = DictMapperService.Compare.get(parser_dict.get("n_compare").get(0));
-            String attr = DictMapperService.Attribute.get(parser_dict.get("n_attr").get(0));
-            List<String> time_items = DictMapperService.processTime(parser_dict.get("n_time"));
-            List<String> unit_items = DictMapperService.processUnit(parser_dict.get("n_unit"));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
+            String operator = AliasMapper.Compare.get(parser_dict.get("n_compare").get(0));
+            String attr = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
+            List<String> time_items = ProcessUtil.processTime(parser_dict.get("n_time"));
+            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get("n_unit"));
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
@@ -174,14 +176,14 @@ public class AnswerSearcherService {
             }
         }
 
-        else if (Constant.patterns.get("单属性单类别多区间").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("单属性单类别多区间").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单属性单类别多区间");
-            String category = DictMapperService.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String operator_1 = DictMapperService.Compare.get(parser_dict.get("n_compare").get(0));
-            String operator_2 = DictMapperService.Compare.get(parser_dict.get("n_compare").get(1));
-            String attr = DictMapperService.Attribute.get(parser_dict.get("n_attr").get(0));
-            List<String> time_items = DictMapperService.processTime(parser_dict.get("n_time"));
-            List<String> unit_items = DictMapperService.processUnit(parser_dict.get("n_unit"));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
+            String operator_1 = AliasMapper.Compare.get(parser_dict.get("n_compare").get(0));
+            String operator_2 = AliasMapper.Compare.get(parser_dict.get("n_compare").get(1));
+            String attr = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
+            List<String> time_items = ProcessUtil.processTime(parser_dict.get("n_time"));
+            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get("n_unit"));
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
@@ -193,15 +195,15 @@ public class AnswerSearcherService {
             }
         }
 
-        else if (Constant.patterns.get("多属性单类别单区间").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("多属性单类别单区间").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "多属性单类别单区间");
-            String category = DictMapperService.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String operator_1 = DictMapperService.Compare.get(parser_dict.get("n_compare").get(0));
-            String operator_2 = DictMapperService.Compare.get(parser_dict.get("n_compare").get(1));
-            String attr_1 = DictMapperService.Attribute.get(parser_dict.get("n_attr").get(0));
-            String attr_2 = DictMapperService.Attribute.get(parser_dict.get("n_attr").get(1));
-            List<String> time_items = DictMapperService.processTime(parser_dict.get("n_time"));
-            List<String> unit_items = DictMapperService.processUnit(parser_dict.get("n_unit"));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
+            String operator_1 = AliasMapper.Compare.get(parser_dict.get("n_compare").get(0));
+            String operator_2 = AliasMapper.Compare.get(parser_dict.get("n_compare").get(1));
+            String attr_1 = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
+            String attr_2 = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(1));
+            List<String> time_items = ProcessUtil.processTime(parser_dict.get("n_time"));
+            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get("n_unit"));
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
@@ -219,10 +221,10 @@ public class AnswerSearcherService {
             }
         }
 
-        else if (Constant.patterns.get("全类别属性最值").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("全类别属性最值").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "全类别属性最值");
-            String type = DictMapperService.Most.get(parser_dict.get("n_most").get(0));
-            String attr = DictMapperService.Attribute.get(parser_dict.get("n_attr").get(0));
+            String type = AliasMapper.Most.get(parser_dict.get("n_most").get(0));
+            String attr = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
 
             // 数据库检索答案
             if ("max".equals(type)) {
@@ -232,11 +234,11 @@ public class AnswerSearcherService {
             }
         }
 
-        else if (Constant.patterns.get("单类别属性最值").contains(parser_dict.get("pattern"))) {
+        else if (QuestionTemplate.patterns.get("单类别属性最值").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单类别属性最值");
-            String category = DictMapperService.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String type = DictMapperService.Most.get(parser_dict.get("n_most").get(0));
-            String attr = DictMapperService.Attribute.get(parser_dict.get("n_attr").get(0));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
+            String type = AliasMapper.Most.get(parser_dict.get("n_most").get(0));
+            String attr = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
 
             // 数据库检索答案
             if ("max".equals(type)) {

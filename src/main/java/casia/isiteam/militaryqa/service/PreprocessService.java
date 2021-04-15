@@ -1,6 +1,10 @@
 package casia.isiteam.militaryqa.service;
 
+import casia.isiteam.militaryqa.common.AliasMapper;
+import casia.isiteam.militaryqa.common.Constant;
+import casia.isiteam.militaryqa.mapper.AnswerMapper;
 import casia.isiteam.militaryqa.mapper.ResultMapper;
+import casia.isiteam.militaryqa.model.DictMatcher;
 import casia.isiteam.militaryqa.model.Result;
 import casia.isiteam.militaryqa.utils.EntityAliasExtractor;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
@@ -17,6 +21,8 @@ public class PreprocessService {
 
     @Autowired
     ResultMapper resultMapper;
+    @Autowired
+    AnswerMapper answerMapper;
     @Autowired
     EntityAliasExtractor entityAliasExtractor;
 
@@ -291,5 +297,67 @@ public class PreprocessService {
         });
 
         log.info("【MatchDict】补充到 CustomDictionary 成功！");
+    }
+
+    /**
+     * 程序首次启动，初始化 CustomDictionary 和 AliasMapper
+     * */
+    public void initCustomDictionaryAndAliasMapper() {
+        log.info("【InitCustomDictionaryAndAliasMapper】正在获取 match_dict 表，并初始化 HanLP(CustomDictionary) 和 AliasMapper...");
+
+        List<DictMatcher> matchers = answerMapper.getMatchDict();
+        log.info("match_dict 加载成功，size：{}", matchers.size());
+
+
+        for (DictMatcher matcher : matchers) {
+            String[] aliases = matcher.getAlias().split("\\|");
+
+            // init CustomDictionary
+            for (String alias : aliases) {
+                CustomDictionary.add(alias, Constant.labelNatureMap.get(matcher.getLabel()));
+            }
+
+            // init AliasMapper
+            if ("entity".equals(matcher.getLabel())) {
+                Arrays.stream(aliases).forEach(alias -> {
+                    if (!AliasMapper.Entity.containsKey(alias)) {
+                        // 一个别名对应多个实体
+                        AliasMapper.Entity.put(alias, new HashSet<>());
+                    }
+                    AliasMapper.Entity.get(alias).add(matcher.getWord());
+                });
+            } else {
+                switch (matcher.getLabel()) {
+                    case "country":
+                        Arrays.stream(aliases).forEach(alias -> AliasMapper.Country.put(alias, matcher.getWord())); break;
+                    case "big_category":
+                        Arrays.stream(aliases).forEach(alias -> AliasMapper.BigCategory.put(alias, matcher.getWord())); break;
+                    case "small_category":
+                        Arrays.stream(aliases).forEach(alias -> AliasMapper.SmallCategory.put(alias, matcher.getWord())); break;
+                    case "attribute":
+                        Arrays.stream(aliases).forEach(alias -> AliasMapper.Attribute.put(alias, matcher.getWord())); break;
+                    case "compare":
+                        Arrays.stream(aliases).forEach(alias -> AliasMapper.Compare.put(alias, matcher.getWord())); break;
+                    case "most":
+                        Arrays.stream(aliases).forEach(alias -> AliasMapper.Most.put(alias, matcher.getWord())); break;
+                    default:  break;
+                }
+            }
+        }
+
+        log.info("【InitCustomDictionaryAndAliasMapper】初始化成功.");
+    }
+
+    /**
+     * 清空DictMapper
+     */
+    private void clearDictMapper() {
+        AliasMapper.Country.clear();
+        AliasMapper.BigCategory.clear();
+        AliasMapper.SmallCategory.clear();
+        AliasMapper.Entity.clear();
+        AliasMapper.Attribute.clear();
+        AliasMapper.Compare.clear();
+        AliasMapper.Most.clear();
     }
 }

@@ -1,11 +1,10 @@
 package casia.isiteam.militaryqa.controller;
 
-import casia.isiteam.militaryqa.common.Constant;
+import casia.isiteam.militaryqa.common.QaStatusCache;
 import casia.isiteam.militaryqa.mapper.AnswerMapper;
 import casia.isiteam.militaryqa.model.Qa;
 import casia.isiteam.militaryqa.service.QuestionParserService;
 import casia.isiteam.militaryqa.service.AnswerSearcherService;
-import casia.isiteam.militaryqa.service.DictMapperService;
 import casia.isiteam.militaryqa.service.PreprocessService;
 import casia.isiteam.militaryqa.utils.MultiQaUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -26,24 +25,22 @@ public class IndexController {
     @Autowired
     AnswerMapper answerMapper;
     @Autowired
+    PreprocessService preprocessService;
+    @Autowired
     QuestionParserService questionParserService;
     @Autowired
     AnswerSearcherService answerSearcherService;
-    @Autowired
-    DictMapperService dictMapperService;
-    @Autowired
-    PreprocessService preprocessService;
 
 
     @RequestMapping("/qa")
     public String index(@RequestParam("uid") String uid, @RequestParam("q") String q) {
 
-        // 初始化
-        if (!Constant.Qas.containsKey(uid)) {
-            Constant.Qas.put(uid, new ArrayList<>());
+        // 初始化该用户提问状态
+        if (!QaStatusCache.Qas.containsKey(uid)) {
+            QaStatusCache.Qas.put(uid, new ArrayList<>());
         }
-        if (!Constant.isUsingPronounMap.containsKey(uid)) {
-            Constant.isUsingPronounMap.put(uid, new boolean[] {false, false});
+        if (!QaStatusCache.isUsingPronounMap.containsKey(uid)) {
+            QaStatusCache.isUsingPronounMap.put(uid, new boolean[] {false, false});
         }
         return multiQaMain(uid, q);
     }
@@ -57,7 +54,7 @@ public class IndexController {
         Qa qa;
         //将原问题标准化
         String standQuestion = multiQaUtil.preProcessQuestion(question);
-        if (Constant.Qas.get(uid).size() == 0) {
+        if (QaStatusCache.Qas.get(uid).size() == 0) {
             qa = singleQaMain(uid, standQuestion, question);
         } else {
             // 多轮，获取历史Entity和Attr，将问句中的指代词替换为对应实体名
@@ -65,11 +62,11 @@ public class IndexController {
             qa = singleQaMain(uid, newQuestion, question);
         }
         // 多轮，用户提问由复数代词变成其他方式时，清空QAs
-        if (Constant.isUsingPronounMap.get(uid)[0] && !Constant.isUsingPronounMap.get(uid)[1]) {
-            Constant.Qas.get(uid).clear();
+        if (QaStatusCache.isUsingPronounMap.get(uid)[0] && !QaStatusCache.isUsingPronounMap.get(uid)[1]) {
+            QaStatusCache.Qas.get(uid).clear();
         }
 
-        Constant.Qas.get(uid).add(qa);
+        QaStatusCache.Qas.get(uid).add(qa);
         return qa.getAnswer();
     }
 
@@ -107,7 +104,7 @@ public class IndexController {
             preprocessService.getEntitiesAndSameasToDB();
 
             preprocessService.getDBToCustomDictionary();
-            dictMapperService.initDictMapper();
+//            dictMapperService.initDictMapper();
             return "success";
         } catch (Exception e) {
             return "fail - " + e;
@@ -118,7 +115,7 @@ public class IndexController {
     public String update() {
         try {
             preprocessService.getDBToCustomDictionary();
-            dictMapperService.initDictMapper();
+//            dictMapperService.initDictMapper();
             return "success";
         } catch (Exception e) {
             return "fail - " + e;
