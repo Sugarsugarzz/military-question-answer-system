@@ -1,8 +1,9 @@
 package casia.isiteam.militaryqa.service;
 
 import casia.isiteam.militaryqa.common.AliasMapper;
+import casia.isiteam.militaryqa.common.Constant;
 import casia.isiteam.militaryqa.common.QuestionTemplate;
-import casia.isiteam.militaryqa.mapper.AnswerMapper;
+import casia.isiteam.militaryqa.mapper.master.AnswerMapper;
 import casia.isiteam.militaryqa.model.Answer;
 import casia.isiteam.militaryqa.utils.ProcessUtil;
 import cn.hutool.core.date.DateField;
@@ -88,7 +89,7 @@ public class AnswerSearcherService {
         else if (QuestionTemplate.patterns.get("大类别名").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "大类别名");
             Q_type = 7;
-            for (String category : parser_dict.get("n_big")) {
+            for (String category : parser_dict.get(Constant.Nature_Big_Category)) {
                 // 数据库检索答案
                 String childCategories = answerMapper.findChildrenByBigCategory(AliasMapper.BigCategory.get(category));
                 answers.addAll(answerMapper.findSmallCategoryByChildren(Arrays.asList(childCategories.split(","))));
@@ -97,7 +98,7 @@ public class AnswerSearcherService {
 
         else if (QuestionTemplate.patterns.get("小类别名").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "小类别名");
-            for (String category : parser_dict.get("n_small")) {
+            for (String category : parser_dict.get(Constant.Nature_Small_Category)) {
                 // 数据库检索答案
                 answers.addAll(answerMapper.findBySmallCategory(AliasMapper.SmallCategory.get(category)));
             }
@@ -105,15 +106,15 @@ public class AnswerSearcherService {
 
         else if (QuestionTemplate.patterns.get("国家及类别名").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "国家及类别名");
-            String country = AliasMapper.Country.get(parser_dict.get("n_country").get(0));
-            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
+            String country = AliasMapper.Country.get(parser_dict.get(Constant.Nature_Country).get(0));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get(Constant.Nature_Small_Category).get(0));
             // 数据库检索答案
             answers = answerMapper.findByCountryAndCategory(country, category);
         }
 
         else if (QuestionTemplate.patterns.get("单实体").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单实体");
-            Set<String> entities = AliasMapper.Entity.get(parser_dict.get("n_entity").get(0));
+            Set<String> entities = AliasMapper.Entity.get(parser_dict.get(Constant.Nature_Entity).get(0));
             for (String entity : entities) {
                 // 数据库检索答案
                 answers.addAll(answerMapper.findByEntity(entity));
@@ -123,7 +124,7 @@ public class AnswerSearcherService {
         else if (QuestionTemplate.patterns.get("多实体").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "多实体");
             Q_type = 2;
-            for (String entity: parser_dict.get("n_entity")) {
+            for (String entity: parser_dict.get(Constant.Nature_Entity)) {
                 for (String enty : AliasMapper.Entity.get(entity)) {
                     // 数据库检索答案
                     answers.addAll(answerMapper.findByEntity(enty));
@@ -134,10 +135,10 @@ public class AnswerSearcherService {
         else if (QuestionTemplate.patterns.get("单实体单属性/多属性").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单实体单属性/多属性");
             A_type = 1;
-            Set<String> entities = AliasMapper.Entity.get(parser_dict.get("n_entity").get(0));
+            Set<String> entities = AliasMapper.Entity.get(parser_dict.get(Constant.Nature_Entity).get(0));
             for (String entity : entities) {
                 List<String> attrs = new ArrayList<>();
-                for (String attr: parser_dict.get("n_attr")) {
+                for (String attr: parser_dict.get(Constant.Nature_Attribute)) {
                     attrs.add(AliasMapper.Attribute.get(attr));
                 }
                 // 数据库检索答案
@@ -148,9 +149,9 @@ public class AnswerSearcherService {
         else if (QuestionTemplate.patterns.get("多实体单属性/多属性").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "多实体单属性/多属性");
             A_type = 1;
-            for (String entity: parser_dict.get("n_entity")) {
+            for (String entity: parser_dict.get(Constant.Nature_Entity)) {
                 List<String> attrs = new ArrayList<>();
-                for (String attr: parser_dict.get("n_attr")) {
+                for (String attr: parser_dict.get(Constant.Nature_Attribute)) {
                     attrs.add(AliasMapper.Attribute.get(attr));
                 }
                 for (String enty : AliasMapper.Entity.get(entity)) {
@@ -162,11 +163,11 @@ public class AnswerSearcherService {
 
         else if (QuestionTemplate.patterns.get("单属性单类别单区间").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单属性单类别单区间");
-            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String operator = AliasMapper.Compare.get(parser_dict.get("n_compare").get(0));
-            String attr = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
-            List<String> time_items = ProcessUtil.processTime(parser_dict.get("n_time"));
-            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get("n_unit"));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get(Constant.Nature_Small_Category).get(0));
+            String operator = AliasMapper.Compare.get(parser_dict.get(Constant.Nature_Compare).get(0));
+            String attr = AliasMapper.Attribute.get(parser_dict.get(Constant.Nature_Attribute).get(0));
+            List<String> time_items = ProcessUtil.processTime(parser_dict.get(Constant.Nature_Time));
+            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get(Constant.Nature_Unit));
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
@@ -178,12 +179,12 @@ public class AnswerSearcherService {
 
         else if (QuestionTemplate.patterns.get("单属性单类别多区间").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单属性单类别多区间");
-            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String operator_1 = AliasMapper.Compare.get(parser_dict.get("n_compare").get(0));
-            String operator_2 = AliasMapper.Compare.get(parser_dict.get("n_compare").get(1));
-            String attr = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
-            List<String> time_items = ProcessUtil.processTime(parser_dict.get("n_time"));
-            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get("n_unit"));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get(Constant.Nature_Small_Category).get(0));
+            String operator_1 = AliasMapper.Compare.get(parser_dict.get(Constant.Nature_Compare).get(0));
+            String operator_2 = AliasMapper.Compare.get(parser_dict.get(Constant.Nature_Compare).get(1));
+            String attr = AliasMapper.Attribute.get(parser_dict.get(Constant.Nature_Attribute).get(0));
+            List<String> time_items = ProcessUtil.processTime(parser_dict.get(Constant.Nature_Time));
+            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get(Constant.Nature_Unit));
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
@@ -197,13 +198,13 @@ public class AnswerSearcherService {
 
         else if (QuestionTemplate.patterns.get("多属性单类别单区间").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "多属性单类别单区间");
-            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String operator_1 = AliasMapper.Compare.get(parser_dict.get("n_compare").get(0));
-            String operator_2 = AliasMapper.Compare.get(parser_dict.get("n_compare").get(1));
-            String attr_1 = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
-            String attr_2 = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(1));
-            List<String> time_items = ProcessUtil.processTime(parser_dict.get("n_time"));
-            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get("n_unit"));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get(Constant.Nature_Small_Category).get(0));
+            String operator_1 = AliasMapper.Compare.get(parser_dict.get(Constant.Nature_Compare).get(0));
+            String operator_2 = AliasMapper.Compare.get(parser_dict.get(Constant.Nature_Compare).get(1));
+            String attr_1 = AliasMapper.Attribute.get(parser_dict.get(Constant.Nature_Attribute).get(0));
+            String attr_2 = AliasMapper.Attribute.get(parser_dict.get(Constant.Nature_Attribute).get(1));
+            List<String> time_items = ProcessUtil.processTime(parser_dict.get(Constant.Nature_Time));
+            List<String> unit_items = ProcessUtil.processUnit(parser_dict.get(Constant.Nature_Unit));
 
             // 数据库检索答案
             if (time_items.isEmpty()) {
@@ -211,7 +212,7 @@ public class AnswerSearcherService {
                         attr_2, operator_2, unit_items.get(1));
             } else {
                 // 区分一下时间属性和数值属性的顺序
-                if (parser_dict.get("pattern").indexOf("n_unit") > parser_dict.get("pattern").indexOf("n_time")) {
+                if (parser_dict.get("pattern").indexOf(Constant.Nature_Unit) > parser_dict.get("pattern").indexOf(Constant.Nature_Time)) {
                     answers = answerMapper.findMultiAttrInSingleRangeByTimeAndUnit(category, attr_2, operator_2, unit_items.get(0),
                             attr_1, operator_1, time_items.get(0));
                 } else {
@@ -223,8 +224,8 @@ public class AnswerSearcherService {
 
         else if (QuestionTemplate.patterns.get("全类别属性最值").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "全类别属性最值");
-            String type = AliasMapper.Most.get(parser_dict.get("n_most").get(0));
-            String attr = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
+            String type = AliasMapper.Most.get(parser_dict.get(Constant.Nature_Most).get(0));
+            String attr = AliasMapper.Attribute.get(parser_dict.get(Constant.Nature_Attribute).get(0));
 
             // 数据库检索答案
             if ("max".equals(type)) {
@@ -236,9 +237,9 @@ public class AnswerSearcherService {
 
         else if (QuestionTemplate.patterns.get("单类别属性最值").contains(parser_dict.get("pattern"))) {
             log.info("与 {} 问句模式匹配成功！", "单类别属性最值");
-            String category = AliasMapper.SmallCategory.get(parser_dict.get("n_small").get(0));
-            String type = AliasMapper.Most.get(parser_dict.get("n_most").get(0));
-            String attr = AliasMapper.Attribute.get(parser_dict.get("n_attr").get(0));
+            String category = AliasMapper.SmallCategory.get(parser_dict.get(Constant.Nature_Small_Category).get(0));
+            String type = AliasMapper.Most.get(parser_dict.get(Constant.Nature_Most).get(0));
+            String attr = AliasMapper.Attribute.get(parser_dict.get(Constant.Nature_Attribute).get(0));
 
             // 数据库检索答案
             if ("max".equals(type)) {
@@ -306,15 +307,15 @@ public class AnswerSearcherService {
             // 报告查询模式
             case 5:
                 obj.put("Q_type", Q_type);
-                obj.put("Q_content", parserDict.get("keywords"));
+                obj.put("Q_content", parserDict.get(Constant.Nature_Keywords));
 
-                if (parserDict.get("n_time").size() == 0) {
+                if (parserDict.get(Constant.Nature_Time).size() == 0) {
                     obj.put("Q_start_time", null);
                     obj.put("Q_end_time", null);
-                } else if (parserDict.get("n_time").size() == 1) {
-                    String startTime = parserDict.get("n_time").get(0);
+                } else if (parserDict.get(Constant.Nature_Time).size() == 1) {
+                    String startTime = parserDict.get(Constant.Nature_Time).get(0);
                     String endTime = null;
-                    String word = parserDict.get("n_unit").get(0);
+                    String word = parserDict.get(Constant.Nature_Unit).get(0);
                     // 长度为1的在处理下，补充一个结束时间
                     try {
                         if (word.contains("年")) {
@@ -332,9 +333,9 @@ public class AnswerSearcherService {
                     obj.put("Q_start_time", startTime);
                     obj.put("Q_end_time", endTime);
                 } else {
-                    Collections.sort(parserDict.get("n_time"));
-                    obj.put("Q_start_time", parserDict.get("n_time").get(0));
-                    obj.put("Q_end_time", parserDict.get("n_time").get(parserDict.get("n_time").size() - 1));
+                    Collections.sort(parserDict.get(Constant.Nature_Time));
+                    obj.put("Q_start_time", parserDict.get(Constant.Nature_Time).get(0));
+                    obj.put("Q_end_time", parserDict.get(Constant.Nature_Time).get(parserDict.get(Constant.Nature_Time).size() - 1));
                 }
                 break;
 

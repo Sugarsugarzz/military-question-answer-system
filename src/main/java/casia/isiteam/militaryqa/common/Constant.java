@@ -13,8 +13,35 @@ public class Constant {
     /** 词性列表 */
     public static List<String> natures = new ArrayList<>();
 
-    /** match_dict表中label与词性的映射关系 */
-    public static Map<String, String> labelNatureMap = new HashMap<>();
+    /** 词性：国家 */
+    public static final String Nature_Country = "n_country";
+
+    /** 词性：实体 */
+    public static final String Nature_Entity = "n_entity";
+
+    /** 词性：实体属性 */
+    public static final String Nature_Attribute = "n_attr";
+
+    /** 词性：一级分类 */
+    public static final String Nature_Big_Category = "n_big";
+
+    /** 词性：二级分类 */
+    public static final String Nature_Small_Category = "n_small";
+
+    /** 词性：比较词 */
+    public static final String Nature_Compare = "n_compare";
+
+    /** 词性：最值 */
+    public static final String Nature_Most = "n_most";
+
+    /** 词性：时间 */
+    public static final String Nature_Time = "n_time";
+
+    /** 词性：单位 */
+    public static final String Nature_Unit = "n_unit";
+
+    /** 词性：关键词 */
+    public static final String Nature_Keywords = "keywords";
 
 
     static {
@@ -35,24 +62,15 @@ public class Constant {
         pluralPronouns.add("这些");
 
         // 初始化已定义的词性列表
-        natures.add("n_country");
-        natures.add("n_entity");
-        natures.add("n_attr");
-        natures.add("n_big");
-        natures.add("n_small");
-        natures.add("n_compare");
-        natures.add("n_most");
-        natures.add("n_time");
-        natures.add("n_unit");
-        natures.add("keywords");
-
-        // label -> nature
-        labelNatureMap.put("country", "n_country");
-        labelNatureMap.put("entity", "n_entity");
-        labelNatureMap.put("attribute", "n_attr");
-        labelNatureMap.put("big_category", "n_big");
-        labelNatureMap.put("small_category", "n_small");
-        labelNatureMap.put("compare", "n_compare");
-        labelNatureMap.put("most", "n_most");
+        natures.add(Nature_Country);
+        natures.add(Nature_Entity);
+        natures.add(Nature_Attribute);
+        natures.add(Nature_Big_Category);
+        natures.add(Nature_Small_Category);
+        natures.add(Nature_Compare);
+        natures.add(Nature_Most);
+        natures.add(Nature_Time);
+        natures.add(Nature_Unit);
+        natures.add(Nature_Keywords);
     }
 }

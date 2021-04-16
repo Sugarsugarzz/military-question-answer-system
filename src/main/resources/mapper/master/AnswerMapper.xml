@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD casia.isiteam.militaryqa.mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="casia.isiteam.militaryqa.mapper.AnswerMapper">
+<mapper namespace="casia.isiteam.militaryqa.mapper.master.AnswerMapper">
 
     <select id="getMatchDict" resultType="casia.isiteam.militaryqa.model.DictMatcher">
         SELECT word, alias, label
         FROM match_dict
     </select>
 
-    <insert id="saveQAInfo">
+    <insert id="saveQaInfo">
         INSERT INTO history_qa(uid, question, answer)
         VALUES (#{uid}, #{question}, #{answer})
     </insert>
@@ -139,5 +139,11 @@
                     and c.concept_name = #{attr_1} and a.attr_id = c.c_id and a.entity_id = e.entity_id and a.attr_value_reg ${operator_1} #{item_1} * 1) t, entity_attr a, concepts c, entities e
         WHERE c.concept_name = #{attr_2} and a.attr_id = c.c_id and a.entity_id = t.entity_id and t.entity_id = e.entity_id and a.attr_value_reg ${operator_2} #{item_2}
         ORDER BY a.attr_value_reg ASC
+    </select>
+
+    <select id="getAttrsByEntityName" resultType="map">
+        select entity_name, concept_name, attr_value
+        from entities e, entity_attr a, concepts c
+        where e.entity_id = a.entity_id and a.attr_id = c.c_id and e.entity_id = #{entity_id}
     </select>
 </mapper>

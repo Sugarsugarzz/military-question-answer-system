@@ -52,7 +52,7 @@ public class QuestionParserService {
         // 识别出问句中的<时间>，加入分词器词典
         Matcher m_time = Pattern.compile("[0-9]{4}年([0-9]{0,2}月)?([0-9]{0,2}日)?").matcher(question);
         while (m_time.find()) {
-            CustomDictionary.add(m_time.group(), "n_time");
+            CustomDictionary.add(m_time.group(), Constant.Nature_Time);
         }
 
         // 识别出问句中的<单位数值>，加入分词器词典
@@ -61,7 +61,7 @@ public class QuestionParserService {
         String unit_regex = String.format("([0-9]+(.[0-9]+)?)(%s)+", String.join("|", units));
         Matcher m_unit = Pattern.compile(unit_regex).matcher(question);
         while (m_unit.find()) {
-            CustomDictionary.add(m_unit.group(), "n_unit");
+            CustomDictionary.add(m_unit.group(), Constant.Nature_Unit);
         }
 
         // 利用HanLP分词，遍历词和词性
@@ -161,17 +161,18 @@ public class QuestionParserService {
                 continue;
             }
             question = question.replace(key, "");
-            parserDict.get("n_time").add(DateUtil.formatDateDefault(timeResults.get(key).getTime()));
+//            log.info("【抽取时间和关键词】Question：{} - key：{} - time: {}", question, key, timeResults.get(key).getTime());
+            parserDict.get(Constant.Nature_Time).add(DateUtil.formatDateDefault(timeResults.get(key).getTime()));
         }
         // 提取 关键词
-        parserDict.get("keywords").addAll(HanLP.extractKeyword(question, 5));
+        parserDict.get(Constant.Nature_Keywords).addAll(HanLP.extractKeyword(question, 5));
         // 针对 n_time 长度为一的情况，将对应字段也加入，以便后面识别加入end_time
-        if (parserDict.get("n_time").size() == 1) {
+        if (parserDict.get(Constant.Nature_Time).size() == 1) {
             for (String key : timeResults.keySet()) {
                 if (question.contains("神舟") && key.contains("号")) {
                     continue;
                 }
-                parserDict.get("n_unit").add(key);
+                parserDict.get(Constant.Nature_Unit).add(key);
             }
         }
     }

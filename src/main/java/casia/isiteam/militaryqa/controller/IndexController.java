@@ -1,7 +1,7 @@
 package casia.isiteam.militaryqa.controller;
 
 import casia.isiteam.militaryqa.common.QaStatusCache;
-import casia.isiteam.militaryqa.mapper.AnswerMapper;
+import casia.isiteam.militaryqa.mapper.master.AnswerMapper;
 import casia.isiteam.militaryqa.model.Qa;
 import casia.isiteam.militaryqa.service.QuestionParserService;
 import casia.isiteam.militaryqa.service.AnswerSearcherService;
@@ -20,8 +20,6 @@ import java.util.*;
 @RestController
 public class IndexController {
 
-    @Autowired
-    MultiQaUtil multiQaUtil;
     @Autowired
     AnswerMapper answerMapper;
     @Autowired
@@ -53,12 +51,12 @@ public class IndexController {
     public String multiQaMain(String uid, String question) {
         Qa qa;
         //将原问题标准化
-        String standQuestion = multiQaUtil.preProcessQuestion(question);
+        String standQuestion = MultiQaUtil.preProcessQuestion(question);
         if (QaStatusCache.Qas.get(uid).size() == 0) {
             qa = singleQaMain(uid, standQuestion, question);
         } else {
             // 多轮，获取历史Entity和Attr，将问句中的指代词替换为对应实体名
-            String newQuestion = multiQaUtil.anaphoraResolution(multiQaUtil.getHistory(uid), standQuestion, uid);
+            String newQuestion = MultiQaUtil.anaphoraResolution(MultiQaUtil.getHistory(uid), standQuestion, uid);
             qa = singleQaMain(uid, newQuestion, question);
         }
         // 多轮，用户提问由复数代词变成其他方式时，清空QAs
@@ -90,35 +88,13 @@ public class IndexController {
         // 打印答案
         log.info("Answer is ：{}", answer);
         // 将该轮问答信息存入数据库
-        answerMapper.saveQAInfo(uid, originQuestion, answer);
+        answerMapper.saveQaInfo(uid, originQuestion, answer);
 
         return new Qa(parserDict.get("n_entity"), parserDict.get("n_attr"), question, answer);
     }
 
-    @RequestMapping("/updateDbField")
-    public String updateDb() {
-        try {
-            preprocessService.addEntityAliasToDB(); // entity  6000 entities for 15min
-
-            preprocessService.getConceptsAndSameasToDB();
-            preprocessService.getEntitiesAndSameasToDB();
-
-            preprocessService.getDBToCustomDictionary();
-//            dictMapperService.initDictMapper();
-            return "success";
-        } catch (Exception e) {
-            return "fail - " + e;
-        }
-    }
-
-    @RequestMapping("/updateDict")
-    public String update() {
-        try {
-            preprocessService.getDBToCustomDictionary();
-//            dictMapperService.initDictMapper();
-            return "success";
-        } catch (Exception e) {
-            return "fail - " + e;
-        }
+    @RequestMapping("/getAttrs")
+    public Object getAttrsByEntityName(@RequestParam("id") Long id) {
+        return answerMapper.getAttrsByEntityName(id);
     }
 }

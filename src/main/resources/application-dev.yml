@@ -3,25 +3,34 @@ server:
 
 spring:
   datasource:
-    druid:
-      url: jdbc:mysql://127.0.0.1:3306/military_qa?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      username: root
-      password: 123456
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      initial-size: 1
-      min-idle: 5
-      max-active: 20
-      max-wait: 60000
-      time-between-eviction-runs-millis: 60000
-      min-evictable-idle-time-millis: 300000
-      validation-query: SELECT 'x'
-      test-while-idle: true
-      test-on-borrow: false
-      test-on-return: false
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 10
+    minIdle: 10
+    maxActive: 200
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    filters: stat,wall,slf4j
+
+master:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/military_qa?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: 123456
+    driverClassName: com.mysql.cj.jdbc.Driver
+
+cluster:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/zbzs1?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: 123456
+    driverClassName: com.mysql.cj.jdbc.Driver
 
 
-
-# 整合mybatis
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
 
