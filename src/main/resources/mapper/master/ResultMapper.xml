@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD casia.isiteam.militaryqa.mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="casia.isiteam.militaryqa.mapper.ResultMapper">
+<mapper namespace="casia.isiteam.militaryqa.mapper.master.ResultMapper">
+
+    <select id="getCursor" resultType="long">
+        select `cursor` from wiki_cursor where `table_name` = 'wiki_info'
+    </select>
+
+    <update id="updateCursor">
+        update wiki_cursor set `cursor` = ${cursor} where `table_name` = 'wiki_info'
+    </update>
 
     <select id="getConcepts" resultType="casia.isiteam.militaryqa.model.Result">
         SELECT c_id, concept_name FROM concepts
@@ -71,4 +79,49 @@
         SELECT alias, label FROM match_dict
     </select>
 
+    <select id="getConceptsStopWords" resultType="string">
+        select alias
+        from match_dict
+        where label in ('country', 'most', 'compare', 'attribute', 'small_category', 'big_category')
+    </select>
+
+    <select id="getEntityIdByName" resultType="int">
+        select entity_id
+        from entities
+        where entity_name = #{name}
+    </select>
+
+    <select id="getEntitiesMaxId" resultType="long">
+        select max(entity_id) from entities
+    </select>
+
+    <select id="getConceptsMaxId" resultType="long">
+        select max(c_id) from concepts
+    </select>
+
+    <insert id="saveEntities">
+        insert into entities (`entity_id`, `entity_name`, `concept_id`, `wiki_info_id`)
+        values (${entity_id}, #{entity_name}, ${concept_id}, #{wiki_info_id})
+    </insert>
+
+    <insert id="saveEntitySameAs">
+        insert into entity_sameas (entity_name, sameAs_id)
+        values (#{entity_name}, ${sameAs_id})
+    </insert>
+
+    <insert id="saveEntityAttr">
+        insert into entity_attr (entity_id, attr_id, attr_value)
+        values (${entity_id}, ${attr_id}, #{attr_value})
+    </insert>
+
+    <select id="getConceptIdByName" resultType="long">
+        select c_id
+        from concepts
+        where concept_name = #{concept_name}
+    </select>
+
+    <insert id="saveConcept">
+        insert into concepts (`c_id`, `concept_name`, `level`)
+        values (${cid}, #{concept_name}, 0)
+    </insert>
 </mapper>

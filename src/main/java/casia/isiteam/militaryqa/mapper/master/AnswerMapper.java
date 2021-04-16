@@ -1,4 +1,4 @@
-package casia.isiteam.militaryqa.mapper;
+package casia.isiteam.militaryqa.mapper.master;
 
 import casia.isiteam.militaryqa.model.Answer;
 import casia.isiteam.militaryqa.model.DictMatcher;
@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -200,7 +201,15 @@ public interface AnswerMapper {
      * @param question 问句
      * @param answer 答案JSON
      */
-    void saveQAInfo(@Param("uid") String uid,
+    void saveQaInfo(@Param("uid") String uid,
                     @Param("question") String question,
                     @Param("answer") String answer);
+
+    /**
+     * 根据实体ID查询实体所有属性名
+     * @param entity_id 实体ID
+     * @return 属性列表
+     */
+    List<Map<String, Object>> getAttrsByEntityName(@Param("entity_id") Long entity_id);
+
 }

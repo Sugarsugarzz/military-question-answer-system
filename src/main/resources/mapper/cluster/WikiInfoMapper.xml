@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD casia.isiteam.militaryqa.mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="casia.isiteam.militaryqa.mapper.cluster.WikiInfoMapper">
+
+    <select id="list" resultType="map">
+        select `auto_id`, `wikiID`, `name`, `othernames`, `transnames`, `infobox`
+        from wiki_info
+        where auto_id > ${cursor}
+        limit ${limit}
+    </select>
+</mapper>

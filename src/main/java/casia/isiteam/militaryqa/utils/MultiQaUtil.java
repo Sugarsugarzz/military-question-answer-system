@@ -19,7 +19,7 @@ public class MultiQaUtil {
      * 问句预处理
      * @return 将问句标准化，仅保留中文、数字和英文，并转化成大写，将文字转数字（如十转为10）
      */
-    public String preProcessQuestion(String question) {
+    public static String preProcessQuestion(String question) {
         return ChineseNumberUtil.convertString(question.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "")).toUpperCase();
     }
 
@@ -27,7 +27,7 @@ public class MultiQaUtil {
      * 多轮问答中，处理问句中出现指代词的情况，将其替换为对应实体和属性
      * @return 构造的新问句
      */
-    public String anaphoraResolution(EaHistory eah, String question, String uid) {
+    public static String anaphoraResolution(EaHistory eah, String question, String uid) {
 
         QaStatusCache.isUsingPronounMap.get(uid)[0] = QaStatusCache.isUsingPronounMap.get(uid)[1];
         QaStatusCache.isUsingPronounMap.get(uid)[1] = false;
@@ -38,10 +38,10 @@ public class MultiQaUtil {
 
         Boolean flagAttr = false, flagEntity = false;
         for (Term term : terms) {
-            if ("n_entity".equals(term.nature.toString())) {
+            if (Constant.Nature_Entity.equals(term.nature.toString())) {
                 flagEntity = true;
             }
-            if ("n_attr".equals(term.nature.toString())) {
+            if (Constant.Nature_Attribute.equals(term.nature.toString())) {
                 flagAttr = true;
             }
         }
@@ -100,7 +100,7 @@ public class MultiQaUtil {
      * 获取多轮问答过程中的历史信息，包括（最近一个属性、最近一个实体、历史所有属性、历史所有实体）
      * @return 历史信息存储实体类 EAHistory
      */
-    public EaHistory getHistory(String uid) {
+    public static EaHistory getHistory(String uid) {
         int numQas = QaStatusCache.Qas.get(uid).size();
         Set<String> histAttrs = new LinkedHashSet<>();
         Set<String> histEntities = new LinkedHashSet<>();

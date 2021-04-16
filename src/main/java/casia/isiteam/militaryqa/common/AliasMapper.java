@@ -1,6 +1,7 @@
 package casia.isiteam.militaryqa.common;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,4 +30,7 @@ public class AliasMapper {
 
     /** 最值 */
     public static Map<String, String> Most = new HashMap<>();
+
+    /** 核心概念词，不可重复 */
+    public static Set<String> conceptsStopWords = new HashSet<>();
 }

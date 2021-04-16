@@ -1,4 +1,4 @@
-package casia.isiteam.militaryqa.mapper;
+package casia.isiteam.militaryqa.mapper.master;
 
 
 import casia.isiteam.militaryqa.model.Result;
@@ -11,6 +11,16 @@ import java.util.List;
 @Mapper
 @Repository
 public interface ResultMapper {
+
+    /**
+     * 获取wiki_info处理游标
+     */
+    Long getCursor();
+
+    /**
+     * 更新wiki_info处理游标
+     */
+    void updateCursor(@Param("cursor") Long cursor);
 
     /**
      * 获取 Concepts 表
@@ -84,4 +94,59 @@ public interface ResultMapper {
      * 获取 match_dict 的 alias 和 label
      */
     List<Result> getSimpleMatchDict();
+
+    /**
+     * 获取 match_dict 中的 concepts stop words
+     */
+    List<String> getConceptsStopWords();
+
+
+    /**
+     * 根据wiki数据名去实体表查看是否存在，存在则返回 entity_id
+     * @param name 实体名
+     * @return     entity_id
+     */
+    Integer getEntityIdByName(@Param("name") String name);
+
+    /**
+     * 获取 Entities表最大 entity_id
+     */
+    Long getEntitiesMaxId();
+
+    /**
+     * 获取 Concepts表最大 concept_id
+     */
+    Long getConceptsMaxId();
+
+    /**
+     * 保存到 Entities
+     */
+    void saveEntities(@Param("entity_id") Long entity_id,
+                      @Param("entity_name") String entity_name,
+                      @Param("concept_id") Long concept_id,
+                      @Param("wiki_info_id") String wiki_info_id);
+
+    /**
+     * 保存到 EntitySameas
+     */
+    void saveEntitySameAs(@Param("entity_name") String entity_name,
+                          @Param("sameAs_id") Long sameAs_id);
+
+    /**
+     * 保存到 EntityAttr
+     */
+    void saveEntityAttr(@Param("entity_id") Long entity_id,
+                        @Param("attr_id") Long attr_id,
+                        @Param("attr_value") String attr_value);
+
+    /**
+     * 根据 concept_name 获取 concept_id
+     */
+    Long getConceptIdByName(@Param("concept_name") String concept_name);
+
+    /**
+     * 保存到 Concepts 属性
+     */
+    void saveConcept(@Param("cid") Long cid,
+                     @Param("concept_name") String concept_name);
 }
