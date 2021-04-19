@@ -124,4 +124,10 @@
         insert into concepts (`c_id`, `concept_name`, `level`)
         values (${cid}, #{concept_name}, 0)
     </insert>
+
+    <select id="getSmallCategories" resultType="casia.isiteam.militaryqa.model.Result">
+        select c.`c_id` as c_id, m.`alias` as alias
+        from concepts c, match_dict_basic m
+        where c.`level` = 3 and c.`concept_name` = m.`word` and m.`label` = 'n_small'
+    </select>
 </mapper>

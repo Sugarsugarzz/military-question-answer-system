@@ -15,7 +15,7 @@ public class Result {
     /**
      * concepts表 c_id
      */
-    private int c_id;
+    private Long c_id;
     /**
      * concepts表 concept_name
      */
@@ -23,7 +23,7 @@ public class Result {
     /**
      * concepts表 level
      */
-    private int level;
+    private Long level;
     /**
      * concepts表 concept1
      */
@@ -48,6 +48,10 @@ public class Result {
      * entity_sameas表 entity_name_2
      */
     private String entity_name_2;
+    /**
+     * match_dict表 word
+     */
+    private String word;
     /**
      * match_dict表 alias
      */

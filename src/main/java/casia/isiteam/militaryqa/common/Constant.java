@@ -43,6 +43,9 @@ public class Constant {
     /** 词性：关键词 */
     public static final String Nature_Keywords = "keywords";
 
+    /** 二级类别与c_id映射，用于新数据分类 */
+    public static Map<String, Long> smallCategoriesMapping = new HashMap<>();
+
 
     static {
         // 单数代词

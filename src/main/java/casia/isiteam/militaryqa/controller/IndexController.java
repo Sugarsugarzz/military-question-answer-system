@@ -5,7 +5,6 @@ import casia.isiteam.militaryqa.mapper.master.AnswerMapper;
 import casia.isiteam.militaryqa.model.Qa;
 import casia.isiteam.militaryqa.service.QuestionParserService;
 import casia.isiteam.militaryqa.service.AnswerSearcherService;
-import casia.isiteam.militaryqa.service.PreprocessService;
 import casia.isiteam.militaryqa.utils.MultiQaUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,6 @@ public class IndexController {
 
     @Autowired
     AnswerMapper answerMapper;
-    @Autowired
-    PreprocessService preprocessService;
     @Autowired
     QuestionParserService questionParserService;
     @Autowired
@@ -93,6 +90,11 @@ public class IndexController {
         return new Qa(parserDict.get("n_entity"), parserDict.get("n_attr"), question, answer);
     }
 
+    /**
+     * 根据实体ID获取实体所有属性
+     * @param id entity_id
+     * @return   属性列表
+     */
     @RequestMapping("/getAttrs")
     public Object getAttrsByEntityName(@RequestParam("id") Long id) {
         return answerMapper.getAttrsByEntityName(id);

@@ -4,7 +4,7 @@
 <mapper namespace="casia.isiteam.militaryqa.mapper.cluster.WikiInfoMapper">
 
     <select id="list" resultType="map">
-        select `auto_id`, `wikiID`, `name`, `othernames`, `transnames`, `infobox`
+        select `auto_id`, `wikiID`, `name`, `othernames`, `transnames`, `summary`, `infobox`
         from wiki_info
         where auto_id > ${cursor}
         limit ${limit}

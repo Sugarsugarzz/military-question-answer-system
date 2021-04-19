@@ -5,6 +5,7 @@ import casia.isiteam.militaryqa.common.Constant;
 import casia.isiteam.militaryqa.mapper.master.AnswerMapper;
 import casia.isiteam.militaryqa.mapper.master.ResultMapper;
 import casia.isiteam.militaryqa.model.DictMatcher;
+import casia.isiteam.militaryqa.model.Result;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class PreprocessService {
+public class InitService {
 
     @Autowired
     ResultMapper resultMapper;
@@ -81,6 +82,21 @@ public class PreprocessService {
         List<String> items = resultMapper.getConceptsStopWords();
         items.forEach(item -> {
             AliasMapper.conceptsStopWords.addAll(Arrays.asList(item.split("\\|")));
+        });
+    }
+
+    /**
+     * 初始化 smallCategoriesMapping，用于新数据分类
+     */
+    public void initSmallCategories() {
+        List<Result> records = resultMapper.getSmallCategories();
+        records.forEach(r -> {
+            if (!"其他".equals(r.getAlias())) {
+                String[] aliases = r.getAlias().split("\\|");
+                for (String alias : aliases) {
+                    Constant.smallCategoriesMapping.put(alias, r.getC_id());
+                }
+            }
         });
     }
 

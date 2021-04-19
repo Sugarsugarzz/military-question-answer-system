@@ -62,6 +62,7 @@ public class WikiInfoService {
                 WikiInfo wikiInfo = new WikiInfo(Long.parseLong(record.get("auto_id").toString()),
                         record.get("wikiID").toString(),
                         record.get("name").toString(),
+                        record.get("summary").toString(),
                         getAlias(record.getOrDefault("othernames", "").toString(),
                                  record.getOrDefault("transnames", "").toString()),
                         getAttrBox(record.getOrDefault("infobox", "").toString()));
@@ -86,8 +87,8 @@ public class WikiInfoService {
         // 新增到entities表
         Long entitiesMaxId = resultMapper.getEntitiesMaxId();
         Long entityId = ObjectUtil.isEmpty(entitiesMaxId) ? 1L : entitiesMaxId + 1;
-        // TODO c_id王品程序没有归类，默认都为-1，后续根据
-        long cid = -1;
+        // 分类
+        long cid = entityClassifyBySummary(wikiInfo.getSummary());
         try {
             resultMapper.saveEntities(entityId, wikiInfo.getName(), cid, wikiInfo.getWikiId());
         } catch (Exception e) {
@@ -139,6 +140,17 @@ public class WikiInfoService {
             // 新增到entity_attr表
             resultMapper.saveEntityAttr(entityId, conceptId, attrValue);
         }
+    }
+
+    /** 根据 summary 字段对实体分类 */
+    private long entityClassifyBySummary(String summary) {
+        // TODO c_id王品程序没有归类，默认都为-1，后续根据 summary字段做分类
+        for (Map.Entry<String, Long> entry : Constant.smallCategoriesMapping.entrySet()) {
+            if (summary.contains(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return -1;
     }
 
     /** 根据 othernames 和 transnames 字段获取别名 */

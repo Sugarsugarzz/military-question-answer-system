@@ -149,4 +149,9 @@ public interface ResultMapper {
      */
     void saveConcept(@Param("cid") Long cid,
                      @Param("concept_name") String concept_name);
+
+    /**
+     * 获取二级类别的类别名及对应c_id，用于新数据分类
+     */
+    List<Result> getSmallCategories();
 }
