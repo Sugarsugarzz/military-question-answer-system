@@ -124,4 +124,10 @@
         insert into concepts (`c_id`, `concept_name`, `level`)
         values (${cid}, #{concept_name}, 0)
     </insert>
+
+    <select id="getSmallCategories" resultType="casia.isiteam.militaryqa.model.Result">
+        select `c_id`, `concept_name`
+        from concepts
+        where `level` = 3
+    </select>
 </mapper>

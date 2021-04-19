@@ -1,6 +1,6 @@
 package casia.isiteam.militaryqa;
 
-import casia.isiteam.militaryqa.service.PreprocessService;
+import casia.isiteam.militaryqa.service.InitService;
 import casia.isiteam.militaryqa.service.WikiInfoService;
 import casia.isiteam.militaryqa.utils.SpringUtil;
 import org.springframework.boot.SpringApplication;
@@ -15,9 +15,10 @@ public class MilitaryqaApplication {
 
         // 初始化CustomDictionary,AliasMapper,ConceptsStopWords
         ApplicationContext context = SpringUtil.getApplicationContext();
-        PreprocessService preprocessService = context.getBean(PreprocessService.class);
-        preprocessService.initCustomDictionaryAndAliasMapper();
-        preprocessService.initConceptsStopWords();
+        InitService initService = context.getBean(InitService.class);
+        initService.initCustomDictionaryAndAliasMapper();
+        initService.initConceptsStopWords();
+        initService.initSmallCategories();
 
         // 启动数据解析服务
         WikiInfoService wikiInfoService = context.getBean(WikiInfoService.class);
