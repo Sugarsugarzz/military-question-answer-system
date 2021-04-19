@@ -30,6 +30,11 @@ public class WikiInfo {
     private String name;
 
     /**
+     * wiki_info表 summary
+     */
+    private String summary;
+
+    /**
      * wiki_info表 othernames + transnames + name衍生别名
      */
     private Set<String> aliases;

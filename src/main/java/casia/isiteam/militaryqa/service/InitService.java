@@ -91,8 +91,11 @@ public class InitService {
     public void initSmallCategories() {
         List<Result> records = resultMapper.getSmallCategories();
         records.forEach(r -> {
-            if (!"其他".equals(r.getConcept_name())) {
-                Constant.smallCategoriesMapping.put(r.getConcept_name(), r.getC_id());
+            if (!"其他".equals(r.getAlias())) {
+                String[] aliases = r.getAlias().split("\\|");
+                for (String alias : aliases) {
+                    Constant.smallCategoriesMapping.put(alias, r.getC_id());
+                }
             }
         });
     }
