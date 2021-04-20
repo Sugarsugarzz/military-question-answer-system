@@ -1,10 +1,15 @@
 package casia.isiteam.militaryqa.utils;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+@Slf4j
 public class ProcessUtil {
 
     /**
@@ -13,26 +18,26 @@ public class ProcessUtil {
      * @return 标准形式列表
      */
     public static List<String> processTime(List<String> times) {
-        List<String> timeItems = new ArrayList<>();
-        for (String item: times) {
-            // 处理成 YYYY-mm-dd 的标准形式
-            Matcher mYear = Pattern.compile("\\d{4}年").matcher(item);
-            Matcher mMonth = Pattern.compile("\\d{1,2}月").matcher(item);
-            Matcher mDay = Pattern.compile("\\d{1,2}日").matcher(item);
-            String year = "", month = "", day = "", date = "";
-            if (mYear.find()) {
-                year = mYear.group().replace("年", "");
-                if (mMonth.find()) {
-                    month = mMonth.group().replace("月", "");
-                }
-                if (mDay.find()) {
-                    day = mDay.group().replace("日", "");
-                }
-                date = year + "-" + dateCompletion(month) + "-" + dateCompletion(day);
+        // 处理成 YYYY-mm-dd 的标准形式
+        return times.stream().map(ProcessUtil::processExplicitTime).collect(Collectors.toList());
+    }
+
+    public static String processExplicitTime(String item) {
+        Matcher mYear = Pattern.compile("(\\d{3,4})年").matcher(item);
+        Matcher mMonth = Pattern.compile("(\\d{1,2})月").matcher(item);
+        Matcher mDay = Pattern.compile("(\\d{1,2})日").matcher(item);
+        String year = "", month = "", day = "", date = "";
+        if (mYear.find()) {
+            year = mYear.group(1);
+            if (mMonth.find()) {
+                month = mMonth.group(1);
             }
-            timeItems.add(date);
+            if (mDay.find()) {
+                day = mDay.group(1);
+            }
+            date = year + "-" + dateCompletion(month) + "-" + dateCompletion(day);
         }
-        return timeItems;
+        return date;
     }
 
     /**
@@ -57,11 +62,16 @@ public class ProcessUtil {
      * @return 处理后的日期
      */
     private static String dateCompletion(String date) {
-        if ("".equals(date)) {
-            date = "01";
+        if (StringUtils.isEmpty(date)) {
+            return "01";
         }
-        if (Integer.parseInt(date) < 10 && date.length() < 2) {
-            date = "0" + date;
+        try {
+            if (Integer.parseInt(date) < 10 && date.length() < 2) {
+                return "0" + date;
+            }
+        } catch (Exception e) {
+            log.error("日期补全 date 类型不为整型！");
+            return "01";
         }
         return date;
     }

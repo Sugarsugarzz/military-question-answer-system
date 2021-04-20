@@ -137,7 +137,9 @@ public interface ResultMapper {
      */
     void saveEntityAttr(@Param("entity_id") Long entity_id,
                         @Param("attr_id") Long attr_id,
-                        @Param("attr_value") String attr_value);
+                        @Param("attr_value") String attr_value,
+                        @Param("attr_value_reg") String attr_value_reg,
+                        @Param("attr_value_reg_unit") String attr_value_reg_unit);
 
     /**
      * 根据 concept_name 获取 concept_id

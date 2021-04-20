@@ -110,8 +110,8 @@
     </insert>
 
     <insert id="saveEntityAttr">
-        insert into entity_attr (entity_id, attr_id, attr_value)
-        values (${entity_id}, ${attr_id}, #{attr_value})
+        insert into entity_attr (entity_id, attr_id, attr_value, attr_value_reg, attr_value_reg_unit)
+        values (${entity_id}, ${attr_id}, #{attr_value}, #{attr_value_reg}, #{attr_value_reg_unit})
     </insert>
 
     <select id="getConceptIdByName" resultType="long">

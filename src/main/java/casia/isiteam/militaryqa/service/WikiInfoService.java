@@ -5,8 +5,10 @@ import casia.isiteam.militaryqa.common.Constant;
 import casia.isiteam.militaryqa.mapper.master.ResultMapper;
 import casia.isiteam.militaryqa.mapper.cluster.WikiInfoMapper;
 import casia.isiteam.militaryqa.model.WikiInfo;
+import casia.isiteam.militaryqa.utils.ChineseNumberUtil;
 import casia.isiteam.militaryqa.utils.EntityAliasExtractor;
 import casia.isiteam.militaryqa.utils.MultiQaUtil;
+import casia.isiteam.militaryqa.utils.ProcessUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -16,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -119,7 +120,7 @@ public class WikiInfoService {
         Map<String, Object> attrBox = wikiInfo.getAttrBox();
         for (Map.Entry<String, Object> entry : attrBox.entrySet()) {
             String attrName = entry.getKey().replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-            String attrValue = entry.getValue().toString().replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
+            String attrValue = entry.getValue().toString().replaceAll("[^a-zA-Z0-9.\\u4E00-\\u9FA5]", "");
             if (StringUtils.isEmpty(attrName) || StringUtils.isEmpty(attrValue)) {
                 continue;
             }
@@ -138,13 +139,29 @@ public class WikiInfoService {
                 AliasMapper.Attribute.put(attrName, attrName);
             }
             // 新增到entity_attr表
-            resultMapper.saveEntityAttr(entityId, conceptId, attrValue);
+            String[] attrReg = extractRegularAttr(attrValue);
+            resultMapper.saveEntityAttr(entityId, conceptId, attrValue, attrReg[0], attrReg[1]);
         }
+    }
+
+    /** 从属性值提取标准化的属性值和属性单位 */
+    private String[] extractRegularAttr(String attrValue) {
+        String[] attrReg = new String[]{"", ""};
+        if (attrValue.contains("年")) {
+            String date = ProcessUtil.processExplicitTime(attrValue);
+            attrReg[0] = date;
+        } else {
+            Matcher m = Pattern.compile("^([\\d.]+)(.*)").matcher(attrValue);
+            if (m.find()) {
+                attrReg[0] = m.group(1);
+                attrReg[1] = m.group(2);
+            }
+        }
+        return attrReg;
     }
 
     /** 根据 summary 字段对实体分类 */
     private long entityClassifyBySummary(String summary) {
-        // TODO c_id王品程序没有归类，默认都为-1，后续根据 summary字段做分类
         for (Map.Entry<String, Long> entry : Constant.smallCategoriesMapping.entrySet()) {
             if (summary.contains(entry.getKey())) {
                 return entry.getValue();
