@@ -82,7 +82,7 @@
     </dependencies>
 
     <build>
-        <finalName>service-military-qa-api</finalName>
+        <finalName>service-military-qa</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -135,6 +135,20 @@
                                 <resource>
                                     <directory>${basedir}/data/dictionary</directory>
                                     <targetPath>${project.build.directory}/release/data/dictionary/</targetPath>
+                                    <filtering>false</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/db</directory>
+                                    <targetPath>${project.build.directory}/release/db/</targetPath>
+                                    <filtering>false</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/</directory>
+                                    <targetPath>${project.build.directory}/release/</targetPath>
+                                    <includes>
+                                        <include>start.sh</include>
+                                        <include>stop.sh</include>
+                                    </includes>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>

@@ -5,11 +5,11 @@ import casia.isiteam.militaryqa.common.Constant;
 import casia.isiteam.militaryqa.mapper.master.ResultMapper;
 import casia.isiteam.militaryqa.mapper.cluster.WikiInfoMapper;
 import casia.isiteam.militaryqa.model.WikiInfo;
-import casia.isiteam.militaryqa.utils.ChineseNumberUtil;
 import casia.isiteam.militaryqa.utils.EntityAliasExtractor;
 import casia.isiteam.militaryqa.utils.MultiQaUtil;
 import casia.isiteam.militaryqa.utils.ProcessUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
@@ -60,10 +60,14 @@ public class WikiInfoService {
             log.info("【数据解析模板】获取新数据：{} 条", records.size());
 
             for (Map<String, Object> record : records) {
+                if (ObjectUtil.isEmpty(record.get("auto_id")) || ObjectUtil.isEmpty(record.get("wikiID")) || ObjectUtil.isEmpty(record.get("name"))) {
+                    log.error("该条wiki_info缺少必要字段！{}", record);
+                    continue;
+                }
                 WikiInfo wikiInfo = new WikiInfo(Long.parseLong(record.get("auto_id").toString()),
                         record.get("wikiID").toString(),
                         record.get("name").toString(),
-                        record.get("summary").toString(),
+                        record.getOrDefault("summary", "").toString(),
                         getAlias(record.getOrDefault("othernames", "").toString(),
                                  record.getOrDefault("transnames", "").toString()),
                         getAttrBox(record.getOrDefault("infobox", "").toString()));
@@ -162,6 +166,9 @@ public class WikiInfoService {
 
     /** 根据 summary 字段对实体分类 */
     private long entityClassifyBySummary(String summary) {
+        if (StrUtil.isEmpty(summary)) {
+            return -1;
+        }
         for (Map.Entry<String, Long> entry : Constant.smallCategoriesMapping.entrySet()) {
             if (summary.contains(entry.getKey())) {
                 return entry.getValue();

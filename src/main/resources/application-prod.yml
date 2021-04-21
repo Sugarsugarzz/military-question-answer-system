@@ -1,5 +1,5 @@
 server:
-  port: 9292
+  port: 9000
 
 spring:
   datasource:
@@ -20,16 +20,16 @@ spring:
 
 master:
   datasource:
-    url: jdbc:mysql://192.168.16.111:3306/military_qa_test?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: bj
-    password: bj2016
+    url: jdbc:mysql://192.168.10.181:3306/military_qa?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: wgdb
+    password: wgdb%2021
     driverClassName: com.mysql.cj.jdbc.Driver
 
 cluster:
   datasource:
-    url: jdbc:mysql://192.168.16.111:3306/zbzs1?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: bj
-    password: bj2016
+    url: jdbc:mysql://192.168.10.181:3306/zbzs1?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: wgdb
+    password: wgdb%2021
     driverClassName: com.mysql.cj.jdbc.Driver
 
 

@@ -14,7 +14,7 @@ public class Answer {
     /**
      * 实体id
      */
-    private int entity_id;
+    private String entity_id;
     /**
      * 实体名
      */

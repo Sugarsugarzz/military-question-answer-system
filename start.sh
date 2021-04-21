@@ -1,0 +1,1 @@
+nohup java -jar service-military-qa.jar &
