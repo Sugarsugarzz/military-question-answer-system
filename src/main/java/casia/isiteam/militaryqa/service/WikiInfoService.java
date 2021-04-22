@@ -39,48 +39,61 @@ public class WikiInfoService {
      */
     public void preprocessWikiInfoData() {
         while (true) {
-            log.info("【数据解析模板】开始解析wiki_info数据...");
-            Long cursor = resultMapper.getCursor();
-            log.info("【数据解析模板】本次Cursor：{}", cursor);
-            if (ObjectUtil.isEmpty(cursor)) {
-                cursor = 0L;
-            }
-            long maxCursorId = cursor;
-
-            List<Map<String, Object>> records = wikiInfoMapper.list(cursor, 100L);
-            if (records.size() == 0) {
-                log.info("【数据解析模板】本次无新数据. 休眠 10min.");
+            log.info("【数据解析模块】开始解析wiki_info数据...");
+            try {
+                Long cursor = 0L;
                 try {
-                    TimeUnit.MINUTES.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    cursor = resultMapper.getCursor();
+                } catch (Exception e) {
+                    log.error("【数据解析模块】获取Cursor失败！", e);
                 }
-                continue;
-            }
-            log.info("【数据解析模板】获取新数据：{} 条", records.size());
+                log.info("【数据解析模块】本次Cursor：{}", cursor);
+                if (ObjectUtil.isEmpty(cursor)) {
+                    cursor = 0L;
+                }
+                long maxCursorId = cursor;
 
-            for (Map<String, Object> record : records) {
-                if (ObjectUtil.isEmpty(record.get("auto_id")) || ObjectUtil.isEmpty(record.get("wikiID")) || ObjectUtil.isEmpty(record.get("name"))) {
-                    log.error("该条wiki_info缺少必要字段！{}", record);
+                List<Map<String, Object>> records = wikiInfoMapper.list(cursor, 100L);
+                if (records.size() == 0) {
+                    log.info("【数据解析模块】本次无新数据. 休眠 10min.");
+                    try {
+                        TimeUnit.MINUTES.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     continue;
                 }
-                WikiInfo wikiInfo = new WikiInfo(Long.parseLong(record.get("auto_id").toString()),
-                        record.get("wikiID").toString(),
-                        record.get("name").toString(),
-                        record.getOrDefault("summary", "").toString(),
-                        getAlias(record.getOrDefault("othernames", "").toString(),
-                                 record.getOrDefault("transnames", "").toString()),
-                        getAttrBox(record.getOrDefault("infobox", "").toString()));
-                log.info("wikiinfo: {}", wikiInfo);
-                // 解析 wikiInfo 并存储
-                analysisAndSave(wikiInfo);
+                log.info("【数据解析模块】获取新数据：{} 条", records.size());
 
-                maxCursorId = wikiInfo.getAutoId();
+                for (Map<String, Object> record : records) {
+                    try {
+                        if (ObjectUtil.isEmpty(record.get("auto_id")) || ObjectUtil.isEmpty(record.get("wikiID")) || ObjectUtil.isEmpty(record.get("name"))) {
+                            log.error("该条wiki_info缺少必要字段！{}", record);
+                            continue;
+                        }
+                        WikiInfo wikiInfo = new WikiInfo(Long.parseLong(record.get("auto_id").toString()),
+                                record.get("wikiID").toString(),
+                                record.get("name").toString(),
+                                record.getOrDefault("summary", "").toString(),
+                                getAlias(record.getOrDefault("othernames", "").toString(),
+                                        record.getOrDefault("transnames", "").toString()),
+                                getAttrBox(record.getOrDefault("infobox", "").toString()));
+//                    log.info("wikiinfo: {}", wikiInfo);
+                        // 解析 wikiInfo 并存储
+                        analysisAndSave(wikiInfo);
+
+                        maxCursorId = wikiInfo.getAutoId();
+                    } catch (Exception e) {
+                        log.error("解析 wikiInfo 出错！", e);
+                    }
+                }
+                if (maxCursorId != cursor) {
+                    resultMapper.updateCursor(maxCursorId);
+                }
+                log.info("【数据解析模块】本次解析结束，处理游标到：{}", maxCursorId);
+            } catch (Exception e) {
+                log.error("【数据解析模块】该模块出错！", e);
             }
-            if (maxCursorId != cursor) {
-                resultMapper.updateCursor(maxCursorId);
-            }
-            log.info("【数据解析模板】本次解析结束，处理游标到：{}", maxCursorId);
         }
     }
 
